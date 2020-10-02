@@ -17,7 +17,8 @@ if (!function_exists('drewlabs_core_datetime_now')) {
      * @param \DateTimeZone|string timezone
      * @return \DateTime
      */
-    function drewlabs_core_datetime_now($timezone = null) {
+    function drewlabs_core_datetime_now($timezone = null)
+    {
         if (\drewlabs_core_strings_is_str($timezone)) {
             $timezone = new \DateTimeZone($timezone);
         }
@@ -31,7 +32,8 @@ if (!function_exists('drewlabs_core_datetime_is_future')) {
      * @param \DateTimeInterface|\DateTime $current_date
      * @return bool
      */
-    function drewlabs_core_datetime_is_future($current_date) {
+    function drewlabs_core_datetime_is_future($current_date)
+    {
         return \drewlabs_core_datetime_is_greater_than($current_date, \drewlabs_core_datetime_now_with_tz());
     }
 }
@@ -42,7 +44,8 @@ if (!function_exists('drewlabs_core_datetime_is_past')) {
      * @param \DateTimeInterface|\DateTime $current_date
      * @return bool
      */
-    function drewlabs_core_datetime_is_past($current_date) {
+    function drewlabs_core_datetime_is_past($current_date)
+    {
         return \drewlabs_core_datetime_is_less_than($current_date, \drewlabs_core_datetime_now_with_tz());
     }
 }
@@ -53,7 +56,8 @@ if (!function_exists('drewlabs_core_datetime_from_timestamp')) {
      * @param int $timestamp
      * @return bool
      */
-    function drewlabs_core_datetime_from_timestamp(int $timestamp) {
+    function drewlabs_core_datetime_from_timestamp(int $timestamp)
+    {
         return new \DateTime('@' . $timestamp);
     }
 }
@@ -64,7 +68,8 @@ if (!function_exists('drewlabs_core_datetime_get_tz')) {
      * @param \DateTime $value
      * @return bool
      */
-    function drewlabs_core_datetime_get_tz(\DateTime $value) {
+    function drewlabs_core_datetime_get_tz(\DateTime $value)
+    {
         return $value->getTimeZone();
     }
 }
@@ -74,7 +79,8 @@ if (!function_exists('drewlabs_core_datetime_now_with_tz')) {
      * Return the current dateTime value alongs with the timezone
      * @return bool
      */
-    function drewlabs_core_datetime_now_with_tz() {
+    function drewlabs_core_datetime_now_with_tz()
+    {
         return \drewlabs_core_datetime_now(\drewlabs_core_datetime_get_tz(new \DateTime));
     }
 }
@@ -86,13 +92,13 @@ if (!function_exists('drewlabs_core_datetime_is_greater_than')) {
      * @param \DateTimeInterface|\DateTime $rhs
      * @return bool
      */
-    function drewlabs_core_datetime_is_greater_than($lhs, $rhs) {
+    function drewlabs_core_datetime_is_greater_than($lhs, $rhs)
+    {
         return $lhs > $rhs;
     }
 }
 
-if (!function_exists('drewlabs_core_datetime_is_less_than'))
-{
+if (!function_exists('drewlabs_core_datetime_is_less_than')) {
     /**
      * Determines if the instance is less (before) than another
      *
@@ -112,15 +118,15 @@ if (!function_exists('drewlabs_core_datetime_add_minutes')) {
      * Add user provided minutes to the datetime instance
      * @param \DateTime $date
      * @param int $minutes
-     * @return bool
+     * @return \DateTime|\DateTimeInterface
      */
-    function drewlabs_core_datetime_add_minutes($date, $minutes = 0) {
+    function drewlabs_core_datetime_add_minutes($date, $minutes = 0)
+    {
         return $date->modify((int) $minutes . ' minute');
     }
 }
 
-if (!function_exists('drewlabs_core_datetime_max'))
-{
+if (!function_exists('drewlabs_core_datetime_max')) {
     /**
      * Get the maximum instance between a given instance (default now) and the current instance.
      *
@@ -148,7 +154,7 @@ if (!function_exists('drewlabs_core_datetime_is_same')) {
      *
      * @return bool
      */
-    function drewlabs_core_datetime_is_same($date, $otherDate = null, $format = 'c' )
+    function drewlabs_core_datetime_is_same($date, $otherDate = null, $format = 'c')
     {
         if (!isset($otherDate)) {
             $otherDate = \drewlabs_core_datetime_now_with_tz();
@@ -158,8 +164,7 @@ if (!function_exists('drewlabs_core_datetime_is_same')) {
     }
 }
 
-if (!function_exists('drewlabs_core_datetime_expect_date_time'))
-{
+if (!function_exists('drewlabs_core_datetime_expect_date_time')) {
     /**
      * Throws an exception if the given object is not a DateTime and does not implement DateTimeInterface
      * and not in $other.
@@ -184,8 +189,7 @@ if (!function_exists('drewlabs_core_datetime_expect_date_time'))
     }
 }
 
-if (!function_exists('drewlabs_core_datetime_resolve'))
-{
+if (!function_exists('drewlabs_core_datetime_resolve')) {
     /**
      * Return the DateTime instance passed through, a now instance in the same timezone
      * if null given or parse the input if string given.
@@ -193,7 +197,7 @@ if (!function_exists('drewlabs_core_datetime_resolve'))
      * @param \DateTimeInterface|string|null $current_date
      * @param \DateTimeInterface|string|null $date
      *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|DateTime
      */
     function drewlabs_core_datetime_resolve($current_date, $date = null)
     {
@@ -208,14 +212,13 @@ if (!function_exists('drewlabs_core_datetime_resolve'))
     }
 }
 
-if (!function_exists('drewlabs_core_datetime_make_date'))
-{
+if (!function_exists('drewlabs_core_datetime_make_date')) {
     /**
      * Create a DateUtils from a DateTime.
      *
      * @param \DateTime|\DateTimeInterface $date
      *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|\DateTime
      */
     function drewlabs_core_datetime_make_date($date)
     {
@@ -227,8 +230,7 @@ if (!function_exists('drewlabs_core_datetime_make_date'))
     }
 }
 
-if (!function_exists('drewlabs_core_datetime_hrs_diff'))
-{
+if (!function_exists('drewlabs_core_datetime_hrs_diff')) {
     /**
      * Get the difference in hours.
      * @param \DateTime|string|null $date
@@ -237,41 +239,38 @@ if (!function_exists('drewlabs_core_datetime_hrs_diff'))
      *
      * @return int
      */
-     function drewlabs_core_datetime_hrs_diff($source, $date = null, $exact = true)
-     {
-         return (int) (\drewlabs_core_datetime_secs_diff($source, $date, $exact) / DREWLABS_CORE_DATETIME_SECONDS_PER_MINUTE / DREWLABS_CORE_DATETIME_MINUTES_PER_HOUR);
-     }
+    function drewlabs_core_datetime_hrs_diff($source, $date = null, $exact = true)
+    {
+        return (int) (\drewlabs_core_datetime_secs_diff($source, $date, $exact) / DREWLABS_CORE_DATETIME_SECONDS_PER_MINUTE / DREWLABS_CORE_DATETIME_MINUTES_PER_HOUR);
+    }
 }
 
-if (!function_exists('drewlabs_core_datetime_min_diff'))
-{
+if (!function_exists('drewlabs_core_datetime_min_diff')) {
     /**
-    * Get the difference in minutes.
-    *
-    * @param \DateTimeInterface $date
-    * @param \DateTimeInterface|null $date
-    * @param bool $exact Get the exact of the difference
-    *
-    * @return int
-    */
+     * Get the difference in minutes.
+     *
+     * @param \DateTimeInterface $date
+     * @param \DateTimeInterface|null $date
+     * @param bool $exact Get the exact of the difference
+     *
+     * @return int
+     */
     function drewlabs_core_datetime_min_diff($date = null, $exact = true)
     {
         return (int) (\drewlabs_core_datetime_secs_diff($date, $exact) / DREWLABS_CORE_DATETIME_SECONDS_PER_MINUTE);
     }
-
 }
- 
-if (!function_exists('drewlabs_core_datetime_secs_diff'))
-{
+
+if (!function_exists('drewlabs_core_datetime_secs_diff')) {
     /**
-    * Get the difference in seconds.
-    *
-    * @param \DateTime $source
-    * @param \DateTime|null $date
-    * @param bool $exact Get the exact of the difference
-    *
-    * @return int
-    */
+     * Get the difference in seconds.
+     *
+     * @param \DateTime $source
+     * @param \DateTime|null $date
+     * @param bool $exact Get the exact of the difference
+     *
+     * @return int
+     */
     function drewlabs_core_datetime_secs_diff($source, $date = null, $exact = true)
     {
         $diff = $source->diff(\drewlabs_core_datetime_resolve($source, $date));
