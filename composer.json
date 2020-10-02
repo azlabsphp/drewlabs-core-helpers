@@ -1,0 +1,31 @@
+{
+    "name": "drewlabs/core-helpers",
+    "description": "Set of global function for handling utility task ranging from array, string and datetimes manipulations",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "azandrew-sidoine",
+            "email": "asmyns.platonnas29@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.4@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Drewlabs\\Core\\Helpers\\Tests\\": "tests/"
+        },
+        "files": [
+            "src/array.php",
+            "src/datetime.php",
+            "src/strings.php",
+            "src/comparator.php"
+        ],
+        "optimize-autoloader": true
+    }
+}
