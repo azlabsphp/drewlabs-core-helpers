@@ -54,7 +54,7 @@ if (!function_exists('drewlabs_core_datetime_from_timestamp')) {
     /**
      * Create a dateTime instance from timestamp
      * @param int $timestamp
-     * @return bool
+     * @return \DateTime
      */
     function drewlabs_core_datetime_from_timestamp(int $timestamp)
     {
@@ -66,7 +66,7 @@ if (!function_exists('drewlabs_core_datetime_get_tz')) {
     /**
      * Get the timezone of a dateTime instance
      * @param \DateTime $value
-     * @return bool
+     * @return \DateTimeZone
      */
     function drewlabs_core_datetime_get_tz(\DateTime $value)
     {
@@ -77,7 +77,7 @@ if (!function_exists('drewlabs_core_datetime_get_tz')) {
 if (!function_exists('drewlabs_core_datetime_now_with_tz')) {
     /**
      * Return the current dateTime value alongs with the timezone
-     * @return bool
+     * @return \DateTime|\DateTimeInterface
      */
     function drewlabs_core_datetime_now_with_tz()
     {
