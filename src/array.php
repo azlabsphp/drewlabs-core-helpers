@@ -203,13 +203,13 @@ if (!function_exists('drewlabs_core_array_object_to_array')) {
      */
     function drewlabs_core_array_object_to_array($value)
     {
-        $entryToArray = function($item) use (&$entryToArray) {
+        $entryToArray = function ($item) use (&$entryToArray) {
             if (\drewlabs_core_array_is_arrayable($item)) {
                 return $item;
             }
             if (is_object($item)) {
                 $item = (array)$item;
-                foreach($item as $k => $v) {
+                foreach ($item as $k => $v) {
                     if (is_object($v)) {
                         $item[$k] = $entryToArray($v);
                     }
@@ -390,5 +390,18 @@ if (!function_exists('drewlabs_core_array_contains_all')) {
     function drewlabs_core_array_contains_all(array $source, array $innerArray)
     {
         return count(array_intersect($source, $innerArray)) === count($innerArray);
+    }
+}
+
+if (!function_exists('drewlabs_core_array_is_assoc')) {
+    /**
+     * Checks if an array is an associative array
+     *
+     * @param array $value
+     * @return boolean
+     */
+    function drewlabs_core_array_is_assoc(array $value)
+    {
+        return array_keys($value) !== range(0, count($value) - 1);
     }
 }

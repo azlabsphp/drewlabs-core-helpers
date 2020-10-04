@@ -1,7 +1,7 @@
 <?php
 
 
-if (!function_exists('drewlabs_core_strings_starts_with')){
+if (!function_exists('drewlabs_core_strings_starts_with')) {
     /**
      * Check if a given string starts with a substring
      *
@@ -87,7 +87,6 @@ if (!function_exists('drewlabs_core_strings_to_upper_case')) {
     {
         return strtoupper($value);
     }
-
 }
 
 if (!function_exists('drewlabs_core_strings_capitalize')) {
@@ -123,7 +122,7 @@ if (!function_exists('drewlabs_core_strings_contains')) {
                 return true;
             }
         }
-    
+
         return false;
     }
 }
@@ -346,5 +345,41 @@ if (!function_exists('drewlabs_core_strings_strrevpos')) {
         $rev_pos = strpos(strrev($instr), strrev($needle));
         if ($rev_pos === false) return false;
         else return strlen($instr) - $rev_pos - strlen($needle);
+    }
+}
+
+if (!function_exists('drewlabs_core_strings_parse_tpl')) {
+
+    /**
+     * Simple template parsing function for replacing properties|keys of an associative
+     * array by their corresponding values
+     *
+     * Usage:
+     * ```
+     * $data = array(
+     *           "param1" => "Hello",
+     *           "param2" => "World",
+     *  );
+     *  $parsed_str = parse_tpl_str('This is a program just for saying {{$param1}}, to the {{ $param2 }} !!!', $data)
+     * ```
+     *
+     * @param string $str
+     * @param array|object $data
+     * @return string
+     */
+    function drewlabs_core_strings_parse_tpl($str, $data)
+    {
+        if (!is_array($data)) {
+            $data = (array) $data;
+        }
+        $patterns = array();
+        $replacements = array();
+        // Foreach values in the data attributes
+        foreach ($data as $key => $value) {
+            # code...
+            $patterns[] = '/(\{){2}[ ]?\$' . $key . '[ ]?(\}){2}/i';
+            $replacements[] = $value;
+        }
+        return preg_replace($patterns, $replacements, $str);
     }
 }
