@@ -60,3 +60,97 @@ if (!function_exists('drewlabs_core_value')) {
         return $value instanceof Closure ? $value() : $value;
     }
 }
+
+if (!function_exists('drewlabs_core_is_valid_php_class')) {
+
+    /**
+     * Checks if a provided class is a valid PHP class autoloadable
+     *
+     * @param string $clazz
+     * @return boolean
+     */
+    function drewlabs_core_is_valid_php_class($clazz)
+    {
+        return !is_null($clazz) && \drewlabs_core_strings_contains($clazz, ['\\', '\\\\']) && class_exists($clazz);
+    }
+}
+
+if (!function_exists('drewlabs_core_build_model_type_attributes_rvalue_object')) {
+
+    /**
+     * Helper function that tries to build a model attribute and model itself using provided options
+     *
+     * @param string|array $config
+     * @param array $options
+     * @return ModelTypeAttributeRValue
+     */
+    function drewlabs_core_build_model_type_attributes_rvalue_object($config, array $options)
+    {
+        if (drewlabs_core_array_is_arrayable($config)) {
+            if (!isset($config['class'])) {
+                throw new \RuntimeException('Wrong collection configuration, class key is required on the collection configuration if an array is provided');
+            }
+            $attributes = [];
+            $model = \drewlabs_core_create_php_class_instance($config['class']);
+            if (!isset($config['attributes'])) {
+                $attributes = ['label' => isset($options['label']) ? $options['label'] : null];
+            }
+            if (!drewlabs_core_array_is_arrayable($config['attributes'])) {
+                throw new \RuntimeException('Wrong collection configuration, attributes key must be a valid PHP array');
+            }
+            if (\drewlabs_core_array_is_assoc($config['attributes'])) {
+                foreach ($config['attributes'] as $key => $value) {
+                    # code...
+                    if (!\drewlabs_core_strings_is_str($key)) {
+                        throw new \RuntimeException('Wrong collection configuration, attributes key must be an array of PHP strings');
+                    }
+                    $attributes[$key] = isset($options[$value]) ? $options[$value] : (isset($options[$key]) ? $options[$key] : null);
+                }
+            } else {
+                foreach ($config['attributes'] as $key) {
+                    # code...
+                    if (!\drewlabs_core_strings_is_str($key)) {
+                        throw new \RuntimeException('Wrong collection configuration, attributes key must be an array of PHP strings');
+                    }
+                    $attributes[$key] = isset($options[$key]) ? $options[$key] : null;
+                }
+            }
+            return new \Drewlabs\Core\Helpers\ValueObject\ModelTypeAttributeRValue([
+                'model' => $model,
+                'attributes' => $attributes
+            ]);
+        } else {
+            $model = \drewlabs_core_create_php_class_instance($config);
+            return new \Drewlabs\Core\Helpers\ValueObject\ModelTypeAttributeRValue([
+                'model' => $model,
+                'attributes' => ['label' => isset($options['label']) ? $options['label'] : null]
+            ]);
+        }
+    }
+}
+
+if (!function_exists('drewlabs_core_create_php_class_instance')) {
+    /**
+     * Try to create a PHP class by loading it from the container or dynamically creating it by calling it default constructor
+     *
+     * @param string $clazz
+     * @return \stdClass|mixed
+     */
+    function drewlabs_core_create_php_class_instance($clazz)
+    {
+        if (!\drewlabs_core_is_valid_php_class($clazz)) {
+            throw new \InvalidArgumentException("Provided class name $clazz is not a valid PHP class");
+        }
+        // Try loading container class if running in Laravel or lumen environment
+        if (\drewlabs_core_is_valid_php_class("\\Illuminate\\Container\\Container")) {
+            $containerInstance = call_user_func_array(array("\\Illuminate\\Container\\Container", "getInstance"), []);
+            return $containerInstance->make($clazz);
+        }
+        // If there exists a global function that return the container object, call it a build the class with the make method
+        if (function_exists('app')) {
+            return app()->make($clazz);
+        }
+        // Call the class default constructor to make the class
+        return new $clazz;
+    }
+}
