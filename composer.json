@@ -26,7 +26,8 @@
             "src/datetime.php",
             "src/strings.php",
             "src/comparator.php",
-            "src/utils.php"
+            "src/utils.php",
+            "src/random.php"
         ],
         "optimize-autoloader": true
     }
