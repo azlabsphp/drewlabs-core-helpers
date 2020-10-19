@@ -229,6 +229,38 @@ if (!function_exists('drewlabs_core_recursive_get_attribute')) {
     }
 }
 
+if (!function_exists('drewlabs_core_recursive_set_attribute')) {
+    /**
+     * Try recursively to find the atribute of the object that need to be setted
+     *
+     * @param object|array $obj
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    function drewlabs_core_recursive_set_attribute($obj, $key, $value = null)
+    {
+        throw new \RuntimeException('Recursive setter not implemented');
+        // if (is_string($key) && \drewlabs_core_strings_contains($key, '.')) {
+        //     $keys = \drewlabs_core_strings_to_array($key, '.');
+        //     $lastIndex = count($keys) - 1;
+        //     $i = 0;
+        //     $current = null;
+        //     while ($i < $lastIndex) {
+        //         # code...
+        //         $rvalue = \drewlabs_core_get_attribute($obj, $keys[$i], null);
+        //         if (is_null($rvalue)) {
+        //             break;
+        //         }
+        //         $current = $rvalue;
+        //         $i++;
+        //     }
+        //     $current = \drewlabs_core_set_attribute($current, $keys[$lastIndex], $value);
+        // }
+        // return \drewlabs_core_set_attribute($obj, $key, $value);
+    }
+}
+
 if (!function_exists('drewlabs_core_get_attribute')) {
     /**
      * Get a property from an object of type array or \stdClass using the provided
@@ -236,7 +268,7 @@ if (!function_exists('drewlabs_core_get_attribute')) {
      *
      * @param \stdClass|array $obj
      * @param string $key
-     * @param mixed $default
+     * @param mixed|null $default
      * @return mixed
      */
     function drewlabs_core_get_attribute($obj, $key, $default = null)
@@ -249,6 +281,34 @@ if (!function_exists('drewlabs_core_get_attribute')) {
         }
         // Throws an execption
         throw new \InvalidArgumentException('Create_property_getter method requires a parameter of type array or object');
+    }
+}
+
+if (!function_exists('drewlabs_core_set_attribute')) {
+    /**
+     * Set the value of a given array or object and return the updated object
+     *
+     * @param \stdClass|array $obj
+     * @param string $key
+     * @param mixed $value
+     * @return mixed
+     */
+    function drewlabs_core_set_attribute($obj, $key, $value)
+    {
+        if (is_object($obj)) {
+            if (method_exists($obj, 'copyWith')) {
+                return $obj->{'copyWith'}([$key => $value]);
+            }
+            // Create a clone copy of the object
+            $clone = clone $obj;
+            $clone->{$key} = $value;
+            return $clone;
+        }
+        if (is_array($obj) || ($obj instanceof \ArrayAccess)) {
+            return array_merge($obj, [$key => $value]);
+        }
+        // Throws an execption
+        throw new \InvalidArgumentException('set_attribute method requires parameter 1 to be of type array or object');
     }
 }
 
