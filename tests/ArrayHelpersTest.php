@@ -87,7 +87,7 @@ class ArrayHelpersTest extends TestCase
                 'type' => 'Dynamic Language'
             ]
         ];
-        $matches = \drewlabs_core_array_where($list, function($item) {
+        $matches = \drewlabs_core_array_where($list, function ($item) {
             return isset($item['lang']) && (($item['lang'] === 'C++') || ($item['lang'] === 'JAVA'));
         });
         $this->assertTrue(count($matches) === 2, 'Expect the returned result to be empty array');
@@ -184,9 +184,6 @@ class ArrayHelpersTest extends TestCase
 
     public function testArrayContainsAll()
     {
-        // printf(implode('', iterator_to_array(\drewlabs_core_array_iter([1, 2, 3, 4], function($item) {
-        //     return sprintf("%d -> ", $item);
-        // }))));
         $this->assertTrue(\drewlabs_core_array_contains_all(['Orange', 'Mangue', 'Banana', 'Paw-Paw'], ['Orange', 'Paw-Paw']), "Expect ['Orange', 'Mangue', 'Banana', 'Paw-paw'] to contains all values of ['Orange', 'Paw-Paw']");
     }
 
@@ -206,8 +203,16 @@ class ArrayHelpersTest extends TestCase
                 'type' => 'Dynamic Language'
             ]
         ];
-        $this->assertEquals(\drewlabs_core_array_map($list, function($i) {
+        $this->assertEquals(\drewlabs_core_array_map($list, function ($i) {
             return $i['lang'];
         })['php'], 'PHP', "Expect first element of the mapped list to be PHP");
+    }
+
+    public function testArrayGroupCountFunction()
+    {
+        $texts = ['repeating', 'problematic', 'restating', 'repetition', 'act', 'many', 'repetition', 'single', 'word', 'problematic', 'many', 'message', 'repetition'];
+
+        $result = \drewlabs_core_array_group_count($texts);
+        $this->assertEquals($result['repetition'], 3, 'Expect the word repetition to appear 3 times in the source array');
     }
 }

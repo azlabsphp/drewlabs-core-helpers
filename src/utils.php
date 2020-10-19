@@ -154,3 +154,157 @@ if (!function_exists('drewlabs_core_create_php_class_instance')) {
         return new $clazz;
     }
 }
+
+/*** Below global functions are related to functionnal approch to certain problems */
+
+
+if (!function_exists('drewlabs_core_fn_compose')) {
+    /**
+     * Function composition function that apply transformations to the source input in the top -> down 
+     * level that the functions appear
+     *
+     * @param mixed $source
+     * @param \Closure[] ...$funcs
+     * @return \Closure|callable 
+     */
+    function drewlabs_core_fn_compose(...$funcs)
+    {
+        return function (...$source) use ($funcs) {
+            return array_reduce(
+                $funcs,
+                function ($carry, $func) {
+                    return $func($carry);
+                },
+                $source
+            );
+        };
+    }
+}
+
+if (!function_exists('drewlabs_core_fn_reverse_compose')) {
+    /**
+     * Function composition function that apply transformations to the source input in the bottom -> up order 
+     * in which functions appear
+     *
+     * @param mixed $source
+     * @param \Closure[] ...$funcs
+     * @return \Closure|callable 
+     */
+    function drewlabs_core_fn_reverse_compose(...$funcs)
+    {
+        return function (...$source) use ($funcs) {
+            return array_reduce(
+                array_reverse($funcs),
+                function ($carry, $func) {
+                    return $func($carry);
+                },
+                $source
+            );
+        };
+    }
+}
+
+if (!function_exists('drewlabs_core_recursive_get_attribute')) {
+    /**
+     * Recursively get the value of an attribute in the provided object
+     * Nested attributes must be separated with the '.' ponctuation
+     *
+     * @param object|array $obj
+     * @param string $key
+     * @param mixed $default
+     * @return void
+     */
+    function drewlabs_core_recursive_get_attribute($obj, $key, $default = null)
+    {
+        if (is_string($key) && \drewlabs_core_strings_contains($key, '.')) {
+            $keys = \drewlabs_core_strings_to_array($key, '.');
+            return array_reduce($keys, function ($carry, $current) use ($default) {
+                if ($carry === $default) {
+                    return $carry;
+                }
+                return \drewlabs_core_get_attribute($carry, $current, $default);
+            }, $obj);
+        }
+        return \drewlabs_core_get_attribute($obj, $key, $default);
+    }
+}
+
+if (!function_exists('drewlabs_core_get_attribute')) {
+    /**
+     * Get a property from an object of type array or \stdClass using the provided
+     * name or returns the {$default} value if provided or {NULL}
+     *
+     * @param \stdClass|array $obj
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    function drewlabs_core_get_attribute($obj, $key, $default = null)
+    {
+        if (is_object($obj)) {
+            return property_exists($obj, $key) ? $obj->{$key} : $default;
+        }
+        if (is_array($obj) || ($obj instanceof \ArrayAccess)) {
+            return array_key_exists($key, $obj) ? $obj[$key] : $default;
+        }
+        // Throws an execption
+        throw new \InvalidArgumentException('Create_property_getter method requires a parameter of type array or object');
+    }
+}
+
+if (!function_exists('drewlabs_core_validate_attribute_name')) {
+    /**
+     * Validate the first argument [key] of the [create_property_getter] function
+     *
+     * @param [type] $func
+     * @return void
+     */
+    function drewlabs_core_validate_attribute_name($func)
+    {
+        if (!($func instanceof \Closure) || !is_callable($func)) {
+            throw new InvalidArgumentException('Function parameter must be a PHP Closure');
+        }
+        return function (...$args) use ($func) {
+            if (count($args) < 1) {
+                throw new InvalidArgumentException("__FUNCTION__ requires at least 2 argument");
+            }
+            $key = $args[0];
+            if (!is_string($key) && !is_int($key)) {
+                throw new \InvalidArgumentException('$key paramater must be a string or an array numeric index');
+            }
+            return $func(...$args);
+        };
+    }
+}
+
+if (!function_exists('drewlabs_core_create_attribute_getter')) {
+
+    /**
+     * Create an operator function that will be use to get attribute on a given array or object
+     *
+     * @return string
+     */
+    function drewlabs_core_create_attribute_getter()
+    {
+        return \drewlabs_core_validate_attribute_name(function ($key, $default = null) {
+            return \drewlabs_core_create_attribute_getter_unsafe($key, $default);
+        });
+    }
+}
+
+if (!function_exists('drewlabs_core_create_attribute_getter_unsafe')) {
+    /**
+     * Create an operator function that does not enforce the rules for the attribute name
+     * being either a string or an integer
+     *
+     * @param string|int $key
+     * @param mixed|null $default
+     * @return \Closure
+     */
+    function drewlabs_core_create_attribute_getter_unsafe($key, $default = null)
+    {
+        return function ($obj) use ($key, $default) {
+            return \drewlabs_core_recursive_get_attribute($obj, $key, $default);
+        };
+    }
+}

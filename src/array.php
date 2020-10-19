@@ -405,3 +405,23 @@ if (!function_exists('drewlabs_core_array_is_assoc')) {
         return array_keys($value) !== range(0, count($value) - 1);
     }
 }
+
+if (!function_exists('drewlabs_core_array_group_count')) {
+    /**
+     * Group array values by the number of their occurence in the array
+     *
+     * @param array $array
+     * @return array
+     */
+    function drewlabs_core_array_group_count(array $array)
+    {
+        return array_reduce(array_values($array), function ($carry, $current) {
+            return array_merge(
+                $carry,
+                array(
+                    $current => array_key_exists($current, $carry) ? $carry[$current] + 1 : 1
+                )
+            );
+        }, []);
+    }
+}
