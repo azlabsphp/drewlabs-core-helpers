@@ -61,7 +61,7 @@ class UtilsHelpersTest extends TestCase
         $person->parent = new \stdClass;
         $person->parent->fullname = 'Morris Campbel';
         $person->parent->total_children = 3;
-        $this->assertTrue(\drewlabs_core_create_attribute_getter()('parent.total_children', null)($person) === 3, 'Expect the total_children property of the object parent property to equals 3');
+        $this->assertTrue(\drewlabs_core_create_attribute_getter('parent.total_children', null)($person) === 3, 'Expect the total_children property of the object parent property to equals 3');
     }
 
     public function testRecursiveGetAttributeFunction()
@@ -123,9 +123,16 @@ class UtilsHelpersTest extends TestCase
         $physical->street = 'HN 78';
         $address->physical = $physical;
         $person->address = $address;
-        $person = \drewlabs_core_create_attribute_setter()('address.physical.house_number', 'H 492')($person);
-        print_r($person);
-        die();
-        $this->assertEquals(\drewlabs_core_recursive_get_attribute($person, 'address.physical.house_number', null), 'H 492',  'Expect the house_number attribute nested in the address field to equals H 492');
+        $p = \drewlabs_core_create_attribute_setter(
+            // 'address.physical.house_number',
+            // 'H 492'
+            [
+                ['address.physical.house_number', 'H 492'],
+                ['address.email', 'lordfera@gmail.com'],
+                ['address.postal_code', 'BP 1515']
+            ]
+        )($person);
+        $this->assertEquals(\drewlabs_core_recursive_get_attribute($p, 'address.physical.house_number', null), 'H 492',  'Expect the house_number attribute nested in the address field to equals H 492');
+        $this->assertNotEquals(\drewlabs_core_recursive_get_attribute($p, 'address.physical.house_number', null), \drewlabs_core_recursive_get_attribute($person, 'address.physical.house_number', null),  'Expect the modified person object to not equls the source person object');
     }
 }

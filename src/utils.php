@@ -396,8 +396,8 @@ if (!function_exists('drewlabs_core_validate_attribute_name')) {
     /**
      * Validate the first argument [key] of the [create_property_getter] function
      *
-     * @param [type] $func
-     * @return void
+     * @param \Closure|callable $func
+     * @return \Closure|callable
      */
     function drewlabs_core_validate_attribute_name($func)
     {
@@ -405,9 +405,12 @@ if (!function_exists('drewlabs_core_validate_attribute_name')) {
             throw new InvalidArgumentException('Function parameter must be a PHP Closure');
         }
         return function (...$args) use ($func) {
-            if (count($args) < 1) {
-                throw new InvalidArgumentException("__FUNCTION__ requires at least 2 argument");
+            if (count($args) === 0) {
+                return $func(...$args);
             }
+            // if (count($args) < 1) {
+            //     throw new InvalidArgumentException("__FUNCTION__ requires at least 1 argument");
+            // }
             $key = $args[0];
             if (!is_string($key) && !is_int($key)) {
                 throw new \InvalidArgumentException('$key paramater must be a string or an array numeric index');
@@ -422,13 +425,17 @@ if (!function_exists('drewlabs_core_create_attribute_getter')) {
     /**
      * Create an operator function that will be use to get attribute on a given array or object
      *
-     * @return string
+     * @param string|int $key
+     * @param mixed|null $default
+     * @return \Closure|callable
      */
-    function drewlabs_core_create_attribute_getter()
+    function drewlabs_core_create_attribute_getter($key, $default = null)
     {
-        return \drewlabs_core_validate_attribute_name(function ($key, $default = null) {
-            return \drewlabs_core_create_attribute_getter_unsafe($key, $default);
-        });
+        return function ($obj) use ($key, $default) {
+            return \drewlabs_core_validate_attribute_name(function () use ($obj, $key, $default) {
+                return \drewlabs_core_recursive_get_attribute($obj, $key, $default);
+            })($key, $default);
+        };
     }
 }
 
@@ -437,50 +444,29 @@ if (!function_exists('drewlabs_core_create_attribute_setter')) {
     /**
      * Create an operator function that will be use to set attribute on a given array or object
      *
-     * @return string
-     */
-    function drewlabs_core_create_attribute_setter()
-    {
-        return \drewlabs_core_validate_attribute_name(function ($key, $value = null) {
-            return \drewlabs_core_create_attribute_setter_unsafe($key, $value);
-        });
-    }
-}
-
-if (!function_exists('drewlabs_core_create_attribute_getter_unsafe')) {
-    /**
-     * Create an operator function that does not enforce the rules for the attribute name
-     * being either a string or an integer
-     *
-     * @param string|int $key
+     * @param string|int|array $key
      * @param mixed|null $default
      * @return \Closure
+     * @return \Closure|callable
      */
-    function drewlabs_core_create_attribute_getter_unsafe($key, $default = null)
-    {
-        return function ($obj) use ($key, $default) {
-            return \drewlabs_core_recursive_get_attribute($obj, $key, $default);
-        };
-    }
-}
-
-if (!function_exists('drewlabs_core_create_attribute_setter_unsafe')) {
-    /**
-     * Create an operator function that does not enforce the rules for the attribute name
-     * being either a string or an integer when setting the attribute value.
-     *
-     * @param string|int $key
-     * @param mixed|null $default
-     * @return \Closure
-     */
-    function drewlabs_core_create_attribute_setter_unsafe($key, $value = null)
+    function drewlabs_core_create_attribute_setter($key, $value = null)
     {
         return function ($obj) use ($key, $value) {
-            return \drewlabs_core_recursive_set_attribute($obj, $key, $value);
+            // If the provided key is an array, apply a reducer for each key in the array
+            if (is_array($key)) {
+                return array_reduce($key, function ($carry, $current) {
+                    return \drewlabs_core_validate_attribute_name(function () use ($carry, $current) {
+                        return \drewlabs_core_recursive_set_attribute($carry, ...$current);
+                    })(...$current);
+                }, $obj);
+            }
+            // return \drewlabs_core_recursive_set_attribute($obj, $key, $value);
+            return \drewlabs_core_validate_attribute_name(function () use ($obj, $key, $value) {
+                return \drewlabs_core_recursive_set_attribute($obj, $key, $value);
+            })($key, $value);
         };
     }
 }
-
 
 if (!function_exists('drewlabs_core_copy_object')) {
     /**
