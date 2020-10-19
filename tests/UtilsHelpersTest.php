@@ -9,7 +9,7 @@ class UtilsHelpersTest extends TestCase
 
     public function testComposeFunction()
     {
-        $result = \drewlabs_core_fn_compose(
+        $result = \drewlabs_core_fn_compose_array(
             function ($params) {
                 return \drewlabs_core_strings_to_array(...$params);
             },
@@ -25,7 +25,7 @@ class UtilsHelpersTest extends TestCase
     }
     public function testReverseComposeFunction()
     {
-        $result = \drewlabs_core_fn_reverse_compose(
+        $result = \drewlabs_core_fn_reverse_compose_array(
             function ($value) {
                 return \drewlabs_core_create_attribute_getter()('repetition', null)($value);
             },
@@ -80,5 +80,52 @@ class UtilsHelpersTest extends TestCase
         );
         $this->assertEquals(\drewlabs_core_recursive_get_attribute($person, 'address.email', null), 'hillairekoudossou@example.com',  'Expect the email attribute nested in the address field to equals hillairekoudossou@example.com');
         $this->assertEquals(\drewlabs_core_recursive_get_attribute($person, 'address.postal_code', null), 228,  'Expect the postal_code attribute nested in the address field to equals 228');
+    }
+
+    public function testRecursiveSetAttributeFunction()
+    {
+        $person = array(
+            'name' => 'Hillaire',
+            'lastname' => 'Kodossou',
+            'age' => 23,
+            'sex' => "M",
+            "address" => [
+                "email" => "hillairekoudossou@example.com",
+                "postal_code" => 228,
+                "physical" => [
+                    "house_number" => "H_so 9021",
+                    "street" => "HN 54",
+                ]
+            ]
+        );
+        $person = \drewlabs_core_fn_compose(
+            function ($p) {
+                return \drewlabs_core_recursive_set_attribute($p, 'address.physical.house_number', 'H 492');
+            },
+            function ($p) {
+                return \drewlabs_core_recursive_set_attribute($p, 'address.email', 'hkoudossou@example.com');
+            },
+            function ($p) {
+                return \drewlabs_core_recursive_set_attribute($p, 'address.postal_code', 'BP 1515');
+            }
+        )($person);
+        $this->assertEquals(\drewlabs_core_recursive_get_attribute($person, 'address.physical.house_number', null), 'H 492',  'Expect the house_number attribute nested in the address field to equals H 492');
+    }
+
+    public function testCreateAttributeSetterFunction()
+    {
+        $person = new \stdClass;
+        $address = new \stdClass;
+        $address->email = 'hlordfera@example.com';
+        $address->postal_code = 'BP 90778';
+        $physical = new \stdClass;
+        $physical->house_number = 'H7856';
+        $physical->street = 'HN 78';
+        $address->physical = $physical;
+        $person->address = $address;
+        $person = \drewlabs_core_create_attribute_setter()('address.physical.house_number', 'H 492')($person);
+        print_r($person);
+        die();
+        $this->assertEquals(\drewlabs_core_recursive_get_attribute($person, 'address.physical.house_number', null), 'H 492',  'Expect the house_number attribute nested in the address field to equals H 492');
     }
 }

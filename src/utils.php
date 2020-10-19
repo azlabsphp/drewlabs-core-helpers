@@ -161,13 +161,42 @@ if (!function_exists('drewlabs_core_create_php_class_instance')) {
 if (!function_exists('drewlabs_core_fn_compose')) {
     /**
      * Function composition function that apply transformations to the source input in the top -> down 
-     * level that the functions appear
+     * level that the functions appear.
+     * It decorates an inner function that accept only single values, and threat array 
+     * params as single value. To pass list of parameters as array, use {drewlabs_core_fn_compose_array}
      *
      * @param mixed $source
      * @param \Closure[] ...$funcs
      * @return \Closure|callable 
      */
     function drewlabs_core_fn_compose(...$funcs)
+    {
+        return function ($source) use ($funcs) {
+            return array_reduce(
+                $funcs,
+                function ($carry, $func) {
+                    return $func($carry);
+                },
+                $source
+            );
+        };
+    }
+}
+
+
+if (!function_exists('drewlabs_core_fn_compose_array')) {
+    /**
+     * Function composition function that apply transformations to the source input in the top -> down 
+     * level that the functions appear.
+     * This method decorate an variadic inner function that one or many parameter or an array or parameter
+     * If should call with single value, use {drewlabs_core_fn_compose} which does not decorate an inner
+     * variadic function and accept only single values, and threat array params as single value
+     *
+     * @param mixed $source
+     * @param \Closure[] ...$funcs
+     * @return \Closure|callable 
+     */
+    function drewlabs_core_fn_compose_array(...$funcs)
     {
         return function (...$source) use ($funcs) {
             return array_reduce(
@@ -186,11 +215,39 @@ if (!function_exists('drewlabs_core_fn_reverse_compose')) {
      * Function composition function that apply transformations to the source input in the bottom -> up order 
      * in which functions appear
      *
+     * Use {drewlabs_core_fn_reverse_compose_array} instead for multiple parameter value or multiple parameter as array.
+     * 
      * @param mixed $source
      * @param \Closure[] ...$funcs
      * @return \Closure|callable 
      */
     function drewlabs_core_fn_reverse_compose(...$funcs)
+    {
+        return function ($source) use ($funcs) {
+            return array_reduce(
+                array_reverse($funcs),
+                function ($carry, $func) {
+                    return $func($carry);
+                },
+                $source
+            );
+        };
+    }
+}
+
+if (!function_exists('drewlabs_core_fn_reverse_compose_array')) {
+    /**
+     * Function composition function that apply transformations to the source input in the bottom -> up order 
+     * in which functions appear
+     * 
+     * This method decorate an variadic inner function that take one or many parameter or an array or parameters.
+     * Use {drewlabs_core_fn_reverse_compose} instead for single parameter value.
+     *
+     * @param mixed $source
+     * @param \Closure[] ...$funcs
+     * @return \Closure|callable 
+     */
+    function drewlabs_core_fn_reverse_compose_array(...$funcs)
     {
         return function (...$source) use ($funcs) {
             return array_reduce(
@@ -236,28 +293,51 @@ if (!function_exists('drewlabs_core_recursive_set_attribute')) {
      * @param object|array $obj
      * @param string $key
      * @param mixed $value
-     * @return void
+     * @return mixed
      */
     function drewlabs_core_recursive_set_attribute($obj, $key, $value = null)
     {
-        throw new \RuntimeException('Recursive setter not implemented');
-        // if (is_string($key) && \drewlabs_core_strings_contains($key, '.')) {
-        //     $keys = \drewlabs_core_strings_to_array($key, '.');
-        //     $lastIndex = count($keys) - 1;
-        //     $i = 0;
-        //     $current = null;
-        //     while ($i < $lastIndex) {
-        //         # code...
-        //         $rvalue = \drewlabs_core_get_attribute($obj, $keys[$i], null);
-        //         if (is_null($rvalue)) {
-        //             break;
-        //         }
-        //         $current = $rvalue;
-        //         $i++;
-        //     }
-        //     $current = \drewlabs_core_set_attribute($current, $keys[$lastIndex], $value);
-        // }
-        // return \drewlabs_core_set_attribute($obj, $key, $value);
+        if (is_string($key) && \drewlabs_core_strings_contains($key, '.')) {
+            $cache = [];
+            $keys = \drewlabs_core_strings_to_array($key, '.');
+            $lastIndex = count($keys) - 1;
+            $topPropertyValue = drewlabs_core_get_attribute($obj, $keys[0], null);
+            if (is_null($topPropertyValue)) {
+                return $obj;
+            }
+            $i = 1;
+            $current = \drewlabs_core_copy_object($topPropertyValue);
+            // Build the attributes tree into a cache variable
+            while ($i <= $lastIndex) {
+                # code...
+                if ($i === $lastIndex) {
+                    $current = $value;
+                } else {
+                    $current = \drewlabs_core_get_attribute($current, $keys[$i], null);
+                }
+                if (is_null($current)) {
+                    return $obj;
+                }
+                $cache[] = ['key' => $keys[$i], 'value' => \drewlabs_core_copy_object($current)];
+                $i++;
+            }
+            // Set the value of the last item in the cache to equal to user provided value
+            $cache = array_reverse($cache);
+            // The last key of the reverse cache values is the name of the attribute to set
+            $rkey = $cache[0]['key'];
+            $rvalue = $cache[0]['value'];
+            // Loop through the cache items in the reverse order and rebuild the object tree
+            for ($index = 0; $index < count($cache); $index++) {
+                # code...
+                if (($index + 1) === count($cache)) {
+                    break;
+                }
+                $rvalue = \drewlabs_core_set_attribute($cache[$index + 1]['value'], $cache[$index]['key'], $rvalue);
+                $rkey = $cache[$index + 1]['key'];
+            }
+            return \drewlabs_core_set_attribute($obj, $keys[0], \drewlabs_core_set_attribute($topPropertyValue, $rkey, $rvalue));
+        }
+        return \drewlabs_core_set_attribute($obj, $key, $value);
     }
 }
 
@@ -300,7 +380,7 @@ if (!function_exists('drewlabs_core_set_attribute')) {
                 return $obj->{'copyWith'}([$key => $value]);
             }
             // Create a clone copy of the object
-            $clone = clone $obj;
+            $clone = \drewlabs_core_copy_object($obj);
             $clone->{$key} = $value;
             return $clone;
         }
@@ -352,6 +432,21 @@ if (!function_exists('drewlabs_core_create_attribute_getter')) {
     }
 }
 
+if (!function_exists('drewlabs_core_create_attribute_setter')) {
+
+    /**
+     * Create an operator function that will be use to set attribute on a given array or object
+     *
+     * @return string
+     */
+    function drewlabs_core_create_attribute_setter()
+    {
+        return \drewlabs_core_validate_attribute_name(function ($key, $value = null) {
+            return \drewlabs_core_create_attribute_setter_unsafe($key, $value);
+        });
+    }
+}
+
 if (!function_exists('drewlabs_core_create_attribute_getter_unsafe')) {
     /**
      * Create an operator function that does not enforce the rules for the attribute name
@@ -366,5 +461,43 @@ if (!function_exists('drewlabs_core_create_attribute_getter_unsafe')) {
         return function ($obj) use ($key, $default) {
             return \drewlabs_core_recursive_get_attribute($obj, $key, $default);
         };
+    }
+}
+
+if (!function_exists('drewlabs_core_create_attribute_setter_unsafe')) {
+    /**
+     * Create an operator function that does not enforce the rules for the attribute name
+     * being either a string or an integer when setting the attribute value.
+     *
+     * @param string|int $key
+     * @param mixed|null $default
+     * @return \Closure
+     */
+    function drewlabs_core_create_attribute_setter_unsafe($key, $value = null)
+    {
+        return function ($obj) use ($key, $value) {
+            return \drewlabs_core_recursive_set_attribute($obj, $key, $value);
+        };
+    }
+}
+
+
+if (!function_exists('drewlabs_core_copy_object')) {
+    /**
+     * Create a copy of a given object or array. If the parameter is an object, this method makes
+     * a clone of the object using PHP {clone} operator, or apply PHP array_merge to the parameter
+     * if the parameter is an array
+     *
+     * @param object|array $obj
+     */
+    function drewlabs_core_copy_object($obj)
+    {
+        if (is_object($obj)) {
+            return clone $obj;
+        }
+        if (is_array($obj)) {
+            return array_merge([], $obj);
+        }
+        return $obj;
     }
 }
