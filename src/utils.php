@@ -371,6 +371,7 @@ if (!function_exists('drewlabs_core_set_attribute')) {
      * @param \stdClass|array $obj
      * @param string $key
      * @param mixed $value
+     * @throws \InvalidArgumentException
      * @return mixed
      */
     function drewlabs_core_set_attribute($obj, $key, $value)
