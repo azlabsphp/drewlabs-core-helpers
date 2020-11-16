@@ -160,14 +160,14 @@ if (!function_exists('drewlabs_core_create_php_class_instance')) {
 
 if (!function_exists('drewlabs_core_fn_compose')) {
     /**
-     * Function composition function that apply transformations to the source input in the top -> down 
+     * Function composition function that apply transformations to the source input in the top -> down
      * level that the functions appear.
-     * It decorates an inner function that accept only single values, and threat array 
+     * It decorates an inner function that accept only single values, and threat array
      * params as single value. To pass list of parameters as array, use {drewlabs_core_fn_compose_array}
      *
      * @param mixed $source
      * @param \Closure[] ...$funcs
-     * @return \Closure|callable 
+     * @return \Closure|callable
      */
     function drewlabs_core_fn_compose(...$funcs)
     {
@@ -186,7 +186,7 @@ if (!function_exists('drewlabs_core_fn_compose')) {
 
 if (!function_exists('drewlabs_core_fn_compose_array')) {
     /**
-     * Function composition function that apply transformations to the source input in the top -> down 
+     * Function composition function that apply transformations to the source input in the top -> down
      * level that the functions appear.
      * This method decorate an variadic inner function that one or many parameter or an array or parameter
      * If should call with single value, use {drewlabs_core_fn_compose} which does not decorate an inner
@@ -194,7 +194,7 @@ if (!function_exists('drewlabs_core_fn_compose_array')) {
      *
      * @param mixed $source
      * @param \Closure[] ...$funcs
-     * @return \Closure|callable 
+     * @return \Closure|callable
      */
     function drewlabs_core_fn_compose_array(...$funcs)
     {
@@ -212,14 +212,14 @@ if (!function_exists('drewlabs_core_fn_compose_array')) {
 
 if (!function_exists('drewlabs_core_fn_reverse_compose')) {
     /**
-     * Function composition function that apply transformations to the source input in the bottom -> up order 
+     * Function composition function that apply transformations to the source input in the bottom -> up order
      * in which functions appear
      *
      * Use {drewlabs_core_fn_reverse_compose_array} instead for multiple parameter value or multiple parameter as array.
-     * 
+     *
      * @param mixed $source
      * @param \Closure[] ...$funcs
-     * @return \Closure|callable 
+     * @return \Closure|callable
      */
     function drewlabs_core_fn_reverse_compose(...$funcs)
     {
@@ -237,15 +237,15 @@ if (!function_exists('drewlabs_core_fn_reverse_compose')) {
 
 if (!function_exists('drewlabs_core_fn_reverse_compose_array')) {
     /**
-     * Function composition function that apply transformations to the source input in the bottom -> up order 
+     * Function composition function that apply transformations to the source input in the bottom -> up order
      * in which functions appear
-     * 
+     *
      * This method decorate an variadic inner function that take one or many parameter or an array or parameters.
      * Use {drewlabs_core_fn_reverse_compose} instead for single parameter value.
      *
      * @param mixed $source
      * @param \Closure[] ...$funcs
-     * @return \Closure|callable 
+     * @return \Closure|callable
      */
     function drewlabs_core_fn_reverse_compose_array(...$funcs)
     {
@@ -354,7 +354,7 @@ if (!function_exists('drewlabs_core_get_attribute')) {
     function drewlabs_core_get_attribute($obj, $key, $default = null)
     {
         if (is_object($obj)) {
-            return property_exists($obj, $key) ? $obj->{$key} : $default;
+            return $obj->{$key} ?? $default;
         }
         if (is_array($obj) || ($obj instanceof \ArrayAccess)) {
             return array_key_exists($key, $obj) ? $obj[$key] : $default;
