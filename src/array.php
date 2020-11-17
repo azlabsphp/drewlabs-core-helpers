@@ -32,7 +32,7 @@ if (!function_exists('drewlabs_core_array_is_array_list')) {
 if (!function_exists('drewlabs_core_array_sort_by')) {
     /**
      * Sort the provided array in the user specified order
-     * 
+     *
      * @param array $items
      * @param string $by
      * @param string $order
@@ -140,11 +140,12 @@ if (!function_exists('drewlabs_core_array_where')) {
      *
      * @param  array  $array
      * @param  callable  $callback
+     * @param boolean $preserve_keys
      * @return array
      */
-    function drewlabs_core_array_where($array, callable $callback)
+    function drewlabs_core_array_where($array, callable $callback, $preserve_keys = true)
     {
-        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+        return $preserve_keys ? array_filter($array, $callback, ARRAY_FILTER_USE_BOTH) : array_values(array_filter($array, $callback, ARRAY_FILTER_USE_BOTH));
     }
 }
 
