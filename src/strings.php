@@ -383,3 +383,17 @@ if (!function_exists('drewlabs_core_strings_parse_tpl')) {
         return preg_replace($patterns, $replacements, $str);
     }
 }
+if (!function_exists('drewlabs_core_strings_value_or_nullable')) {
+
+    /**
+     * Convert an enpty striing into PHP Nullable type
+     * @return string|null
+     */
+    function drewlabs_core_strings_value_or_nullable($value)
+    {
+        if (!(drewlabs_core_strings_is_str($value))) {
+            throw new InvalidArgumentException(sprintf('Helper %s requires a valid PHP string', __FUNCTION__));
+        }
+        return trim($value) === '' ? $value : null;
+    }
+}
