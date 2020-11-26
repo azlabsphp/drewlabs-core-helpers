@@ -394,6 +394,6 @@ if (!function_exists('drewlabs_core_strings_value_or_nullable')) {
         if (!(drewlabs_core_strings_is_str($value))) {
             throw new InvalidArgumentException(sprintf('Helper %s requires a valid PHP string', __FUNCTION__));
         }
-        return trim($value) === '' ? $value : null;
+        return trim($value) === '' ?  null : $value;
     }
 }
