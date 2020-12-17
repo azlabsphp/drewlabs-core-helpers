@@ -25,9 +25,10 @@
             "src/array.php",
             "src/datetime.php",
             "src/strings.php",
-            "src/comparator.php",
             "src/utils.php",
-            "src/random.php"
+            "src/random.php",
+            "src/compose.php",
+            "src/immutable.php"
         ],
         "optimize-autoloader": true
     }
