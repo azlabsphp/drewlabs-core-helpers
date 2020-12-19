@@ -11,6 +11,6 @@ class StringsHelperTest extends TestCase
     {
         $haystack = 'DonalTrumpVsJoeBaiden';
 
-        $this->assertEquals(\drewlabs_core_strings_after('Vs', $haystack), 'DonalTrump', 'Expect strings afert Vs to be JoeBaiden');
+        $this->assertEquals(\drewlabs_core_strings_after('Vs', $haystack), 'JoeBaiden', 'Expect strings afert Vs to be JoeBaiden');
     }
 }

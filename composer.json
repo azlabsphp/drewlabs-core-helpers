@@ -28,7 +28,8 @@
             "src/utils.php",
             "src/random.php",
             "src/compose.php",
-            "src/immutable.php"
+            "src/immutable.php",
+            "src/format.php"
         ],
         "optimize-autoloader": true
     }
