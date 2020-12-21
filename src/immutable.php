@@ -1,4 +1,4 @@
-<?<?php 
+<?php 
 
 
 if (!function_exists('drewlabs_core_recursive_get_attribute')) {
