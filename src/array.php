@@ -394,6 +394,22 @@ if (!function_exists('drewlabs_core_array_contains_all')) {
     }
 }
 
+
+if (!function_exists('is_assoc')) {
+    /**
+     * Checks if an array is an associative array
+     * 
+     * @deprecated 1.0.0
+     *
+     * @param array $value
+     * @return boolean
+     */
+    function is_assoc(array $value)
+    {
+        return array_keys($value) !== range(0, count($value) - 1);
+    }
+}
+
 if (!function_exists('drewlabs_core_array_is_assoc')) {
     /**
      * Checks if an array is an associative array
