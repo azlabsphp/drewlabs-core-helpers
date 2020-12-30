@@ -442,3 +442,56 @@ if (!function_exists('drewlabs_core_array_group_count')) {
         }, []);
     }
 }
+
+if (!function_exists('drewlabs_core_array_except')) {
+    /**
+     * Return all items in an array execpt the specified keys
+     *
+     * @param array $array
+     * @param string[]|string $keys
+     * @return array
+     */
+    function drewlabs_core_array_except(array $array, $keys)
+    {
+        \drewlabs_core_array_remove($array, $keys);
+        return $array;
+    }
+}
+
+if (!function_exists('drewlabs_core_array_remove')) {
+
+    /**
+     * Remove a key or a list of keys from a given array
+     *
+     * @param array $array
+     * @param string[]|string $keys
+     * @return void
+     */
+    function drewlabs_core_array_remove(&$array, $keys)
+    {
+        $original = &$array;
+        $keys = (array) $keys;
+        if (count($keys) === 0) {
+            return;
+        }
+        foreach ($keys as $key) {
+            // if the exact key exists in the top-level, remove it
+            if (\drewlabs_core_array_key_exists($array, $key)) {
+                unset($array[$key]);
+                continue;
+            }
+            $parts = explode('.', $key);
+            // clean up before each pass
+            $array = &$original;
+            while (count($parts) > 1) {
+                $part = array_shift($parts);
+                if (isset($array[$part]) && is_array($array[$part])) {
+                    $array = &$array[$part];
+                } else {
+                    continue 2;
+                }
+            }
+            unset($array[array_shift($parts)]);
+        }
+    }
+}
