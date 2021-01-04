@@ -1,10 +1,18 @@
 <?php
 
-if (!function_exists('drewlabs_core_hashing_encode')) {
+if (!function_exists('drewlabs_core_hashing_base62encode')) {
 
-    function drewlabs_core_hashing_encode($value)
+    function drewlabs_core_hashing_base62encode($value)
     {
         return (new \Tuupola\Base62)->encode($value);
+    }
+}
+
+if (!function_exists('drewlabs_core_hashing_base62decode')) {
+
+    function drewlabs_core_hashing_base62decode($value)
+    {
+        return (new \Tuupola\Base62)->decode($value);
     }
 }
 
@@ -24,7 +32,7 @@ if (!function_exists('drewlabs_core_hashing_hash_str')) {
         if (!is_string($key_resolver)) {
             throw new \RuntimeException(\sprintf('%s : Requires either a PHP Closure or a string as 2nd parameter'), __METHOD__);
         }
-        return hash_hmac('sha256', \drewlabs_core_hashing_encode($source), $key_resolver);
+        return hash_hmac('sha256', \drewlabs_core_hashing_base62encode($source), $key_resolver);
     }
 }
 
