@@ -21,8 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Drewlabs\\Core\\Helpers\\": "src/",
-            "Drewlabs\\Core\\Helpers\\Tests\\": "tests/"
+            "Drewlabs\\Core\\Helpers\\": "src/"
         },
         "files": [
             "src/array.php",
@@ -36,5 +35,10 @@
             "src/url.php"
         ],
         "optimize-autoloader": true
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Drewlabs\\Core\\Helpers\\Tests\\": "tests/"
+        }
     }
 }
