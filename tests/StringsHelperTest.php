@@ -13,4 +13,18 @@ class StringsHelperTest extends TestCase
 
         $this->assertEquals(\drewlabs_core_strings_after('Vs', $haystack), 'JoeBaiden', 'Expect strings afert Vs to be JoeBaiden');
     }
+
+    public function testStringsToCamelCaseFunction()
+    {
+        $source = 'test_char_variable';
+
+        $this->assertEquals(\drewlabs_core_strings_as_camel_case($source, true), 'TestCharVariable', 'Expect the transformed string to equals TestCharVariable');
+    } //
+
+    public function testStringsToSnakeCaseFunction()
+    {
+        $source = 'TestChar_Variable ';
+
+        $this->assertEquals(\drewlabs_core_strings_as_snake_case($source), 'test_char_variable', 'Expect the transformed string to equals test_char_variable');
+    }
 }

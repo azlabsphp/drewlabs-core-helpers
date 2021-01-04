@@ -2,6 +2,7 @@
 
 namespace Drewlabs\Core\Helpers\Tests;
 
+use Drewlabs\Core\Helpers\Tests\Stubs\Person;
 use PHPUnit\Framework\TestCase;
 
 class UtilsHelpersTest extends TestCase
@@ -134,5 +135,17 @@ class UtilsHelpersTest extends TestCase
         )($person);
         // $this->assertEquals(\drewlabs_core_recursive_get_attribute($p, 'address.physical.house_number', null), 'H 492',  'Expect the house_number attribute nested in the address field to equals H 492');
         $this->assertNotEquals(\drewlabs_core_recursive_get_attribute($p, 'address.physical.house_number', null), \drewlabs_core_recursive_get_attribute($person, 'address.physical.house_number', null),  'Expect the modified person object to not equls the source person object');
+    }
+
+
+
+    public function testCreatePrivateAttributeSetterFunction()
+    {
+        $person = new Person;
+        $person = \drewlabs_core_create_attribute_setter(
+            'secret',
+            'MySecureSecretPassword'
+        )($person);
+        $this->assertEquals(\drewlabs_core_recursive_get_attribute($person, 'secret', null), 'MySecureSecretPassword',  'Expect new person password to equals MySecureSecretPassword');
     }
 }

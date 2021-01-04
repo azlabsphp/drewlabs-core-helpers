@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 
 if (!function_exists('drewlabs_core_recursive_get_attribute')) {
@@ -94,7 +94,23 @@ if (!function_exists('drewlabs_core_get_attribute')) {
     function drewlabs_core_get_attribute($obj, $key, $default = null)
     {
         if (is_object($obj)) {
-            return $obj->{$key} ?? $default;
+            $result = $default;
+            // Breaking property accessibility of the OOP concept to avoid 
+            // unexpected private or protected properties errors
+            $refObject = new \ReflectionObject($obj);
+            $keyProperty = $refObject->getProperty($key);
+            $publicProperties = array_map(function (\ReflectionProperty $prop) {
+                return $prop->getName();
+            }, $refObject->getProperties(\ReflectionProperty::IS_PUBLIC));
+            // Get the accessibility value of the property
+            if (!in_array($key, $publicProperties)) {
+                $keyProperty->setAccessible(true);
+            }
+            $result = $keyProperty->getValue($obj);
+            if (!in_array($key, $publicProperties)) {
+                $keyProperty->setAccessible(false);
+            }
+            return $result;
         }
         if (is_array($obj) || ($obj instanceof \ArrayAccess)) {
             return array_key_exists($key, $obj) ? $obj[$key] : $default;
@@ -122,7 +138,21 @@ if (!function_exists('drewlabs_core_set_attribute')) {
             }
             // Create a clone copy of the object
             $clone = \drewlabs_core_copy_object($obj);
-            $clone->{$key} = $value;
+            // Breaking property accessibility of the OOP concept to avoid 
+            // unexpected private or protected properties errors [Cannot access private property]
+            $refObject = new \ReflectionObject($clone);
+            $keyProperty = $refObject->getProperty($key);
+            $publicProperties = array_map(function (\ReflectionProperty $prop) {
+                return $prop->getName();
+            }, $refObject->getProperties(\ReflectionProperty::IS_PUBLIC));
+            // Get the accessibility value of the property
+            if (!in_array($key, $publicProperties)) {
+                $keyProperty->setAccessible(true);
+            }
+            $keyProperty->setValue($clone, $value);
+            if (!in_array($key, $publicProperties)) {
+                $keyProperty->setAccessible(false);
+            }
             return $clone;
         }
         if (is_array($obj) || ($obj instanceof \ArrayAccess)) {
@@ -149,9 +179,6 @@ if (!function_exists('drewlabs_core_validate_attribute_name')) {
             if (count($args) === 0) {
                 return $func(...$args);
             }
-            // if (count($args) < 1) {
-            //     throw new InvalidArgumentException("__FUNCTION__ requires at least 1 argument");
-            // }
             $key = $args[0];
             if (!is_string($key) && !is_int($key)) {
                 throw new \InvalidArgumentException('$key paramater must be a string or an array numeric index');
