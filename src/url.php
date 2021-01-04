@@ -31,9 +31,8 @@ if (!function_exists('drewlabs_core_url_has_correct_signature')) {
      */
     function drewlabs_core_url_has_correct_signature(ServerRequestInterface $request, \Closure $key_resolver, $absolute = true)
     {
-        $requestURI = $request->getUri();
         $query_params = $request->getQueryParams();
-        $url = $absolute ? (string)($requestURI) : '/' . $requestURI->getPath();
+        $url = $absolute ? \drewlabs_core_url_get_request_url($request) : '/' . \drewlabs_core_url_get_request_path($request);
         $original = rtrim($url . '?' . \drewlabs_core_url_array_to_query_string(
             \drewlabs_core_array_except($query_params, 'signature')
         ), '?');
@@ -70,5 +69,36 @@ if (!function_exists('drewlabs_core_url_array_to_query_string')) {
     function drewlabs_core_url_array_to_query_string($array)
     {
         return http_build_query($array, '', '&', PHP_QUERY_RFC3986);
+    }
+}
+
+
+if (!function_exists('drewlabs_core_url_get_request_url')) {
+
+    /**
+     * @description Returns the request URI without any query string
+     *
+     * @param ServerRequestInterface $request
+     * @return string
+     */
+    function drewlabs_core_url_get_request_url(ServerRequestInterface $request)
+    {
+        return rtrim(preg_replace('/\?.*/', '', $request->getUri()), '/');
+    }
+}
+
+if (!function_exists('drewlabs_core_url_get_request_path')) {
+
+    /**
+     * Normalize the request path
+     *
+     * @param ServerRequestInterface $request
+     * @return string
+     */
+    function drewlabs_core_url_get_request_path(ServerRequestInterface $request)
+    {
+        $requestURI = $request->getUri();
+        $pattern = trim($requestURI->getPath(), '/');
+        return $pattern == '' ? '/' : $pattern;
     }
 }
