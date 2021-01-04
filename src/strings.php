@@ -397,3 +397,47 @@ if (!function_exists('drewlabs_core_strings_value_or_nullable')) {
         return trim($value) === '' ?  null : $value;
     }
 }
+
+if (!function_exists('drewlabs_core_strings_as_camel_case')) {
+    function drewlabs_core_strings_as_camel_case($str, $capitalize_first_chr = true, $delimiter = '_')
+    {
+        return \drewlabs_core_fn_compose_array(
+            function ($params) {
+                if (count($params) < 2) {
+                    throw new \RuntimeException();
+                }
+                return str_replace($params[1], '', ucwords($params[0], $params[1]));
+            },
+            function ($param) use ($capitalize_first_chr) {
+                return !$capitalize_first_chr ? lcfirst($param) : $param;
+            }
+        )($str, $delimiter);
+    }
+}
+
+if (!function_exists('drewlabs_core_strings_as_snake_case')) {
+    function drewlabs_core_strings_as_snake_case($str, $delimiter = '_')
+    {
+        // Convert all capital letters to $delimiter + lowercaseLetter
+        $str = str_replace([' ', $delimiter], '', lcfirst($str));
+        return strtolower(preg_replace("/[A-Z]/", $delimiter.'\\0', $str));
+    }
+}
+
+if (!function_exists('drewlabs_core_strings_is_upper')) {
+
+    /**
+     * Checks if a given character is upper case or lowercase
+     *
+     * @param char $str
+     * @return bool
+     */
+    function drewlabs_core_strings_is_upper($chr)
+    {
+        return (function_exists('ctype_upper') ? function ($source) {
+            return ctype_upper($source);
+        } : function ($source) {
+            preg_match("/[A-Z]/", $source) ? true : false;
+        })($chr);
+    }
+}

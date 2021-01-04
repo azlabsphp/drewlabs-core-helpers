@@ -12,7 +12,8 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=7.0",
-        "psr/http-message": "^1.0"
+        "psr/http-message": "^1.0",
+        "tuupola/base62": "^2.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.0",
@@ -21,8 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Drewlabs\\Core\\Helpers\\": "src/",
-            "Drewlabs\\Core\\Helpers\\Tests\\": "tests/"
+            "Drewlabs\\Core\\Helpers\\": "src/"
         },
         "files": [
             "src/array.php",
@@ -33,8 +33,14 @@
             "src/compose.php",
             "src/immutable.php",
             "src/format.php",
-            "src/url.php"
+            "src/url.php",
+            "src/hashing.php"
         ],
         "optimize-autoloader": true
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Drewlabs\\Core\\Helpers\\Tests\\": "tests/"
+        }
     }
 }
