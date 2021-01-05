@@ -3,6 +3,7 @@
 namespace Drewlabs\Core\Helpers\Tests;
 
 use Drewlabs\Core\Helpers\Tests\Stubs\Person;
+use Drewlabs\Core\Helpers\Tests\Stubs\PersonValueObject;
 use PHPUnit\Framework\TestCase;
 
 class UtilsHelpersTest extends TestCase
@@ -147,5 +148,36 @@ class UtilsHelpersTest extends TestCase
             'MySecureSecretPassword'
         )($person);
         $this->assertEquals(\drewlabs_core_recursive_get_attribute($person, 'secret', null), 'MySecureSecretPassword',  'Expect new person password to equals MySecureSecretPassword');
+    }
+
+    public function testCreateValueObjectAttributeSetterFunction()
+    {
+        $person = new PersonValueObject([
+            'login' => 'Asmyns14',
+            'email' => 'asmyns.platonnas29@gmail.com'
+        ]);
+        $person = \drewlabs_core_create_attribute_setter(
+            'secret',
+            'SuperSecretPassword'
+        )($person);
+        $this->assertEquals(\drewlabs_core_recursive_get_attribute($person, 'secret', null), 'SuperSecretPassword',  'Expect new person password to equals SuperSecretPassword');
+    }
+
+    public function testValueObjectCopyWithMethodCreateACopyOfTheObject()
+    {
+        $person = new PersonValueObject([
+            'login' => 'Asmyns14',
+            'email' => 'asmyns.platonnas29@gmail.com',
+            'secret' => 'SuperSecretPassword'
+        ]);
+        $person2 = $person->copyWith([
+           'login' => 'Azandrew'
+        ]);
+        $person = \drewlabs_core_create_attribute_setter(
+            'secret',
+            'Person1Secret'
+        )($person);
+        // $person->secret = 'Person1Secret';
+        $this->assertEquals(\drewlabs_core_recursive_get_attribute($person, 'secret', null), \drewlabs_core_recursive_get_attribute($person2, 'secret', null),  'Expect person2 to be a deep copy of person, and any modification of person does not affect person 2');
     }
 }

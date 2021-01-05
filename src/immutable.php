@@ -94,23 +94,27 @@ if (!function_exists('drewlabs_core_get_attribute')) {
     function drewlabs_core_get_attribute($obj, $key, $default = null)
     {
         if (is_object($obj)) {
-            $result = $default;
+            $value = $default;
             // Breaking property accessibility of the OOP concept to avoid 
             // unexpected private or protected properties errors
             $refObject = new \ReflectionObject($obj);
-            $keyProperty = $refObject->getProperty($key);
-            $publicProperties = array_map(function (\ReflectionProperty $prop) {
-                return $prop->getName();
-            }, $refObject->getProperties(\ReflectionProperty::IS_PUBLIC));
-            // Get the accessibility value of the property
-            if (!in_array($key, $publicProperties)) {
-                $keyProperty->setAccessible(true);
+            if ($refObject->hasProperty($key)) {
+                $keyProperty = $refObject->getProperty($key);
+                $publicProperties = array_map(function (\ReflectionProperty $prop) {
+                    return $prop->getName();
+                }, $refObject->getProperties(\ReflectionProperty::IS_PUBLIC));
+                // Get the accessibility value of the property
+                if (!in_array($key, $publicProperties)) {
+                    $keyProperty->setAccessible(true);
+                }
+                $value = $keyProperty->getValue($obj);
+                if (!in_array($key, $publicProperties)) {
+                    $keyProperty->setAccessible(false);
+                }
+            } else {
+                $value = $obj->{$key} ?? $default;
             }
-            $result = $keyProperty->getValue($obj);
-            if (!in_array($key, $publicProperties)) {
-                $keyProperty->setAccessible(false);
-            }
-            return $result;
+            return $value;
         }
         if (is_array($obj) || ($obj instanceof \ArrayAccess)) {
             return array_key_exists($key, $obj) ? $obj[$key] : $default;
@@ -138,20 +142,24 @@ if (!function_exists('drewlabs_core_set_attribute')) {
             }
             // Create a clone copy of the object
             $clone = \drewlabs_core_copy_object($obj);
-            // Breaking property accessibility of the OOP concept to avoid 
-            // unexpected private or protected properties errors [Cannot access private property]
             $refObject = new \ReflectionObject($clone);
-            $keyProperty = $refObject->getProperty($key);
-            $publicProperties = array_map(function (\ReflectionProperty $prop) {
-                return $prop->getName();
-            }, $refObject->getProperties(\ReflectionProperty::IS_PUBLIC));
-            // Get the accessibility value of the property
-            if (!in_array($key, $publicProperties)) {
-                $keyProperty->setAccessible(true);
-            }
-            $keyProperty->setValue($clone, $value);
-            if (!in_array($key, $publicProperties)) {
-                $keyProperty->setAccessible(false);
+            if ($refObject->hasProperty($key)) {
+                // Breaking property accessibility of the OOP concept to avoid 
+                // unexpected private or protected properties errors [Cannot access private property]
+                $keyProperty = $refObject->getProperty($key);
+                $publicProperties = array_map(function (\ReflectionProperty $prop) {
+                    return $prop->getName();
+                }, $refObject->getProperties(\ReflectionProperty::IS_PUBLIC));
+                // Get the accessibility value of the property
+                if (!in_array($key, $publicProperties)) {
+                    $keyProperty->setAccessible(true);
+                }
+                $keyProperty->setValue($clone, $value);
+                if (!in_array($key, $publicProperties)) {
+                    $keyProperty->setAccessible(false);
+                }
+            } else {
+                $clone->{$key} = $value;
             }
             return $clone;
         }
