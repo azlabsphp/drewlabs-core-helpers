@@ -13,6 +13,7 @@
     "require": {
         "php": ">=7.0",
         "psr/http-message": "^1.0",
+        "drewlabs/contracts": "dev-master",
         "tuupola/base62": "^2.1"
     },
     "require-dev": {
@@ -42,5 +43,11 @@
         "psr-4": {
             "Drewlabs\\Core\\Helpers\\Tests\\": "tests/"
         }
-    }
+    },
+    "repositories":[
+        {
+            "type": "vcs",
+            "url": "git@github.com:azandrew-sidoine/drewlabs-php-contracts.git"
+        }
+    ]
 }
