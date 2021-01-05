@@ -171,13 +171,14 @@ class UtilsHelpersTest extends TestCase
             'secret' => 'SuperSecretPassword'
         ]);
         $person2 = $person->copyWith([
-           'login' => 'Azandrew'
+           'login' => 'Azandrew',
+           'email' => 'azandrewdevelopper@gmail.com'
         ]);
         $person = \drewlabs_core_create_attribute_setter(
             'secret',
             'Person1Secret'
         )($person);
-        // $person->secret = 'Person1Secret';
-        $this->assertEquals(\drewlabs_core_recursive_get_attribute($person, 'secret', null), \drewlabs_core_recursive_get_attribute($person2, 'secret', null),  'Expect person2 to be a deep copy of person, and any modification of person does not affect person 2');
+        $this->assertNotEquals(\drewlabs_core_recursive_get_attribute($person, 'secret', null), \drewlabs_core_recursive_get_attribute($person2, 'secret', null),  'Expect person2 to be a deep copy of person, and any modification of person does not affect person 2');
+        $this->assertEquals(\drewlabs_core_recursive_get_attribute($person2, 'login', null), 'Azandrew',  'Expect person2 login to equals Azandrew');
     }
 }
