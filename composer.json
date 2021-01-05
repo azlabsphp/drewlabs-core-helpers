@@ -47,7 +47,7 @@
     "repositories":[
         {
             "type": "vcs",
-            "url": "git@github.com:azandrew-sidoine/drewlabs-php-contracts.git"
+            "url": "git@github.com:liksoft/drewlabs-php-contracts.git"
         }
     ]
 }
