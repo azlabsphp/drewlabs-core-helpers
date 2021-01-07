@@ -420,7 +420,7 @@ if (!function_exists('drewlabs_core_strings_as_snake_case')) {
     {
         // Convert all capital letters to $delimiter + lowercaseLetter
         $str = str_replace([' ', $delimiter], '', lcfirst($str));
-        return strtolower(preg_replace("/[A-Z]/", $delimiter.'\\0', $str));
+        return strtolower(preg_replace("/[A-Z]/", $delimiter . '\\0', $str));
     }
 }
 
@@ -439,5 +439,55 @@ if (!function_exists('drewlabs_core_strings_is_upper')) {
         } : function ($source) {
             preg_match("/[A-Z]/", $source) ? true : false;
         })($chr);
+    }
+}
+
+
+if (!function_exists('drewlabs_core_strings_cadena_rtf')) {
+    function drewlabs_core_strings_cadena_rtf($txt)
+    {
+        $result = null;
+        for ($pos = 0; $pos < mb_strlen($txt); $pos++) {
+            $char = mb_substr($txt, $pos, 1);
+            if (!preg_match("/[A-Za-z1-9,.]/", $char)) {
+                //unicode ord real!!!
+                $k   = mb_convert_encoding($char, 'UCS-2LE', 'UTF-8');
+                $k1  = ord(substr($k, 0, 1));
+                $k2  = ord(substr($k, 1, 1));
+                $ord = $k2 * 256 + $k1;
+                if ($ord > 255) {
+                    $result .= '\uc1\u' . $ord . '*';
+                } elseif ($ord > 32768) {
+                    $result .= '\uc1\u' . ($ord - 65535) . '*';
+                } else {
+                    $result .= "\\'" . dechex($ord);
+                }
+            } else {
+                $result .= $char;
+            }
+        }
+        return $result;
+    }
+}
+
+if (!function_exists('drewlabs_core_strings_ordutf8')) {
+    function drewlabs_core_strings_ordutf8($string, &$offset)
+    {
+        $code = ord(substr($string, $offset, 1));
+        if ($code >= 128) {        //otherwise 0xxxxxxx
+            if ($code < 224) $bytesnumber = 2;                //110xxxxx
+            else if ($code < 240) $bytesnumber = 3;        //1110xxxx
+            else if ($code < 248) $bytesnumber = 4;    //11110xxx
+            $codetemp = $code - 192 - ($bytesnumber > 2 ? 32 : 0) - ($bytesnumber > 3 ? 16 : 0);
+            for ($i = 2; $i <= $bytesnumber; $i++) {
+                $offset++;
+                $code2 = ord(substr($string, $offset, 1)) - 128;        //10xxxxxx
+                $codetemp = $codetemp * 64 + $code2;
+            }
+            $code = $codetemp;
+        }
+        $offset += 1;
+        if ($offset >= strlen($string)) $offset = -1;
+        return $code;
     }
 }
