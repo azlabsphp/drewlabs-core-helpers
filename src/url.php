@@ -1,43 +1,55 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the Drewlabs package.
+ *
+ * (c) Sidoine Azandrew <azandrewdevelopper@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use Psr\Http\Message\ServerRequestInterface;
 
 if (!function_exists('drewlabs_core_url_has_valid_signature')) {
 
     /**
-     * Check if Request URI is has valid signature or has not being tempered
+     * Check if Request URI is has valid signature or has not being tempered.
      *
-     * @param ServerRequestInterface $request
      * @param \Closure $key_resolver
-     * @param boolean $absolute
-     * @return boolean
+     * @param bool     $absolute
+     *
+     * @return bool
      */
-    function drewlabs_core_url_has_valid_signature(ServerRequestInterface $request, \Closure $key_resolver, $absolute = true)
+    function drewlabs_core_url_has_valid_signature(ServerRequestInterface $request, Closure $key_resolver, $absolute = true)
     {
-        return \drewlabs_core_url_has_correct_signature($request, $key_resolver, $absolute)
-            && \drewlabs_core_url_has_not_expired_signature($request);
+        return drewlabs_core_url_has_correct_signature($request, $key_resolver, $absolute)
+            && drewlabs_core_url_has_not_expired_signature($request);
     }
 }
 
 if (!function_exists('drewlabs_core_url_has_correct_signature')) {
 
     /**
-     * Verify if request URI is correct
+     * Verify if request URI is correct.
      *
-     * @param ServerRequestInterface $request
      * @param \Closure $key_resolver
-     * @param boolean $absolute
-     * @return boolean
+     * @param bool     $absolute
+     *
+     * @return bool
      */
-    function drewlabs_core_url_has_correct_signature(ServerRequestInterface $request, \Closure $key_resolver, $absolute = true)
+    function drewlabs_core_url_has_correct_signature(ServerRequestInterface $request, Closure $key_resolver, $absolute = true)
     {
         $query_params = $request->getQueryParams();
-        $url = $absolute ? \drewlabs_core_url_get_request_url($request) : '/' . \drewlabs_core_url_get_request_path($request);
-        $original = rtrim($url . '?' . \drewlabs_core_url_array_to_query_string(
-            \drewlabs_core_array_except($query_params, 'signature')
+        $url = $absolute ? drewlabs_core_url_get_request_url($request) : '/'.drewlabs_core_url_get_request_path($request);
+        $original = rtrim($url.'?'.drewlabs_core_url_array_to_query_string(
+            drewlabs_core_array_except($query_params, 'signature')
         ), '?');
         $signature = hash_hmac('sha256', $original, call_user_func($key_resolver));
-        $signature_query = isset($query_params['signature']) ? $query_params['signature'] : '';
+        $signature_query = $query_params['signature'] ?? '';
+
         return hash_equals($signature, (string) $signature_query);
     }
 }
@@ -45,16 +57,16 @@ if (!function_exists('drewlabs_core_url_has_correct_signature')) {
 if (!function_exists('drewlabs_core_url_has_not_expired_signature')) {
 
     /**
-     * Checks if request URI has noot expired
+     * Checks if request URI has noot expired.
      *
-     * @param ServerRequestInterface $request
-     * @return boolean
+     * @return bool
      */
     function drewlabs_core_url_has_not_expired_signature(ServerRequestInterface $request)
     {
         $query_params = $request->getQueryParams();
-        $expires = isset($query_params['expires']) ? $query_params['expires'] : '';
-        return !($expires && \drewlabs_core_datetime_now()->getTimestamp() > $expires);
+        $expires = $query_params['expires'] ?? '';
+
+        return !($expires && drewlabs_core_datetime_now()->getTimestamp() > $expires);
     }
 }
 
@@ -63,7 +75,8 @@ if (!function_exists('drewlabs_core_url_array_to_query_string')) {
     /**
      * Convert the array into a query string.
      *
-     * @param  array  $array
+     * @param array $array
+     *
      * @return string
      */
     function drewlabs_core_url_array_to_query_string($array)
@@ -72,13 +85,11 @@ if (!function_exists('drewlabs_core_url_array_to_query_string')) {
     }
 }
 
-
 if (!function_exists('drewlabs_core_url_get_request_url')) {
 
     /**
      * @description Returns the request URI without any query string
      *
-     * @param ServerRequestInterface $request
      * @return string
      */
     function drewlabs_core_url_get_request_url(ServerRequestInterface $request)
@@ -90,15 +101,15 @@ if (!function_exists('drewlabs_core_url_get_request_url')) {
 if (!function_exists('drewlabs_core_url_get_request_path')) {
 
     /**
-     * Normalize the request path
+     * Normalize the request path.
      *
-     * @param ServerRequestInterface $request
      * @return string
      */
     function drewlabs_core_url_get_request_path(ServerRequestInterface $request)
     {
         $requestURI = $request->getUri();
         $pattern = trim($requestURI->getPath(), '/');
-        return $pattern == '' ? '/' : $pattern;
+
+        return '' === $pattern ? '/' : $pattern;
     }
 }
