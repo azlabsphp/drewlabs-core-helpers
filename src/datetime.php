@@ -1,5 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the Drewlabs package.
+ *
+ * (c) Sidoine Azandrew <azandrewdevelopper@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 if (!defined('DREWLABS_CORE_DATETIME_YEARS_PER_CENTURY')) {
     define('DREWLABS_CORE_DATETIME_YEARS_PER_CENTURY', 100);
 }
@@ -253,15 +264,15 @@ if (!function_exists('drewlabs_core_datetime_make_date')) {
 if (!function_exists('drewlabs_core_datetime_hrs_diff')) {
     /**
      * Get the difference in hours.
-     * @param \DateTime|string|null $date
+     * @param \DateTime|string|null $source_date
      * @param \DateTime|string|null $date
      * @param bool $exact Get the exact of the difference
      *
      * @return int
      */
-    function drewlabs_core_datetime_hrs_diff($source, $date = null, $exact = true)
+    function drewlabs_core_datetime_hrs_diff($source_date, $date = null, $exact = true)
     {
-        return (int) (\drewlabs_core_datetime_secs_diff($source, $date, $exact) / DREWLABS_CORE_DATETIME_SECONDS_PER_MINUTE / DREWLABS_CORE_DATETIME_MINUTES_PER_HOUR);
+        return (int) (\drewlabs_core_datetime_secs_diff($source_date, $date, $exact) / DREWLABS_CORE_DATETIME_SECONDS_PER_MINUTE / DREWLABS_CORE_DATETIME_MINUTES_PER_HOUR);
     }
 }
 
@@ -269,15 +280,15 @@ if (!function_exists('drewlabs_core_datetime_min_diff')) {
     /**
      * Get the difference in minutes.
      *
-     * @param \DateTimeInterface $date
+     * @param \DateTimeInterface $source_date
      * @param \DateTimeInterface|null $date
      * @param bool $exact Get the exact of the difference
      *
      * @return int
      */
-    function drewlabs_core_datetime_min_diff($date = null, $exact = true)
+    function drewlabs_core_datetime_min_diff($source_date, $date = null, $exact = true)
     {
-        return (int) (\drewlabs_core_datetime_secs_diff($date, $exact) / DREWLABS_CORE_DATETIME_SECONDS_PER_MINUTE);
+        return (int) (\drewlabs_core_datetime_secs_diff($source_date, $date, $exact) / DREWLABS_CORE_DATETIME_SECONDS_PER_MINUTE);
     }
 }
 
