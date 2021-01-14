@@ -124,6 +124,9 @@ if (!function_exists('drewlabs_core_strings_contains')) {
      */
     function drewlabs_core_strings_contains($haystack, $needle)
     {
+        if (is_null($haystack)) {
+            return false;
+        }
         // Code patch for searching for string directly without converting it to an array of character
         if (drewlabs_core_strings_is_str($needle)) {
             return '' !== $needle && false !== mb_strpos($haystack, $needle);
