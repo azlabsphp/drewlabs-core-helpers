@@ -14,6 +14,9 @@ declare(strict_types=1);
 if (!function_exists('drewlabs_core_format_amount_value')) {
     function drewlabs_core_format_amount_value($balance, float $decimal = 0, $separator = ' ')
     {
+        if (null === $balance) {
+            return '0';
+        }
         $inDecimal = round(
             10 ** $decimal *
                 (abs($balance) - floor(abs($balance))),
