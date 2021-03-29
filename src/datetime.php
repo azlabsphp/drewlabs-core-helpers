@@ -53,7 +53,7 @@ if (!function_exists('drewlabs_core_datetime_now')) {
         if (\drewlabs_core_strings_is_str($timezone)) {
             $timezone = new \DateTimeZone($timezone);
         }
-        return new \DateTime(null, $timezone);
+        return new \DateTime('now', $timezone);
     }
 }
 
