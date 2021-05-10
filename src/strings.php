@@ -163,7 +163,7 @@ if (!function_exists('drewlabs_core_strings_concat')) {
      * @param string      $separator
      * @param array|mixed ...$values
      *
-     * @return void
+     * @return string
      */
     function drewlabs_core_strings_concat($separator, ...$values)
     {
@@ -368,7 +368,7 @@ if (!function_exists('drewlabs_core_strings_strrevpos')) {
      * @param string $instr
      * @param string $needle
      *
-     * @return string
+     * @return null|int
      */
     function drewlabs_core_strings_strrevpos($instr, $needle)
     {
