@@ -132,7 +132,7 @@ class ArrayHelpersTest extends TestCase
         $address->email = 'jeanpaul@example.com';
         $address->physical = $physicalAddress;
         $person->address = $address;
-        $this->assertSame(drewlabs_core_array_object_to_array($person)['address']['email'], 'jeanpaul@example.com', 'Expect the generated array to have an inner array with email equals to jeanpaul@example.com');
+        $this->assertSame(drewlabs_core_array_udt_to_array($person)['address']['email'], 'jeanpaul@example.com', 'Expect the generated array to have an inner array with email equals to jeanpaul@example.com');
     }
 
     public function testArrayHasFunction()
@@ -225,5 +225,14 @@ class ArrayHelpersTest extends TestCase
 
         $result = drewlabs_core_array_group_count($texts);
         $this->assertSame($result['repetition'], 3, 'Expect the word repetition to appear 3 times in the source array');
+    }
+
+    public function testZipMethod()
+    {
+        $list = \drewlabs_core_array_szip((object)["one" => 1, "two" => 2, "thee" => 3], [4, 5, 6], [7, 8, 9]);
+        $this->assertTrue(\drewlabs_core_array_is_arrayable($list), 'Expect the returned list ot be an array');
+        $this->assertEquals(count($list[0]), 3, 'Expect the total items in the first index of the list to have a total length equals 3');
+        $this->assertTrue($list[0][0] === 1, 'Expect first item of the list first element to equal 1');
+        print_r($list);
     }
 }

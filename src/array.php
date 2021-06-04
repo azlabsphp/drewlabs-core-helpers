@@ -225,13 +225,11 @@ if (!function_exists('drewlabs_core_array_object_to_array')) {
                         $item[$k] = $entryToArray($v);
                     }
                 }
-
                 return $item;
             }
 
             return null;
         };
-
         return $entryToArray($value);
     }
 }
@@ -504,5 +502,97 @@ if (!function_exists('drewlabs_core_array_remove')) {
             }
             unset($array[array_shift($parts)]);
         }
+    }
+}
+
+if (!function_exists('drewlabs_core_array_udt_to_array')) {
+    /**
+     * Convert a given user define type to array.
+     * 
+     * If $preserve_keys = false the first layer of the array is 
+     *
+     * @param mixed $value
+     * @param bool $preserve_keys
+     *
+     * @return array|null
+     */
+    function drewlabs_core_array_udt_to_array($value, $preserve_keys = true)
+    {
+        // $entryToArray = static function ($item) use (&$entryToArray, $preserve_keys) {
+        // };
+        // return $entryToArray($value);
+        if ($value instanceof \Traversable) {
+            $value = iterator_to_array($value);
+        } elseif ($value instanceof JsonSerializable) {
+            $value = (array) $value->jsonSerialize();
+        } elseif (is_object($value)) {
+            if (method_exists($value, 'all')) {
+                $value = $value->all();
+            } else if (method_exists($value, 'toArray')) {
+                $value = $value->toArray();
+            } elseif (method_exists($value, 'toJson')) {
+                $value = json_decode($value->toJson(), true);
+            } else {
+                $value = drewlabs_core_array_object_to_array($value);
+            }
+        }
+        if (!is_array($value)) {
+            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of' . \Traversable::class . ', ' . \JsonSerializable::class);
+        }
+        return $preserve_keys ? $value : array_values($value);
+    }
+}
+
+
+if (!function_exists('drewlabs_core_array_zip')) {
+    /**
+     * Zip two or more array values in a single list
+     *
+     * @param array|mixed $lhs
+     * @param array|mixed ...$rhs
+     * @return array[]
+     */
+    function drewlabs_core_array_zip($lhs, ...$rhs)
+    {
+        $variadic_params = array_slice(func_get_args(), 1);
+        $lhs = drewlabs_core_array_udt_to_array($lhs, false);
+        $arrayableItems = array_map(function ($item) {
+            return drewlabs_core_array_udt_to_array($item, false);
+        }, $variadic_params);
+        $params = array_merge([function () {
+            return func_get_args();
+        }, $lhs], $arrayableItems);
+        return array_map(...$params);
+    }
+}
+
+
+if (!function_exists('drewlabs_core_array_szip')) {
+    /**
+     * Zip two or more array values in a single list
+     * 
+     * Arrays passed as paramter must of of the same size as the first array
+     *
+     * @param array|mixed $lhs
+     * @param array|mixed ...$rhs
+     * @return array[]
+     */
+    function drewlabs_core_array_szip($lhs, ...$rhs)
+    {
+        $variadic_params = array_slice(func_get_args(), 1);
+        $lhs = drewlabs_core_array_udt_to_array($lhs, false);
+        $count = count($lhs);
+        // Transform all variadic params to array to ensure data integrity
+        $arrayableItems = array_map(function ($item) {
+            return drewlabs_core_array_udt_to_array($item, false);
+        }, $variadic_params);
+        // Ensure that all arrays are of the same size
+        $all_same_size = array_filter($arrayableItems, function ($v) use ($count) {
+            return count($v) === $count;
+        }) === $arrayableItems;
+        if (!$all_same_size) {
+            throw new \InvalidArgumentException('All params must be of the same size');
+        }
+        return drewlabs_core_array_zip($lhs, ...$rhs);
     }
 }
