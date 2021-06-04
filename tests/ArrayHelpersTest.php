@@ -170,7 +170,9 @@ class ArrayHelpersTest extends TestCase
                 'type' => 'Dynamic Language',
             ],
         ];
-        $this->assertSame(drewlabs_core_array_get($list, 'java.lang'), 'JAVA', 'Expect array get to return PHP as result');
+        $this->assertSame(drewlabs_core_array_get($list, function($values) {
+            return $values['java']['lang'];
+        }), 'JAVA', 'Expect array get to return PHP as result');
     }
 
     public function testArraySetFunction()

@@ -285,7 +285,7 @@ if (!function_exists('drewlabs_core_array_get')) {
      * Get an item from an array using "dot" notation.
      *
      * @param \ArrayAccess|array $array
-     * @param string             $key
+     * @param string|\Closure             $key
      * @param mixed              $default
      *
      * @return mixed
@@ -298,6 +298,10 @@ if (!function_exists('drewlabs_core_array_get')) {
 
         if (null === $key) {
             return $array;
+        }
+
+        if (drewlabs_core_is_callable($key)) {
+            return $key($array)  ?? ($default instanceof \Closure ? $default() : $default);
         }
 
         if (drewlabs_core_array_key_exists($array, $key)) {

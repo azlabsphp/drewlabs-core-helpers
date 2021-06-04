@@ -35,7 +35,9 @@
             "src/immutable.php",
             "src/format.php",
             "src/url.php",
-            "src/hashing.php"
+            "src/hashing.php",
+            "src/callables.php",
+            "src/reflector.php"
         ],
         "optimize-autoloader": true
     },
