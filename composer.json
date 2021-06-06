@@ -13,7 +13,7 @@
     "require": {
         "php": ">=7.0",
         "psr/http-message": "^1.0",
-        "drewlabs/contracts": "dev-master",
+        "drewlabs/contracts": "dev-master|v1.0.x-dev",
         "tuupola/base62": "^2.1"
     },
     "require-dev": {
