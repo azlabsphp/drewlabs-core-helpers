@@ -431,6 +431,9 @@ if (!function_exists('drewlabs_core_array_is_assoc')) {
      */
     function drewlabs_core_array_is_assoc(array $value)
     {
+        if (is_null($value)) {
+            return false;
+        }
         return array_keys($value) !== range(0, count($value) - 1);
     }
 }
@@ -598,5 +601,20 @@ if (!function_exists('drewlabs_core_array_szip')) {
             throw new \InvalidArgumentException('All params must be of the same size');
         }
         return drewlabs_core_array_zip($lhs, ...$rhs);
+    }
+}
+
+if (!function_exists('drewlabs_core_array_is_no_assoc_array_list')) {
+    /**
+     * Process entries in the provided list and return true if the list is a list of list.
+     *
+     * @return bool
+     */
+    function drewlabs_core_array_is_no_assoc_array_list(array $items)
+    {
+        if (drewlabs_core_array_is_assoc($items)) {
+            return false;
+        }
+        return array_filter($items, 'is_array') === $items;
     }
 }
