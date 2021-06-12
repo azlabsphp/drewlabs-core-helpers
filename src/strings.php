@@ -279,6 +279,7 @@ if (!function_exists('drewlabs_core_strings_after')) {
         if (!is_bool(strpos($haystack, $character))) {
             return substr($haystack, strpos($haystack, $character) + strlen($character));
         }
+        return "";
     }
 }
 
@@ -310,7 +311,12 @@ if (!function_exists('drewlabs_core_strings_before')) {
      */
     function drewlabs_core_strings_before($character, $haystack)
     {
-        return substr($haystack, 0, strpos($haystack, $character));
+        $pos = strpos($haystack, $character);
+        if ($pos) {
+            return substr($character, 0, $pos);
+        }
+        return "";
+        // return substr($haystack, 0, strpos($haystack, $character));
     }
 }
 
