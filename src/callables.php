@@ -51,3 +51,21 @@ if (!function_exists('drewlabs_core_is_callable')) {
         return false;
     }
 }
+
+if (!function_exists('drewlabs_core_filter_fn_params')) {
+    /**
+     * Filter paramters of a function based on existance of key in the provided parameter
+     *
+     * @param string|array $value
+     * @return array
+     */
+    function drewlabs_core_filter_fn_params($value)
+    {
+        return function ($param) use ($value) {
+            if (is_array($value)) {
+                return !in_array($param, $value);
+            }
+            return $param !== $value;
+        };
+    }
+}
