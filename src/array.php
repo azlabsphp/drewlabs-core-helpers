@@ -612,9 +612,7 @@ if (!function_exists('drewlabs_core_array_is_no_assoc_array_list')) {
      */
     function drewlabs_core_array_is_no_assoc_array_list(array $items)
     {
-        if (drewlabs_core_array_is_assoc($items)) {
-            return false;
-        }
-        return array_filter($items, 'is_array') === $items;
+        $items = array_values($items);
+        return !empty($items) && array_filter($items, 'is_array') === $items;
     }
 }
