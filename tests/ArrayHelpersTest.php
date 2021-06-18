@@ -28,8 +28,8 @@ class ArrayHelpersTest extends TestCase
 
     public function testIsArrayList()
     {
-        $testArray = ['Hello', 'World!', 'Java', 'Php'];
-        $this->assertTrue(!drewlabs_core_array_is_array_list($testArray));
+        $testArray = [['Hello'], ['World!'], ['Java'], ['Php']];
+        $this->assertTrue(drewlabs_core_array_is_no_assoc_array_list($testArray));
     }
 
     public function testArrayCombine()
