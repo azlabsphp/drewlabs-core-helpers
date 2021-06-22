@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+
 /*
  * This file is part of the Drewlabs package.
  *
@@ -94,10 +95,16 @@ if (!function_exists('drewlabs_core_random_guid')) {
     /**
      * Generate a Global unique identifier (GUID).
      *
-     * @return string
+     * @return string|mixed
      */
-    function drewlabs_core_random_guid()
+    function drewlabs_core_random_guid($factory =  null)
     {
+        if ($factory) {
+            return (string)call_user_func($factory);
+        }
+        if (class_exists('Ramsey\\Uuid\\Uuid')) {
+            return (string)(new ReflectionMethod('Ramsey\\Uuid\\Uuid', 'uuid4'))->invoke(null, []);
+        }
         if (function_exists('com_create_guid')) {
             return trim(com_create_guid(), '{}');
         }
@@ -113,5 +120,57 @@ if (!function_exists('drewlabs_core_random_guid')) {
             random_int(0, 65535),
             random_int(0, 65535)
         );
+    }
+}
+
+if (!function_exists('drewlabs_core_random_ordered_uuid')) {
+    /**
+     * Generate a time-ordered UUID (version 4).
+     *
+     * @return string|mixed
+     */
+    function drewlabs_core_random_ordered_uuid($factory = null)
+    {
+        if ($factory) {
+            return call_user_func($factory);
+        }
+        if (!class_exists('Ramsey\\Uuid\\UuidFactory')) {
+            throw new Exception(sprintf("%s required the ramsey/uuid library", __FUNCTION__));
+        }
+        $factoryClazz = 'Ramsey\\Uuid\\UuidFactory';
+        $factory = new $factoryClazz();
+        if (!class_exists('Ramsey\\Uuid\\Generator\\CombGenerator')) {
+            throw new Exception(sprintf("%s required the ramsey/uuid library", __FUNCTION__));
+        }
+        $generatorClazz = 'Ramsey\\Uuid\\Generator\\CombGenerator';
+        $factory->setRandomGenerator(new $generatorClazz(
+            $factory->getRandomGenerator(),
+            $factory->getNumberConverter()
+        ));
+
+        if (!class_exists('Ramsey\\Uuid\\Codec\\TimestampFirstCombCodec')) {
+            throw new Exception(sprintf("%s required the ramsey/uuid library", __FUNCTION__));
+        }
+        $codecClazz = 'Ramsey\\Uuid\\Codec\\TimestampFirstCombCodec';
+        $factory->setCodec(new $codecClazz(
+            $factory->getUuidBuilder()
+        ));
+
+        return (string)$factory->uuid4();
+    }
+}
+
+if (!function_exists('drewlabs_core_random_create_uuids_using')) {
+    /**
+     * Set the callable that will be used to generate UUIDs.
+     *
+     * @param  callable|null  $factory
+     * @return string|mixed
+     */
+    function drewlabs_core_random_create_uuids_using(callable $factory = null)
+    {
+        return (function () use ($factory) {
+            return (string)drewlabs_core_random_guid($factory);
+        })();
     }
 }
