@@ -93,7 +93,7 @@ if (!function_exists('drewlabs_core_random_int')) {
 
 if (!function_exists('drewlabs_core_random_guid')) {
     /**
-     * Generate a Global unique identifier (GUID).
+     * Generate a Global unique identifier (GUID) (version 4)
      *
      * @return string|mixed
      */
@@ -125,7 +125,7 @@ if (!function_exists('drewlabs_core_random_guid')) {
 
 if (!function_exists('drewlabs_core_random_ordered_uuid')) {
     /**
-     * Generate a time-ordered UUID (version 4).
+     * Generate a time-ordered Global unique identifier (version 4).
      *
      * @return string|mixed
      */
@@ -162,7 +162,7 @@ if (!function_exists('drewlabs_core_random_ordered_uuid')) {
 
 if (!function_exists('drewlabs_core_random_create_uuids_using')) {
     /**
-     * Set the callable that will be used to generate UUIDs.
+     * Generate a GUuid using the provided callable
      *
      * @param  callable|null  $factory
      * @return string|mixed
