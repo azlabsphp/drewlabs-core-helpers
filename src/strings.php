@@ -313,10 +313,9 @@ if (!function_exists('drewlabs_core_strings_before')) {
     {
         $pos = strpos($haystack, $character);
         if ($pos) {
-            return substr($character, 0, $pos);
+            return substr($haystack, 0, $pos);
         }
         return "";
-        // return substr($haystack, 0, strpos($haystack, $character));
     }
 }
 
