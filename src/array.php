@@ -629,7 +629,6 @@ if (!function_exists('drewlabs_core_array_value_retriever_func')) {
     function drewlabs_core_array_value_retriever_func($value = null)
     {
         return function ($item) use ($value) {
-            var_dump($item);
             if (null === $value || !is_string($value)) {
                 return $item;
 
