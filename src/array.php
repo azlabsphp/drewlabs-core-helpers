@@ -618,3 +618,48 @@ if (!function_exists('drewlabs_core_array_is_no_assoc_array_list')) {
         return !empty($items) && array_filter($items, 'is_array') === $items;
     }
 }
+
+if (!function_exists('drewlabs_core_array_value_retriever_func')) {
+    /**
+     * Get a value retrieving callback.
+     *
+     * @param  string|null  $value
+     * @return callable
+     */
+    function drewlabs_core_array_value_retriever_func($value = null)
+    {
+        return function ($item) use ($value) {
+            var_dump($item);
+            if (null === $value || !is_string($value)) {
+                return $item;
+
+            }
+            return drewlabs_core_array_get($item, $value);
+        };
+    }
+}
+
+if (!function_exists('drewlabs_core_array_unique')) {
+    /**
+     * Undocumented function
+     *
+     * @param array $haystack
+     * @param string $key
+     * @param boolean $strict
+     * @return array
+     */
+    function drewlabs_core_array_unique($haystack, string $key = null, $strict = false)
+    {
+        $callback = drewlabs_core_array_value_retriever_func($key);
+        $exists = [];
+        $out = [];
+        foreach ($haystack as $key => $value) {
+            # code...
+            if (!in_array($id = $callback($value), $exists, $strict)) {
+                $out[$key] = $value; 
+            }
+            $exists[] = $id;
+        }
+        return $out;
+    }
+}
