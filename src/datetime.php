@@ -53,7 +53,7 @@ if (!function_exists('drewlabs_core_datetime_now')) {
         if (\drewlabs_core_strings_is_str($timezone)) {
             $timezone = new \DateTimeZone($timezone);
         }
-        return new \DateTime('now', $timezone);
+        return new \DateTimeImmutable('now', $timezone);
     }
 }
 
@@ -89,7 +89,7 @@ if (!function_exists('drewlabs_core_datetime_from_timestamp')) {
      */
     function drewlabs_core_datetime_from_timestamp(int $timestamp)
     {
-        return new \DateTime('@' . $timestamp);
+        return new \DateTimeImmutable('@' . $timestamp);
     }
 }
 
@@ -236,7 +236,7 @@ if (!function_exists('drewlabs_core_datetime_resolve')) {
             return \drewlabs_core_datetime_now_with_tz();
         }
         if (is_string($date)) {
-            return new \DateTime($date, $current_date->getTimezone());
+            return new \DateTimeImmutable($date, $current_date->getTimezone());
         }
         \drewlabs_core_datetime_expect_date_time($date, array('null', 'String'));
         return ($date instanceof \DateTime) || ($date instanceof \DateTimeInterface) ? $date : \drewlabs_core_datetime_make_date($date);
@@ -257,7 +257,7 @@ if (!function_exists('drewlabs_core_datetime_make_date')) {
             return clone $date;
         }
         \drewlabs_core_datetime_expect_date_time($date);
-        return new \DateTime($date->format('Y-m-d H:i:s.u'), $date->getTimezone());
+        return new \DateTimeImmutable($date->format('Y-m-d H:i:s.u'), $date->getTimezone());
     }
 }
 
