@@ -662,3 +662,35 @@ if (!function_exists('drewlabs_core_array_unique')) {
         return $out;
     }
 }
+
+if (!function_exists('drewlabs_core_array_key_last')) {
+    /**
+     * Return the last key of a php array
+     *
+     * @param array $list
+     * @return int|string|mixed
+     */
+    function drewlabs_core_array_key_last(array $list)
+    {
+        if (function_exists('array_key_last')) {
+            return array_key_last($list);
+        }
+        return !empty($array) ? key(array_slice($array, -1, 1, true)) : null;
+    }
+}
+
+if (!function_exists('drewlabs_core_array_key_first')) {
+    /**
+     * Returns the first key of a PHP array
+     *
+     * @param array $list
+     * @return int|string|mixed
+     */
+    function drewlabs_core_array_key_first(array $list)
+    {
+        if (function_exists('array_key_first')) {
+            return array_key_first($list);
+        }
+        return key($list);
+    }
+}
