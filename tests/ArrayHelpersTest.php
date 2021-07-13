@@ -256,5 +256,15 @@ class ArrayHelpersTest extends TestCase
             var_dump($values->getArrayCopy());
         }
         return $this->assertTrue(true);
+    } // 
+
+    public function testIteratorReduce()
+    {
+        $list = new ArrayIterator([1,2,3,4,5]);
+
+        $result = drewlabs_core_iter_reduce($list, function($carry, $item) {
+            return $carry + $item;
+        }, 0);
+        return $this->assertTrue($result === 15);
     }
 }

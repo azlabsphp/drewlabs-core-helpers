@@ -24,3 +24,23 @@ if (!function_exists('drewlabs_core_iter_map')) {
         return new ArrayIterator($preserve_keys ? array_combine($keys, $items) : $items);
     }
 }
+
+if (!function_exists('drewlabs_core_iter_reduce')) {
+    /**
+     * Apply a reducer to the values of a given iterator
+     *
+     * @param Iterator $it
+     * @param \Closure $callback
+     * @return mixed
+     */
+    function drewlabs_core_iter_reduce(Iterator $it, \Closure $reducer, $initial_value = NULL)
+    {
+        $out = $initial_value;
+        iterator_apply($it, function (Iterator $it) use ($reducer, &$out) {
+            list($current, $key) = [$it->current(), $it->key()];
+            $out = $reducer($out, $current, $key);
+            return true;
+        }, [$it]);
+        return $out;
+    }
+}
