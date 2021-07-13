@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests;
 
+use ArrayIterator;
 use PHPUnit\Framework\TestCase;
 
 class ArrayHelpersTest extends TestCase
@@ -236,5 +237,24 @@ class ArrayHelpersTest extends TestCase
         $this->assertEquals(count($list[0]), 3, 'Expect the total items in the first index of the list to have a total length equals 3');
         $this->assertTrue($list[0][0] === 1, 'Expect first item of the list first element to equal 1');
         print_r($list);
+    }
+
+    public function  testIteratorMap()
+    {
+        $list = new ArrayIterator([
+            'english' => 'Hello!',
+            'french' => 'Salut!',
+            'spanish' => 'Hola!',
+            'latin' => 'Salve!',
+            'german' => 'Guten Tag!'
+        ]);
+
+        $values = drewlabs_core_iter_map($list, function($item) {
+            return strtoupper($item);
+        }, true);
+        if ($values instanceof ArrayIterator) {
+            var_dump($values->getArrayCopy());
+        }
+        return $this->assertTrue(true);
     }
 }

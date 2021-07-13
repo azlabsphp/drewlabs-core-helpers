@@ -38,7 +38,8 @@
             "src/url.php",
             "src/hashing.php",
             "src/callables.php",
-            "src/reflector.php"
+            "src/reflector.php",
+            "src/iterators.php"
         ],
         "optimize-autoloader": true
     },

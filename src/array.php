@@ -631,7 +631,6 @@ if (!function_exists('drewlabs_core_array_value_retriever_func')) {
         return function ($item) use ($value) {
             if (null === $value || !is_string($value)) {
                 return $item;
-
             }
             return drewlabs_core_array_get($item, $value);
         };
@@ -655,14 +654,13 @@ if (!function_exists('drewlabs_core_array_unique')) {
         foreach ($haystack as $key => $value) {
             # code...
             if (!in_array($id = $callback($value), $exists, $strict)) {
-                $out[$key] = $value; 
+                $out[$key] = $value;
             }
             $exists[] = $id;
         }
         return $out;
     }
 }
-
 if (!function_exists('drewlabs_core_array_key_last')) {
     /**
      * Return the last key of a php array
@@ -675,7 +673,7 @@ if (!function_exists('drewlabs_core_array_key_last')) {
         if (function_exists('array_key_last')) {
             return array_key_last($list);
         }
-        return !empty($array) ? key(array_slice($array, -1, 1, true)) : null;
+        return !empty($list) ? key(array_slice($list, -1, 1, true)) : null;
     }
 }
 
@@ -694,3 +692,30 @@ if (!function_exists('drewlabs_core_array_key_first')) {
         return key($list);
     }
 }
+
+if (!function_exists('drewlabs_core_array_last')) {
+    /**
+     * Return the last element of a php array
+     *
+     * @param array $list
+     * @return int|string|mixed
+     */
+    function drewlabs_core_array_last(array $list)
+    {
+        return !empty($list) ? array_slice($list, -1, 1, false)[0] : null;
+    }
+}
+
+if (!function_exists('drewlabs_core_array_first')) {
+    /**
+     * Returns the first element of a PHP array
+     *
+     * @param array $list
+     * @return int|string|mixed
+     */
+    function drewlabs_core_array_first(array $list)
+    {
+        return !empty($list) ? array_slice($list, 0, 1, false)[0] : null;
+    }
+}
+
