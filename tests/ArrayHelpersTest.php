@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Drewlabs\Core\Helpers\Tests;
 
 use ArrayIterator;
+use Drewlabs\Core\Helpers\Arrays\BinarySearchBoundEnum;
 use PHPUnit\Framework\TestCase;
 
 class ArrayHelpersTest extends TestCase
@@ -171,7 +172,7 @@ class ArrayHelpersTest extends TestCase
                 'type' => 'Dynamic Language',
             ],
         ];
-        $this->assertSame(drewlabs_core_array_get($list, function($values) {
+        $this->assertSame(drewlabs_core_array_get($list, function ($values) {
             return $values['java']['lang'];
         }), 'JAVA', 'Expect array get to return PHP as result');
     }
@@ -215,7 +216,7 @@ class ArrayHelpersTest extends TestCase
             'python' => [
                 'lang' => 'Python',
                 'type' => 'Dynamic Language',
-            ],
+            ]
         ];
         $this->assertSame(drewlabs_core_array_map($list, static function ($i) {
             return $i['lang'];
@@ -249,7 +250,7 @@ class ArrayHelpersTest extends TestCase
             'german' => 'Guten Tag!'
         ]);
 
-        $values = drewlabs_core_iter_map($list, function($item) {
+        $values = drewlabs_core_iter_map($list, function ($item) {
             return strtoupper($item);
         }, true);
         if ($values instanceof ArrayIterator) {
@@ -258,13 +259,65 @@ class ArrayHelpersTest extends TestCase
         return $this->assertTrue(true);
     } // 
 
-    public function testIteratorReduce()
+    public function testIteratorReduceFunction()
     {
-        $list = new ArrayIterator([1,2,3,4,5]);
+        $list = new ArrayIterator([1, 2, 3, 4, 5]);
 
-        $result = drewlabs_core_iter_reduce($list, function($carry, $item) {
+        $result = drewlabs_core_iter_reduce($list, function ($carry, $item) {
             return $carry + $item;
         }, 0);
         return $this->assertTrue($result === 15);
+    }
+
+    public function testIsAssocFunction()
+    {
+        $array = [
+            'php' => [
+                'lang' => 'PHP',
+                'type' => 'Dynamic Language',
+            ],
+            'java' => [
+                'lang' => 'JAVA',
+                'type' => 'Statically Type Language',
+            ],
+            [
+                'lang' => 'Python',
+                'type' => 'Dynamic Language',
+            ]
+        ];
+        $this->assertFalse(drewlabs_core_array_is_full_assoc($array), 'Expect the array to not be an associative array');
+    }
+
+    public function testBinarySearchFunction()
+    {
+        // $array = [1, 2, 3, 4, 5, 6];
+        // $this->assertEquals(drewlabs_core_array_bsearch($array, 5, function ($curr, $item) {
+        //     if ($curr === $item) {
+        //         return BinarySearchBoundEnum::FOUND;
+        //     }
+        //     return $curr > $item ? BinarySearchBoundEnum::LOWER : BinarySearchBoundEnum::UPPER;
+        // }), 4, 'Expect drewlabs_core_array_bsearch function to return 5');
+
+        $array = [
+            'php' => [
+                'lang' => 'PHP',
+                'type' => 'Dynamic Language',
+            ],
+            'java' => [
+                'lang' => 'JAVA',
+                'type' => 'Statically Type Language',
+            ],
+            'python' => [
+                'lang' => 'Python',
+                'type' => 'Dynamic Language',
+            ],
+        ];
+        sort($array);
+        $this->assertEquals(drewlabs_core_array_bsearch($array, 'JAVA', function ($curr, $item) {
+            if (strcmp($curr['lang'], $item) === 0) {
+                return BinarySearchBoundEnum::FOUND;
+            }
+            return strcmp($curr['lang'], $item) > 0 ? BinarySearchBoundEnum::LOWER : BinarySearchBoundEnum::UPPER;
+        }), 0, 'Expect drewlabs_core_array_bsearch function to return 0');
     }
 }

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Drewlabs\Core\Helpers\Arrays\BinarySearchBoundEnum;
+
 /*
  * This file is part of the Drewlabs package.
  *
@@ -438,6 +440,30 @@ if (!function_exists('drewlabs_core_array_is_assoc')) {
     }
 }
 
+if (!function_exists('drewlabs_core_array_is_full_assoc')) {
+    /**
+     * Checks if an array is an associative array.
+     * 
+     * This checks if all array keys are string values
+     * 
+     * Performs a O(n) comparison in a worst case scenario
+     * 
+     * Use it instead of {drewlabs_core_array_is_assoc} to increase
+     * error checking on full associative arrays
+     *
+     * @return bool
+     */
+    function drewlabs_core_array_is_full_assoc(array $value)
+    {
+        if (is_null($value)) {
+            return false;
+        }
+        return drewlabs_core_array_ssearch(array_keys($value), null, function ($item) {
+            return !is_string($item);
+        }) === -1;
+    }
+}
+
 if (!function_exists('drewlabs_core_array_group_count')) {
     /**
      * Group array values by the number of their occurence in the array.
@@ -719,3 +745,77 @@ if (!function_exists('drewlabs_core_array_first')) {
     }
 }
 
+if (!function_exists('drewlabs_core_array_bsearch')) {
+    function drewlabs_core_array_bsearch(array $list, $x = null, \Closure $fn = null, int $l = null, int $r = null)
+    {
+        $search = function (
+            array $array,
+            $item = null,
+            \Closure $predicate = null,
+            int $start = null,
+            int $end = null
+        )  use (&$search) {
+            $start = $start ?? (!empty($array) ? drewlabs_core_array_key_first($array) : 0);
+            $end = $end ?? (!empty($array) ? drewlabs_core_array_key_last($array) : 0);
+            if ($end >= $start) {
+                $mid = intval(ceil($start + ($end - $start) / 2));
+                $result = $predicate ? $predicate($array[$mid], $item) : null;
+                // If the predicate return not null 0, match is found
+                if ((null !== $result) ? ($result === BinarySearchBoundEnum::FOUND) : $array[$mid] == $item) {
+                    return floor($mid);
+                }
+                // If the predicate return not null 1, search the lower bound
+                if ((null !== $result) ? $result === BinarySearchBoundEnum::LOWER : $array[$mid] > $item)
+                    return $search(
+                        $array,
+                        $item,
+                        $predicate,
+                        $start,
+                        $mid - 1
+                    );
+
+
+                // Else, search the upper bound
+                return $search(
+                    $array,
+                    $item,
+                    $predicate,
+                    $mid + 1,
+                    $end
+                );
+            }
+
+            // We reach here when element 
+            // is not present in array
+            return -1;
+        };
+        // First convert array to numeric array to avoid dealing with associative array
+        $list = array_values($list);
+        return $search($list, $x, $fn, $l, $r);
+    }
+}
+
+
+if (!function_exists('drewlabs_core_array_ssearch')) {
+    /**
+     * Perform a sequential search on array and apply a predicate function to it if one is passed
+     *
+     * @param array $list
+     * @param mixed $x
+     * @param \Closure $fn
+     * @return string|int
+     */
+    function drewlabs_core_array_ssearch(array $list, $x = null, \Closure $fn = null)
+    {
+        $it = new ArrayIterator($list);
+        $index = -1;
+        while (($value = $it->current()) !== null) {
+            if ($fn ? $fn($value, $x) : $value === $x) {
+                $index = $it->key();
+                break;
+            }
+            $it->next();
+        }
+        return $index;
+    }
+}
