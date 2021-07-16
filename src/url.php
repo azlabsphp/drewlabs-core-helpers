@@ -12,6 +12,7 @@ declare(strict_types=1);
  */
 
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 
 if (!function_exists('drewlabs_core_url_has_valid_signature')) {
 
@@ -94,7 +95,7 @@ if (!function_exists('drewlabs_core_url_get_request_url')) {
      */
     function drewlabs_core_url_get_request_url(ServerRequestInterface $request)
     {
-        return rtrim(preg_replace('/\?.*/', '', $request->getUri()), '/');
+        return rtrim(preg_replace('/\?.*/', '', (string)$request->getUri()), '/');
     }
 }
 
@@ -111,5 +112,24 @@ if (!function_exists('drewlabs_core_url_get_request_path')) {
         $pattern = trim($requestURI->getPath(), '/');
 
         return '' === $pattern ? '/' : $pattern;
+    }
+}
+
+
+if(!function_exists('drewlabs_core_url_is_http_url'))
+{
+    /**
+     * Checks if the provided uri is a valid HTTP url
+     *
+     * @param string|UriInterface $url
+     * @return bool
+     */
+    function drewlabs_core_url_is_http_url($url)
+    {
+        if ($url instanceof UriInterface) {
+            $url = (string)$url;
+        }
+        return filter_var($url, FILTER_VALIDATE_URL) !== false
+            && in_array(parse_url($url, PHP_URL_SCHEME), ['http', 'https']);
     }
 }
