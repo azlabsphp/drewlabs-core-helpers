@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__ . '/vendor/autoload.php';
+
 $header = <<<'HEADER'
 This file is part of the Drewlabs package.
 
@@ -10,7 +12,6 @@ file that was distributed with this source code.
 HEADER;
 
 $rules = [
-    '@PHP56Migration' => true,
     '@PHP56Migration:risky' => true,
     '@PHP70Migration' => true,
     '@PHP70Migration:risky' => true,
@@ -50,7 +51,7 @@ $rules = [
     'static_lambda' => true,
     'strict_comparison' => true,
     'strict_param' => true,
-    'void_return' => null,
+    'void_return' => false,
 ];
 
 
@@ -59,12 +60,10 @@ $finder = PhpCsFixer\Finder::create()
     ->exclude('Tests/Fixtures')
     ->exclude('tests/Fixtures')
     ->exclude('Resources/skeleton')
-    ->exclude('Resources/public/vendor')
-;
+    ->exclude('Resources/public/vendor');
 
-return PhpCsFixer\Config::create()
+return (new PhpCsFixer\Config())
     ->setFinder($finder)
     ->setRiskyAllowed(true)
     ->setRules($rules)
-    ->setUsingCache(true)
-;
+    ->setUsingCache(true);

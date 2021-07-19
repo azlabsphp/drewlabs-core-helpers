@@ -237,7 +237,6 @@ class ArrayHelpersTest extends TestCase
         $this->assertTrue(\drewlabs_core_array_is_arrayable($list), 'Expect the returned list ot be an array');
         $this->assertEquals(count($list[0]), 3, 'Expect the total items in the first index of the list to have a total length equals 3');
         $this->assertTrue($list[0][0] === 1, 'Expect first item of the list first element to equal 1');
-        print_r($list);
     }
 
     public function  testIteratorMap()
@@ -253,10 +252,7 @@ class ArrayHelpersTest extends TestCase
         $values = drewlabs_core_iter_map($list, function ($item) {
             return strtoupper($item);
         }, true);
-        if ($values instanceof ArrayIterator) {
-            var_dump($values->getArrayCopy());
-        }
-        return $this->assertTrue(true);
+        return $this->assertInstanceOf(ArrayIterator::class, $values, 'Expect drewlabs_core_iter_map to return an Array Iterator');
     } // 
 
     public function testIteratorReduceFunction()

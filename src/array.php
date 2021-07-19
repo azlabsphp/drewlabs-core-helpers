@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Drewlabs\Core\Helpers\Arrays\BinarySearchBoundEnum;
-
 /*
  * This file is part of the Drewlabs package.
  *
@@ -12,6 +10,8 @@ use Drewlabs\Core\Helpers\Arrays\BinarySearchBoundEnum;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+use Drewlabs\Core\Helpers\Arrays\BinarySearchBoundEnum;
 
 if (!function_exists('drewlabs_core_array_sort')) {
     /**
@@ -153,7 +153,7 @@ if (!function_exists('drewlabs_core_array_where')) {
      */
     function drewlabs_core_array_where($array, callable $callback, $preserve_keys = true)
     {
-        return $preserve_keys ? array_filter($array, $callback, ARRAY_FILTER_USE_BOTH) : array_values(array_filter($array, $callback, ARRAY_FILTER_USE_BOTH));
+        return $preserve_keys ? array_filter($array, $callback, \ARRAY_FILTER_USE_BOTH) : array_values(array_filter($array, $callback, \ARRAY_FILTER_USE_BOTH));
     }
 }
 
@@ -227,11 +227,13 @@ if (!function_exists('drewlabs_core_array_object_to_array')) {
                         $item[$k] = $entryToArray($v);
                     }
                 }
+
                 return $item;
             }
 
             return null;
         };
+
         return $entryToArray($value);
     }
 }
@@ -287,7 +289,7 @@ if (!function_exists('drewlabs_core_array_get')) {
      * Get an item from an array using "dot" notation.
      *
      * @param \ArrayAccess|array $array
-     * @param string|\Closure             $key
+     * @param string|\Closure    $key
      * @param mixed              $default
      *
      * @return mixed
@@ -302,8 +304,8 @@ if (!function_exists('drewlabs_core_array_get')) {
             return $array;
         }
 
-        if (drewlabs_core_is_callable($key)) {
-            return $key($array)  ?? ($default instanceof \Closure ? $default() : $default);
+        if ($key instanceof \Closure) {
+            return $key($array) ?? ($default instanceof \Closure ? $default() : $default);
         }
 
         if (drewlabs_core_array_key_exists($array, $key)) {
@@ -433,9 +435,10 @@ if (!function_exists('drewlabs_core_array_is_assoc')) {
      */
     function drewlabs_core_array_is_assoc(array $value)
     {
-        if (is_null($value)) {
+        if (null === $value) {
             return false;
         }
+
         return array_keys($value) !== range(0, count($value) - 1);
     }
 }
@@ -443,11 +446,11 @@ if (!function_exists('drewlabs_core_array_is_assoc')) {
 if (!function_exists('drewlabs_core_array_is_full_assoc')) {
     /**
      * Checks if an array is an associative array.
-     * 
+     *
      * This checks if all array keys are string values
-     * 
+     *
      * Performs a O(n) comparison in a worst case scenario
-     * 
+     *
      * Use it instead of {drewlabs_core_array_is_assoc} to increase
      * error checking on full associative arrays
      *
@@ -455,12 +458,13 @@ if (!function_exists('drewlabs_core_array_is_full_assoc')) {
      */
     function drewlabs_core_array_is_full_assoc(array $value)
     {
-        if (is_null($value)) {
+        if (null === $value) {
             return false;
         }
-        return drewlabs_core_array_ssearch(array_keys($value), null, function ($item) {
+
+        return -1 === drewlabs_core_array_ssearch(array_keys($value), null, static function ($item) {
             return !is_string($item);
-        }) === -1;
+        });
     }
 }
 
@@ -487,6 +491,7 @@ if (!function_exists('drewlabs_core_array_except')) {
     /**
      * Return all items in an array execpt the specified keys.
      *
+     * @param array $array
      * @param string[]|string $keys
      *
      * @return array
@@ -541,11 +546,11 @@ if (!function_exists('drewlabs_core_array_remove')) {
 if (!function_exists('drewlabs_core_array_udt_to_array')) {
     /**
      * Convert a given user define type to array.
-     * 
-     * If $preserve_keys = false the first layer of the array is 
+     *
+     * If $preserve_keys = false the first layer of the array is
      *
      * @param mixed $value
-     * @param bool $preserve_keys
+     * @param bool  $preserve_keys
      *
      * @return array|null
      */
@@ -561,7 +566,7 @@ if (!function_exists('drewlabs_core_array_udt_to_array')) {
         } elseif (is_object($value)) {
             if (method_exists($value, 'all')) {
                 $value = $value->all();
-            } else if (method_exists($value, 'toArray')) {
+            } elseif (method_exists($value, 'toArray')) {
                 $value = $value->toArray();
             } elseif (method_exists($value, 'toJson')) {
                 $value = json_decode($value->toJson(), true);
@@ -570,44 +575,46 @@ if (!function_exists('drewlabs_core_array_udt_to_array')) {
             }
         }
         if (!is_array($value)) {
-            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of' . \Traversable::class . ', ' . \JsonSerializable::class);
+            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of'.\Traversable::class.', '.\JsonSerializable::class);
         }
+
         return $preserve_keys ? $value : array_values($value);
     }
 }
 
-
 if (!function_exists('drewlabs_core_array_zip')) {
     /**
-     * Zip two or more array values in a single list
+     * Zip two or more array values in a single list.
      *
      * @param array|mixed $lhs
      * @param array|mixed ...$rhs
+     *
      * @return array[]
      */
     function drewlabs_core_array_zip($lhs, ...$rhs)
     {
         $variadic_params = array_slice(func_get_args(), 1);
         $lhs = drewlabs_core_array_udt_to_array($lhs, false);
-        $arrayableItems = array_map(function ($item) {
+        $arrayableItems = array_map(static function ($item) {
             return drewlabs_core_array_udt_to_array($item, false);
         }, $variadic_params);
-        $params = array_merge([function () {
+        $params = array_merge([static function () {
             return func_get_args();
         }, $lhs], $arrayableItems);
+
         return array_map(...$params);
     }
 }
 
-
 if (!function_exists('drewlabs_core_array_szip')) {
     /**
-     * Zip two or more array values in a single list
-     * 
+     * Zip two or more array values in a single list.
+     *
      * Arrays passed as paramter must of of the same size as the first array
      *
      * @param array|mixed $lhs
      * @param array|mixed ...$rhs
+     *
      * @return array[]
      */
     function drewlabs_core_array_szip($lhs, ...$rhs)
@@ -616,16 +623,17 @@ if (!function_exists('drewlabs_core_array_szip')) {
         $lhs = drewlabs_core_array_udt_to_array($lhs, false);
         $count = count($lhs);
         // Transform all variadic params to array to ensure data integrity
-        $arrayableItems = array_map(function ($item) {
+        $arrayableItems = array_map(static function ($item) {
             return drewlabs_core_array_udt_to_array($item, false);
         }, $variadic_params);
         // Ensure that all arrays are of the same size
-        $all_same_size = array_filter($arrayableItems, function ($v) use ($count) {
+        $all_same_size = array_filter($arrayableItems, static function ($v) use ($count) {
             return count($v) === $count;
         }) === $arrayableItems;
         if (!$all_same_size) {
             throw new \InvalidArgumentException('All params must be of the same size');
         }
+
         return drewlabs_core_array_zip($lhs, ...$rhs);
     }
 }
@@ -641,6 +649,7 @@ if (!function_exists('drewlabs_core_array_is_no_assoc_array_list')) {
         if (drewlabs_core_array_is_assoc($items)) {
             return false;
         }
+
         return !empty($items) && array_filter($items, 'is_array') === $items;
     }
 }
@@ -649,15 +658,17 @@ if (!function_exists('drewlabs_core_array_value_retriever_func')) {
     /**
      * Get a value retrieving callback.
      *
-     * @param  string|null  $value
+     * @param string|null $value
+     *
      * @return callable
      */
     function drewlabs_core_array_value_retriever_func($value = null)
     {
-        return function ($item) use ($value) {
+        return static function ($item) use ($value) {
             if (null === $value || !is_string($value)) {
                 return $item;
             }
+
             return drewlabs_core_array_get($item, $value);
         };
     }
@@ -665,33 +676,34 @@ if (!function_exists('drewlabs_core_array_value_retriever_func')) {
 
 if (!function_exists('drewlabs_core_array_unique')) {
     /**
-     * Undocumented function
+     * Undocumented function.
      *
-     * @param array $haystack
+     * @param array  $haystack
      * @param string $key
-     * @param boolean $strict
+     * @param bool   $strict
+     *
      * @return array
      */
-    function drewlabs_core_array_unique($haystack, string $key = null, $strict = false)
+    function drewlabs_core_array_unique($haystack, ?string $key = null, $strict = false)
     {
         $callback = drewlabs_core_array_value_retriever_func($key);
         $exists = [];
         $out = [];
         foreach ($haystack as $key => $value) {
-            # code...
+            // code...
             if (!in_array($id = $callback($value), $exists, $strict)) {
                 $out[$key] = $value;
             }
             $exists[] = $id;
         }
+
         return $out;
     }
 }
 if (!function_exists('drewlabs_core_array_key_last')) {
     /**
-     * Return the last key of a php array
+     * Return the last key of a php array.
      *
-     * @param array $list
      * @return int|string|mixed
      */
     function drewlabs_core_array_key_last(array $list)
@@ -699,15 +711,15 @@ if (!function_exists('drewlabs_core_array_key_last')) {
         if (function_exists('array_key_last')) {
             return array_key_last($list);
         }
+
         return !empty($list) ? key(array_slice($list, -1, 1, true)) : null;
     }
 }
 
 if (!function_exists('drewlabs_core_array_key_first')) {
     /**
-     * Returns the first key of a PHP array
+     * Returns the first key of a PHP array.
      *
-     * @param array $list
      * @return int|string|mixed
      */
     function drewlabs_core_array_key_first(array $list)
@@ -715,15 +727,15 @@ if (!function_exists('drewlabs_core_array_key_first')) {
         if (function_exists('array_key_first')) {
             return array_key_first($list);
         }
+
         return key($list);
     }
 }
 
 if (!function_exists('drewlabs_core_array_last')) {
     /**
-     * Return the last element of a php array
+     * Return the last element of a php array.
      *
-     * @param array $list
      * @return int|string|mixed
      */
     function drewlabs_core_array_last(array $list)
@@ -734,9 +746,8 @@ if (!function_exists('drewlabs_core_array_last')) {
 
 if (!function_exists('drewlabs_core_array_first')) {
     /**
-     * Returns the first element of a PHP array
+     * Returns the first element of a PHP array.
      *
-     * @param array $list
      * @return int|string|mixed
      */
     function drewlabs_core_array_first(array $list)
@@ -746,26 +757,26 @@ if (!function_exists('drewlabs_core_array_first')) {
 }
 
 if (!function_exists('drewlabs_core_array_bsearch')) {
-    function drewlabs_core_array_bsearch(array $list, $x = null, \Closure $fn = null, int $l = null, int $r = null)
+    function drewlabs_core_array_bsearch(array $list, $x = null, ?Closure $fn = null, ?int $l = null, ?int $r = null)
     {
-        $search = function (
+        $search = static function (
             array $array,
             $item = null,
-            \Closure $predicate = null,
-            int $start = null,
-            int $end = null
-        )  use (&$search) {
+            ?Closure $predicate = null,
+            ?int $start = null,
+            ?int $end = null
+        ) use (&$search) {
             $start = $start ?? (!empty($array) ? drewlabs_core_array_key_first($array) : 0);
             $end = $end ?? (!empty($array) ? drewlabs_core_array_key_last($array) : 0);
             if ($end >= $start) {
-                $mid = intval(ceil($start + ($end - $start) / 2));
+                $mid = (int) (ceil($start + ($end - $start) / 2));
                 $result = $predicate ? $predicate($array[$mid], $item) : null;
                 // If the predicate return not null 0, match is found
-                if ((null !== $result) ? ($result === BinarySearchBoundEnum::FOUND) : $array[$mid] == $item) {
+                if ((null !== $result) ? (BinarySearchBoundEnum::FOUND === $result) : $array[$mid] === $item) {
                     return floor($mid);
                 }
                 // If the predicate return not null 1, search the lower bound
-                if ((null !== $result) ? $result === BinarySearchBoundEnum::LOWER : $array[$mid] > $item)
+                if ((null !== $result) ? BinarySearchBoundEnum::LOWER === $result : $array[$mid] > $item) {
                     return $search(
                         $array,
                         $item,
@@ -773,7 +784,7 @@ if (!function_exists('drewlabs_core_array_bsearch')) {
                         $start,
                         $mid - 1
                     );
-
+                }
 
                 // Else, search the upper bound
                 return $search(
@@ -785,27 +796,27 @@ if (!function_exists('drewlabs_core_array_bsearch')) {
                 );
             }
 
-            // We reach here when element 
+            // We reach here when element
             // is not present in array
             return -1;
         };
         // First convert array to numeric array to avoid dealing with associative array
         $list = array_values($list);
+
         return $search($list, $x, $fn, $l, $r);
     }
 }
 
-
 if (!function_exists('drewlabs_core_array_ssearch')) {
     /**
-     * Perform a sequential search on array and apply a predicate function to it if one is passed
+     * Perform a sequential search on array and apply a predicate function to it if one is passed.
      *
-     * @param array $list
-     * @param mixed $x
+     * @param mixed    $x
      * @param \Closure $fn
+     *
      * @return string|int
      */
-    function drewlabs_core_array_ssearch(array $list, $x = null, \Closure $fn = null)
+    function drewlabs_core_array_ssearch(array $list, $x = null, ?Closure $fn = null)
     {
         $it = new ArrayIterator($list);
         $index = -1;
@@ -816,6 +827,7 @@ if (!function_exists('drewlabs_core_array_ssearch')) {
             }
             $it->next();
         }
+
         return $index;
     }
 }

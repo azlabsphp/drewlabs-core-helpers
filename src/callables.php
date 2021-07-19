@@ -1,11 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the Drewlabs package.
+ *
+ * (c) Sidoine Azandrew <azandrewdevelopper@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 if (!function_exists('drewlabs_core_is_callable')) {
     /**
      * This is a PHP 7.4 compatible implementation of is_callable.
      *
-     * @param  mixed  $var
-     * @param  bool  $syntaxOnly
+     * @param mixed $var
+     * @param bool  $syntaxOnly
+     *
      * @return bool
      */
     function drewlabs_core_is_callable($var, $syntaxOnly = false)
@@ -54,17 +66,19 @@ if (!function_exists('drewlabs_core_is_callable')) {
 
 if (!function_exists('drewlabs_core_filter_fn_params')) {
     /**
-     * Filter paramters of a function based on existance of key in the provided parameter
+     * Filter paramters of a function based on existance of key in the provided parameter.
      *
      * @param string|array $value
+     *
      * @return array
      */
     function drewlabs_core_filter_fn_params($value)
     {
-        return function ($param) use ($value) {
+        return static function ($param) use ($value) {
             if (is_array($value)) {
-                return !in_array($param, $value);
+                return !in_array($param, $value, true);
             }
+
             return $param !== $value;
         };
     }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests;
 
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class DateTimeHelpersTest extends TestCase
@@ -20,18 +21,18 @@ class DateTimeHelpersTest extends TestCase
     public function testNowDatetimeFunction()
     {
         $date = drewlabs_core_datetime_now('GMT');
-        $this->assertInstanceOf(\DateTime::class, $date);
+        $this->assertInstanceOf(\DateTimeInterface::class, $date);
         $this->assertSame($date->getTimezone()->getName(), 'GMT', 'Expect the timezone of the created date to be UTC');
     }
 
     public function testDateTimeIsFuture()
     {
-        $this->assertTrue(drewlabs_core_datetime_is_future(new \DateTime('2021-10-02T09:19:01.012345Z')), 'Expect the provided date to be a future date');
+        $this->assertTrue(drewlabs_core_datetime_is_future(new DateTimeImmutable('2021-10-02T09:19:01.012345Z')), 'Expect the provided date to be a future date');
     }
 
     public function testDateTimeIsPast()
     {
-        $this->assertTrue(drewlabs_core_datetime_is_past(new \DateTime('2020-10-02T09:18:01.012345Z')), 'Expect the provided date to be a past date');
+        $this->assertTrue(drewlabs_core_datetime_is_past(new DateTimeImmutable('2020-10-02T09:18:01.012345Z')), 'Expect the provided date to be a past date');
     }
 
     public function testDateTimeFromTimeStampFunction()
@@ -39,8 +40,8 @@ class DateTimeHelpersTest extends TestCase
         $date = drewlabs_core_datetime_now_with_tz();
         $timestamps = $date->getTimestamp();
         $new_date = drewlabs_core_datetime_from_timestamp($timestamps);
-        $this->assertInstanceOf(\DateTime::class, $date, 'Expect $date to be an instance of DateTime class');
-        $this->assertInstanceOf(\DateTime::class, $new_date, 'Expect $date to be an instance of DateTime class');
+        $this->assertInstanceOf(\DateTimeInterface::class, $date, 'Expect $date to be an instance DateTimeInterface');
+        $this->assertInstanceOf(\DateTimeInterface::class, $new_date, 'Expect $date to be an instance DateTimeInterface');
         $this->assertTrue(drewlabs_core_datetime_is_same($date, $new_date), 'Expects $date and $new_date variables to be the same');
     }
 
@@ -54,7 +55,7 @@ class DateTimeHelpersTest extends TestCase
 
     public function testMakeDateFunction()
     {
-        $this->assertInstanceOf(\DateTime::class, drewlabs_core_datetime_make_date(new \DateTime()), 'Expect the result of the make function to return a date time instance');
+        $this->assertInstanceOf(\DateTimeInterface::class, drewlabs_core_datetime_make_date(new DateTimeImmutable()), 'Expect the result of the make function to return a date time instance');
     }
 
     public function testAddMinutesFunction()

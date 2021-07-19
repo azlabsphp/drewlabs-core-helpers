@@ -124,7 +124,7 @@ if (!function_exists('drewlabs_core_strings_contains')) {
      */
     function drewlabs_core_strings_contains($haystack, $needle)
     {
-        if (is_null($haystack)) {
+        if (null === $haystack) {
             return false;
         }
         // Code patch for searching for string directly without converting it to an array of character
@@ -279,7 +279,8 @@ if (!function_exists('drewlabs_core_strings_after')) {
         if (!is_bool(strpos($haystack, $character))) {
             return substr($haystack, strpos($haystack, $character) + strlen($character));
         }
-        return "";
+
+        return '';
     }
 }
 
@@ -315,7 +316,8 @@ if (!function_exists('drewlabs_core_strings_before')) {
         if ($pos) {
             return substr($haystack, 0, $pos);
         }
-        return "";
+
+        return '';
     }
 }
 
@@ -373,7 +375,7 @@ if (!function_exists('drewlabs_core_strings_strrevpos')) {
      * @param string $instr
      * @param string $needle
      *
-     * @return null|int
+     * @return int|null
      */
     function drewlabs_core_strings_strrevpos($instr, $needle)
     {
