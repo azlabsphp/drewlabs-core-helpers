@@ -219,3 +219,34 @@ if (!function_exists('drewlabs_core_create_php_class_instance')) {
         return new $clazz();
     }
 }
+
+
+if (!function_exists('drewlabs_core_is_empty'))
+{
+    /**
+     * Provides a wrapper arround PHP empty method. It allows to
+     * check if an object is empty.
+     * 
+     * By definition, an object is empty is it properties are null or not set
+     *
+     * @param object|array|string $value
+     * @return bool
+     */
+    function drewlabs_core_is_empty($value)
+    {
+        if (is_object($value))
+        {
+            if (method_exists($value, 'isEmpty')) {
+                return  call_user_func([$value, 'isEmpty'], []);
+            }
+            // Iterate over object properties and return false if one property is set
+            foreach ($value as $v) {
+                if (isset($v)) {
+                    return false;
+                }
+            }
+        }
+        return empty($value);
+    }
+
+}
