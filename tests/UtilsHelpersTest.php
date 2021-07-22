@@ -16,6 +16,7 @@ namespace Drewlabs\Core\Helpers\Tests;
 use Drewlabs\Core\Helpers\Tests\Stubs\Person;
 use Drewlabs\Core\Helpers\Tests\Stubs\PersonValueObject;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class UtilsHelpersTest extends TestCase
 {
@@ -189,5 +190,20 @@ class UtilsHelpersTest extends TestCase
         )($person);
         $this->assertNotSame(drewlabs_core_recursive_get_attribute($person, 'secret', null), drewlabs_core_recursive_get_attribute($person2, 'secret', null), 'Expect person2 to be a deep copy of person, and any modification of person does not affect person 2');
         $this->assertSame(drewlabs_core_recursive_get_attribute($person2, 'login', null), 'Azandrew', 'Expect person2 login to equals Azandrew');
+    }
+
+    public function testIsEmptyFunction()
+    {
+        $p = new stdClass;
+
+        $p2 = new stdClass;
+        $p2->name = null;
+        $p2->lastname = 'Azandrew';
+        $p2->age = 32;
+    
+        $this->assertTrue(drewlabs_core_is_empty($p), 'Expect $p to be empty');
+        $this->assertTrue(!drewlabs_core_is_empty($p2), 'Expect $p2 to be be empty');
+        $this->assertTrue(drewlabs_core_is_empty([]), 'Expect an empty array to be empty');
+        $this->assertTrue(drewlabs_core_is_empty(''), 'Expect an empty string to be empty');
     }
 }

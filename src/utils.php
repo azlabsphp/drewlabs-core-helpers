@@ -234,17 +234,25 @@ if (!function_exists('drewlabs_core_is_empty'))
      */
     function drewlabs_core_is_empty($value)
     {
-        if (is_object($value))
-        {
-            if (method_exists($value, 'isEmpty')) {
-                return  call_user_func([$value, 'isEmpty'], []);
+        $is_object_empty = function($obj) {
+            if (method_exists($obj, 'isEmpty')) {
+                return  call_user_func([$obj, 'isEmpty'], []);
+            }
+            if (empty(get_object_vars($obj))) {
+                return true;
             }
             // Iterate over object properties and return false if one property is set
-            foreach ($value as $v) {
+            foreach ($obj as $v) {
                 if (isset($v)) {
                     return false;
                 }
             }
+            // Return true if all properties of the object are not set
+            return true;
+        };
+        if (is_object($value))
+        {
+            return $is_object_empty($value);
         }
         return empty($value);
     }
