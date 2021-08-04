@@ -1,7 +1,10 @@
 <?php
 
+namespace Drewlabs\Core\Helpers\Doc;
+
 use Drewlabs\Core\Helpers\Exceptions\CSVHeaderCountException;
 use Drewlabs\Core\Helpers\Exceptions\FileNotFoundException;
+use InvalidArgumentException;
 
 class CSV
 {
