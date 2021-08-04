@@ -505,11 +505,29 @@ if (!function_exists('drewlabs_core_strings_as_snake_case')) {
      * @param string $delimiter
      * @return string
      */
-    function drewlabs_core_strings_as_snake_case(string $str, $delimiter = '_')
+    function drewlabs_core_strings_as_snake_case(string $str, $delimiter = '_', $delimiter_escape_char = '\\')
     {
-        // Convert all capital letters to $delimiter + lowercaseLetter
-        $str = str_replace([' ', $delimiter], '', lcfirst($str));
-        return \mb_strtolower(preg_replace('/[A-Z]/', $delimiter . '\\0', $str));
+        if ((null === $str) || empty($str)) {
+            return $str;
+        }
+        return str_replace(
+            ' ',
+            '',
+            str_replace(
+                [\sprintf("%s%s", $delimiter_escape_char, $delimiter), $delimiter_escape_char],
+                $delimiter,
+                trim(
+                    drewlabs_core_strings_to_lower_case(
+                        preg_replace(
+                            '/([A-Z])([a-z\d])/',
+                            $delimiter . '$0',
+                            preg_replace("/[$delimiter]/", $delimiter_escape_char, $str)
+                        )
+                    ),
+                    $delimiter
+                )
+            )
+        );
     }
 }
 
@@ -525,7 +543,7 @@ if (!function_exists('drewlabs_core_strings_as_snake_case_regex')) {
     {
         // Convert all capital letters to $delimiter + lowercaseLetter
         $str = preg_replace([' ', $delimiter], '', lcfirst($str));
-        return \mb_strtolower(preg_replace('/[A-Z]/', $delimiter . '\\0', $str));
+        return \mb_strtolower(preg_replace('/([A-Z])([a-z\d])/', $delimiter . '\\0', $str));
     }
 }
 
@@ -594,11 +612,9 @@ if (!function_exists('drewlabs_core_strings_ordutf8')) {
         if ($code >= 128) {
             if ($code < 224) {
                 $bytesnumber = 2;
-            }
-            elseif ($code < 240) {
+            } elseif ($code < 240) {
                 $bytesnumber = 3;
-            }
-            elseif ($code < 248) {
+            } elseif ($code < 248) {
                 $bytesnumber = 4;
             }
             $codetemp = $code - 192 - ($bytesnumber > 2 ? 32 : 0) - ($bytesnumber > 3 ? 16 : 0);

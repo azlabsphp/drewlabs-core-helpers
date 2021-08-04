@@ -14,6 +14,7 @@ class CSV
         bool $fistLineAsHeader = true,
         array $headers = [],
         bool $assoc = true,
+        \Closure $headerTransformer = null,
         string $separator = ",",
         string $enclosure = "\"",
         string $escape = '\\'
@@ -31,6 +32,10 @@ class CSV
                 return $out;
             }
             $headers_ = $fistLineAsHeader ? $out[0] : $headers;
+            $headers_ = $headerTransformer ? $headerTransformer($headers_) : $headers_;
+            if (!is_array($headers_)) {
+                throw new InvalidArgumentException("Transformer fn must return an array of header keys");   
+            }
             // Check if column count match between data and headers
             if (!empty($headers_) && (count($headers_) !== count($out[1]))) {
                 throw new CSVHeaderCountException('CSV header count does not match data column count');
@@ -44,6 +49,7 @@ class CSV
                         $value->{$headers_[$key]} = $curr[$key] ?? null;
                     }
                     $carry[] = $assoc ? (array)$value : $value;
+                    return $carry;
                 }, []);
             }
             return $out;
@@ -56,6 +62,7 @@ class CSV
         bool $firstLineAsHeader = true,
         array $headers = [],
         bool $assoc = true,
+        \Closure $headerTransformer = null,
         string $separator = ",",
         string $enclosure = "\"",
         string $escape = '\\'
@@ -64,6 +71,15 @@ class CSV
             throw new FileNotFoundException(sprintf("Specified file path %s could not be found", $path));
         }
         $content = file_get_contents($path);
-        return self::read($content, $firstLineAsHeader, $headers, $assoc, $separator, $enclosure, $escape);
+        return self::read(
+            $content,
+            $firstLineAsHeader,
+            $headers,
+            $assoc,
+            $headerTransformer,
+            $separator,
+            $enclosure,
+            $escape
+        );
     }
 }
