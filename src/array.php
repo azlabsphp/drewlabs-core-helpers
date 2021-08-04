@@ -814,9 +814,11 @@ if (!function_exists('drewlabs_core_array_bsearch')) {
             // is not present in array
             return -1;
         };
+        if (empty($list)) {
+            return BinarySearchResult::LEFT;
+        }
         // First convert array to numeric array to avoid dealing with associative array
         $list = array_values($list);
-
         return $search($list, $needle, $fn, $l, $r);
     }
 }
@@ -828,12 +830,15 @@ if (!function_exists('drewlabs_core_array_ssearch')) {
      * @param mixed    $x
      * @param \Closure $fn
      *
-     * @return string|int
+     * @return int
      */
     function drewlabs_core_array_ssearch(array $list, $x = null, ?Closure $fn = null)
     {
-        $it = new ArrayIterator($list);
         $index = -1;
+        if (empty($list)) {
+            return $index;
+        }
+        $it = new ArrayIterator($list);
         while (($value = $it->current()) !== null) {
             if ($fn ? $fn($value, $x) : $value === $x) {
                 $index = $it->key();
