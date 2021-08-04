@@ -56,3 +56,26 @@ if (!function_exists('drewlabs_core_iter_reduce')) {
         return $out;
     }
 }
+
+if (!function_exists('drewlabs_core_iter_filter')) {
+     /**
+      * Apply a filter to the values of a given iterator.
+      *
+      * @param Iterator $it
+      * @param Closure $filterFn
+      * @return Iterator
+      */
+    function drewlabs_core_iter_filter(Iterator $it, Closure $filterFn)
+    {
+        $out = [];
+        iterator_apply($it, static function (Iterator $it) use ($filterFn, &$out) {
+            [$current, $key] = [$it->current(), $it->key()];
+            if ($filterFn($current, $key)) {
+                $out[] = $current;
+            }
+            return true;
+        }, [$it]);
+
+        return new ArrayIterator($out);
+    }
+}
