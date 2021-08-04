@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Arrays;
 
-class BinarySearchBoundEnum
+class BinarySearchResult
 {
     /**
      * Indicates that the search must be performed in the lower bound of the mid element.
      */
-    public const LOWER = -1;
+    public const LEFT = -1;
     /**
      * Indicates that the search must be performed in the upper bound of the mid element.
      */
-    public const UPPER = 1;
+    public const RIGHT = 1;
 
     /**
      * Indicated the item was found by the predicates function.

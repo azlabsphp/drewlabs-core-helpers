@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Drewlabs\Core\Helpers\Tests;
 
 use ArrayIterator;
-use Drewlabs\Core\Helpers\Arrays\BinarySearchBoundEnum;
+use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
 use PHPUnit\Framework\TestCase;
 
 class ArrayHelpersTest extends TestCase
@@ -311,9 +311,9 @@ class ArrayHelpersTest extends TestCase
         sort($array);
         $this->assertEquals(drewlabs_core_array_bsearch($array, 'JAVA', function ($curr, $item) {
             if (strcmp($curr['lang'], $item) === 0) {
-                return BinarySearchBoundEnum::FOUND;
+                return BinarySearchResult::FOUND;
             }
-            return strcmp($curr['lang'], $item) > 0 ? BinarySearchBoundEnum::LOWER : BinarySearchBoundEnum::UPPER;
+            return strcmp($curr['lang'], $item) > 0 ? BinarySearchResult::LEFT : BinarySearchResult::RIGHT;
         }), 0, 'Expect drewlabs_core_array_bsearch function to return 0');
     }
 }

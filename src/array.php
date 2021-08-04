@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-use Drewlabs\Core\Helpers\Arrays\BinarySearchBoundEnum;
+use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
 
 if (!function_exists('drewlabs_core_array_sort')) {
     /**
@@ -757,7 +757,21 @@ if (!function_exists('drewlabs_core_array_first')) {
 }
 
 if (!function_exists('drewlabs_core_array_bsearch')) {
-    function drewlabs_core_array_bsearch(array $list, $x = null, ?Closure $fn = null, ?int $l = null, ?int $r = null)
+    /**
+     * Perform a binary search while providing a closure as predicate that provide the compison expression
+     * If no closure is provided it use === sign to compare values
+     * 
+     * Return BinarySearchResult::FOUND, BinarySearchResult::LEFT or BinarySearchResult::RIGHT to indicate
+     * whether to search in in the lower or upper bound
+     *
+     * @param array $list
+     * @param mixed $needle
+     * @param Closure|null $fn
+     * @param integer|null $l First item key
+     * @param integer|null $r Last item key
+     * @return int
+     */
+    function drewlabs_core_array_bsearch(array $list, $needle = null, ?Closure $fn = null, ?int $l = null, ?int $r = null)
     {
         $search = static function (
             array $array,
@@ -772,11 +786,11 @@ if (!function_exists('drewlabs_core_array_bsearch')) {
                 $mid = (int) (ceil($start + ($end - $start) / 2));
                 $result = $predicate ? $predicate($array[$mid], $item) : null;
                 // If the predicate return not null 0, match is found
-                if ((null !== $result) ? (BinarySearchBoundEnum::FOUND === $result) : $array[$mid] === $item) {
+                if ((null !== $result) ? (BinarySearchResult::FOUND === $result) : $array[$mid] === $item) {
                     return floor($mid);
                 }
-                // If the predicate return not null 1, search the lower bound
-                if ((null !== $result) ? BinarySearchBoundEnum::LOWER === $result : $array[$mid] > $item) {
+                // If the predicate return not null == 1, search the lower bound
+                if ((null !== $result) ? BinarySearchResult::LEFT === $result : $array[$mid] > $item) {
                     return $search(
                         $array,
                         $item,
@@ -803,7 +817,7 @@ if (!function_exists('drewlabs_core_array_bsearch')) {
         // First convert array to numeric array to avoid dealing with associative array
         $list = array_values($list);
 
-        return $search($list, $x, $fn, $l, $r);
+        return $search($list, $needle, $fn, $l, $r);
     }
 }
 
