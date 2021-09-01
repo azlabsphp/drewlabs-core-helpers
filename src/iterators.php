@@ -14,10 +14,11 @@ declare(strict_types=1);
 if (!function_exists('drewlabs_core_iter_map')) {
     /**
      * Map through the values of a given iterator.
-     *
-     * @param \Closure $callback
-     *
-     * @return \Iterator|\ArrayIterator|array
+     * 
+     * @param Iterator $it 
+     * @param Closure $callback 
+     * @param bool $preserve_keys 
+     * @return ArrayIterator 
      */
     function drewlabs_core_iter_map(Iterator $it, Closure $callback, $preserve_keys = true)
     {
@@ -40,8 +41,11 @@ if (!function_exists('drewlabs_core_iter_map')) {
 if (!function_exists('drewlabs_core_iter_reduce')) {
     /**
      * Apply a reducer to the values of a given iterator.
-     *
-     * @return mixed
+     * 
+     * @param Iterator $it 
+     * @param Closure $reducer 
+     * @param mixed|null $initial_value 
+     * @return mixed 
      */
     function drewlabs_core_iter_reduce(Iterator $it, Closure $reducer, $initial_value = null)
     {
@@ -63,15 +67,21 @@ if (!function_exists('drewlabs_core_iter_filter')) {
       *
       * @param Iterator $it
       * @param Closure $filterFn
+      * @param bool $preserve_keys
       * @return Iterator
       */
-    function drewlabs_core_iter_filter(Iterator $it, Closure $filterFn)
+    function drewlabs_core_iter_filter(Iterator $it, Closure $filterFn, $preserve_keys = true)
     {
         $out = [];
-        iterator_apply($it, static function (Iterator $it) use ($filterFn, &$out) {
+        iterator_apply($it, static function (Iterator $it) use ($filterFn, &$out, $preserve_keys) {
             [$current, $key] = [$it->current(), $it->key()];
-            if ($filterFn($current, $key)) {
-                $out[] = $current;
+            if (!$filterFn($current, $key)) {
+                return true;
+            }
+            if ($preserve_keys) {
+                $out[$key] = $current;
+            } else {
+                $out[$key] = $current;
             }
             return true;
         }, [$it]);
