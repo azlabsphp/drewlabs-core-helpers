@@ -5,3 +5,6 @@ composer.lock
 
 fixer.sh
 Todos.md
+.vscode/**
+.metals/**
+.vscode
