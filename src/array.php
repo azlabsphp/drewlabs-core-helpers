@@ -516,6 +516,9 @@ if (!function_exists('drewlabs_core_array_remove')) {
      */
     function drewlabs_core_array_remove(&$array, $keys)
     {
+        if (empty($array)) {
+            return;
+        }
         $original = &$array;
         $keys = (array) $keys;
         if (0 === count($keys)) {
@@ -523,8 +526,12 @@ if (!function_exists('drewlabs_core_array_remove')) {
         }
         foreach ($keys as $key) {
             // if the exact key exists in the top-level, remove it
-            if (drewlabs_core_array_key_exists($array, $key)) {
+            if (drewlabs_core_array_is_assoc($array) && drewlabs_core_array_key_exists($array, $key)) {
                 unset($array[$key]);
+                continue;
+            }
+            if (!drewlabs_core_array_is_assoc($array) && ($key_ = array_search($key, $array, true))) {
+                unset($array[$key_]);
                 continue;
             }
             $parts = explode('.', $key);
@@ -535,7 +542,7 @@ if (!function_exists('drewlabs_core_array_remove')) {
                 if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
                 } else {
-                    continue 2;
+                    continue;
                 }
             }
             unset($array[array_shift($parts)]);
