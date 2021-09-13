@@ -51,8 +51,8 @@ class IteratorHelpersTest extends TestCase
         ));
         $result = drewlabs_core_array_only($test_array, ['127.0.0.1', 'admin'], false);
         $this->assertTrue(count($result) !== 4, 'Expect test to fail');
-        $this->assertEquals(1, count($result), 'Assert only on item in array');
+        $this->assertEquals(2, count($result), 'Assert only on item in array');
         $this->assertTrue(in_array('host', array_keys($result)), 'Assert password key is in result array');
-        $this->assertTrue(!in_array('user', array_keys($result)), 'Test for fail case');
+        $this->assertTrue(in_array('user', array_keys($result)), 'Test for fail case');
     }
 }
