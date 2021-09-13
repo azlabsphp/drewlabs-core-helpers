@@ -316,4 +316,26 @@ class ArrayHelpersTest extends TestCase
             return strcmp($curr['lang'], $item) > 0 ? BinarySearchResult::LEFT : BinarySearchResult::RIGHT;
         }), 0, 'Expect drewlabs_core_array_bsearch function to return 0');
     }
+
+    public function testArrayOnlyFunction()
+    {
+        $test_array = [
+            'user' => 'admin',
+            'password' => 'homestead',
+            'host' => '127.0.0.1',
+            'port' => 22
+        ];
+        $result = drewlabs_core_array_only($test_array, ['password']);
+        $this->assertTrue(count($result) !== 4, 'Expect test to fail');
+        $this->assertEquals(1, count($result), 'Assert only on item in array');
+        $this->assertTrue(in_array('password', array_keys($result)), 'Assert password key is in result array');
+
+        // Test filtering on value
+
+        $result = drewlabs_core_array_only($test_array, ['127.0.0.1', 'user'], false);
+        $this->assertTrue(count($result) !== 4, 'Expect test to fail');
+        $this->assertEquals(1, count($result), 'Assert only on item in array');
+        $this->assertTrue(in_array('host', array_keys($result)), 'Assert password key is in result array');
+        $this->assertTrue(!in_array('user', array_keys($result)), 'Test for fail case');
+    }
 }

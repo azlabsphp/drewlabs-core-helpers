@@ -582,7 +582,7 @@ if (!function_exists('drewlabs_core_array_udt_to_array')) {
             }
         }
         if (!is_array($value)) {
-            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of'.\Traversable::class.', '.\JsonSerializable::class);
+            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of' . \Traversable::class . ', ' . \JsonSerializable::class);
         }
 
         return $preserve_keys ? $value : array_values($value);
@@ -855,5 +855,31 @@ if (!function_exists('drewlabs_core_array_ssearch')) {
         }
 
         return $index;
+    }
+}
+
+if (!function_exists('drewlabs_core_array_only')) {
+
+     /**
+      * Filter array returning only the values matching the provided keys
+      * 
+      * @param array $list 
+      * @param array $keys 
+      * @param bool $use_keys 
+      * @return array 
+      * @throws InvalidArgumentException 
+      */
+    function drewlabs_core_array_only(array $list, $keys = [], bool $use_keys = true)
+    {
+        if (!is_string($keys) && !is_array($keys) && !($keys instanceof Iterator)) {
+            throw new InvalidArgumentException('$keys parameter must be a PHP string|array or a validate iterator');
+        }
+        $keys = is_string($keys) ? [$keys] : (is_array($keys) ? $keys : iterator_to_array($keys));
+        if (empty($keys)) {
+            return [];
+        }
+        return array_filter($list, function ($current) use ($keys) {
+            return in_array($current, $keys);
+        }, $use_keys ? ARRAY_FILTER_USE_KEY : ARRAY_FILTER_USE_BOTH);
     }
 }
