@@ -308,7 +308,10 @@ if (!function_exists('drewlabs_core_array_get')) {
             return $key($array) ?? ($default instanceof \Closure ? $default() : $default);
         }
 
-        if (drewlabs_core_array_key_exists($array, $key)) {
+        if (
+            drewlabs_core_array_key_exists($array, $key) ||
+            isset($array[$key])
+        ) {
             return $array[$key];
         }
 
@@ -860,15 +863,15 @@ if (!function_exists('drewlabs_core_array_ssearch')) {
 
 if (!function_exists('drewlabs_core_array_only')) {
 
-     /**
-      * Filter array returning only the values matching the provided keys
-      * 
-      * @param array $list 
-      * @param array $keys 
-      * @param bool $use_keys 
-      * @return array 
-      * @throws InvalidArgumentException 
-      */
+    /**
+     * Filter array returning only the values matching the provided keys
+     * 
+     * @param array $list 
+     * @param array $keys 
+     * @param bool $use_keys 
+     * @return array 
+     * @throws InvalidArgumentException 
+     */
     function drewlabs_core_array_only(array $list, $keys = [], bool $use_keys = true)
     {
         if (!is_string($keys) && !is_array($keys) && !($keys instanceof Iterator)) {
