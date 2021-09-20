@@ -83,3 +83,17 @@ if (!function_exists('drewlabs_core_filter_fn_params')) {
         };
     }
 }
+
+
+if (!function_exists('filter_fn_params')) {
+    /**
+     * Filter paramters of a function based on existance of key in the provided parameter
+     *
+     * @param string|array $value
+     * @return array
+     */
+    function filter_fn_params($value)
+    {
+        return drewlabs_core_filter_fn_params($value);
+    }
+}

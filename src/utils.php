@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Drewlabs\Core\Helpers\ValueObject\ModelTypeAttributeRValue;
+
 /*
  * This file is part of the Drewlabs package.
  *
@@ -99,7 +101,7 @@ if (!function_exists('drewlabs_core_convert_size_to_human_readable')) {
         foreach ($arBytes as $arItem) {
             if ($bytes >= $arItem['value']) {
                 $result = $bytes / $arItem['value'];
-                $result = str_replace('.', $separator, (string) (round($result, 2))).' '.$arItem['unit'];
+                $result = str_replace('.', $separator, (string) (round($result, 2))) . ' ' . $arItem['unit'];
                 break;
             }
         }
@@ -178,17 +180,17 @@ if (!function_exists('drewlabs_core_build_model_type_attributes_rvalue_object'))
                 }
             }
 
-            return new \Drewlabs\Core\Helpers\ValueObject\ModelTypeAttributeRValue([
+            return new ModelTypeAttributeRValue([
                 'model' => $model,
                 'attributes' => $attributes,
             ]);
         }
         $model = drewlabs_core_create_php_class_instance($config);
 
-        return new \Drewlabs\Core\Helpers\ValueObject\ModelTypeAttributeRValue([
-                'model' => $model,
-                'attributes' => ['label' => $options['label'] ?? null],
-            ]);
+        return new ModelTypeAttributeRValue([
+            'model' => $model,
+            'attributes' => ['label' => $options['label'] ?? null],
+        ]);
     }
 }
 
@@ -205,26 +207,21 @@ if (!function_exists('drewlabs_core_create_php_class_instance')) {
         if (!drewlabs_core_is_valid_php_class($clazz)) {
             throw new \InvalidArgumentException("Provided class name $clazz is not a valid PHP class");
         }
-        // Try loading container class if running in Laravel or lumen environment
-        if (drewlabs_core_is_valid_php_class('\\Illuminate\\Container\\Container')) {
-            $containerInstance = call_user_func_array(['\\Illuminate\\Container\\Container', 'getInstance'], []);
-
-            return $containerInstance->make($clazz);
-        }
         // If there exists a global function that return the container object, call it a build the class with the make method
-        if (function_exists('app')) {
-            return app()->make($clazz);
-        }
-        // Call the class default constructor to make the class
-        return new $clazz();
+        $app = function_exists('app') ? call_user_func('app') : null;
+        return $app ?
+            (method_exists($app, 'make') ?
+                $app->make($clazz) :
+                $app->get($clazz)) :
+            new $clazz;
     }
 }
 
 
-if (!function_exists('drewlabs_core_is_empty'))
-{
+if (!function_exists('drewlabs_core_is_empty')) {
     /**
      * Provides a wrapper arround PHP empty method. It allows to
+     * 
      * check if an object is empty.
      * 
      * By definition, an object is empty is it properties are null or not set
@@ -234,7 +231,7 @@ if (!function_exists('drewlabs_core_is_empty'))
      */
     function drewlabs_core_is_empty($value)
     {
-        $is_object_empty = function($obj) {
+        $is_object_empty = function ($obj) {
             if (method_exists($obj, 'isEmpty')) {
                 return  call_user_func([$obj, 'isEmpty'], []);
             }
@@ -250,11 +247,37 @@ if (!function_exists('drewlabs_core_is_empty'))
             // Return true if all properties of the object are not set
             return true;
         };
-        if (is_object($value))
-        {
+        if (is_object($value)) {
             return $is_object_empty($value);
         }
         return empty($value);
     }
+}
 
+if (!function_exists('build_data_provider')) {
+
+    /**
+     * Helper global method for building data provider based on a closure or a class name
+     *
+     * @param \Closure|string $callback
+     * @param array $params
+     * @return DataProviderInterface
+     */
+    function build_data_provider($callback, $params = [])
+    {
+        $provider = null;
+        if (is_string($callback) && (\drewlabs_core_strings_contains($callback, ['\\', '\\\\']) === true)) {
+            // Add condition check for global application helper
+            $app = function_exists('app') ? call_user_func('app') : null;
+            $provider = $app ?
+                (method_exists($app, 'make') ?
+                    $app->make($callback) :
+                    $app->get($callback)) :
+                new $callback;
+        }
+        if ($callback instanceof \Closure) {
+            $provider = $callback(...$params);
+        }
+        return $provider;
+    }
 }
