@@ -13,7 +13,7 @@
     "require": {
         "php": ">=7.0",
         "psr/http-message": "^1.0",
-        "drewlabs/contracts": "v1.0.x-dev",
+        "drewlabs/contracts": "^1.0",
         "tuupola/base62": "^2.1",
         "ramsey/uuid": "^4.1",
         "psr/http-factory": "^1.0"
