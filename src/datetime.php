@@ -48,7 +48,7 @@ if (!function_exists('drewlabs_core_datetime_now')) {
      *
      * @param \DateTimeZone|string timezone
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     function drewlabs_core_datetime_now($timezone = null)
     {
@@ -64,7 +64,7 @@ if (!function_exists('drewlabs_core_datetime_is_future')) {
     /**
      * Checks if a given date time is a future date time.
      *
-     * @param \DateTimeInterface|\DateTime $current_date
+     * @param \DateTimeInterface $current_date
      *
      * @return bool
      */
@@ -78,7 +78,7 @@ if (!function_exists('drewlabs_core_datetime_is_past')) {
     /**
      * Determines if the instance is in the past, ie. less (before) than now.
      *
-     * @param \DateTimeInterface|\DateTime $current_date
+     * @param \DateTimeInterface $current_date
      *
      * @return bool
      */
@@ -92,7 +92,7 @@ if (!function_exists('drewlabs_core_datetime_from_timestamp')) {
     /**
      * Create a dateTime instance from timestamp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     function drewlabs_core_datetime_from_timestamp(int $timestamp)
     {
@@ -104,11 +104,11 @@ if (!function_exists('drewlabs_core_datetime_get_tz')) {
     /**
      * Get the timezone of a dateTime instance.
      *
-     * @param \DateTime $value
+     * @param \DateTimeInterface $value
      *
      * @return \DateTimeZone
      */
-    function drewlabs_core_datetime_get_tz(DateTime $value)
+    function drewlabs_core_datetime_get_tz(DateTimeInterface $value)
     {
         return $value->getTimeZone();
     }
@@ -118,7 +118,7 @@ if (!function_exists('drewlabs_core_datetime_now_with_tz')) {
     /**
      * Return the current dateTime value alongs with the timezone.
      *
-     * @return \DateTime|\DateTimeInterface
+     * @return \DateTimeInterface
      */
     function drewlabs_core_datetime_now_with_tz()
     {
@@ -130,8 +130,8 @@ if (!function_exists('drewlabs_core_datetime_is_greater_than')) {
     /**
      * Date comparison function which returns true if the first date is greater that the other date.
      *
-     * @param \DateTimeInterface|\DateTime $lhs
-     * @param \DateTimeInterface|\DateTime $rhs
+     * @param \DateTimeInterface $lhs
+     * @param \DateTimeInterface $rhs
      *
      * @return bool
      */
@@ -145,7 +145,7 @@ if (!function_exists('drewlabs_core_datetime_is_less_than')) {
     /**
      * Determines if the instance is less (before) than another.
      *
-     * @param \DateTimeInterface|\DateTime $lhs
+     * @param \DateTimeInterface $lhs
      * @param \DateTimeInterface|mixed     $rhs
      *
      * @return bool
@@ -160,10 +160,10 @@ if (!function_exists('drewlabs_core_datetime_add_minutes')) {
     /**
      * Add user provided minutes to the datetime instance.
      *
-     * @param \DateTime $date
+     * @param \DateTimeImmutable|\DateTime $date
      * @param int       $minutes
      *
-     * @return \DateTime|\DateTimeInterface
+     * @return  \DateTimeInterface
      */
     function drewlabs_core_datetime_add_minutes($date, $minutes = 0)
     {
@@ -227,7 +227,7 @@ if (!function_exists('drewlabs_core_datetime_expect_date_time')) {
             $message .= "{$expect}, ";
         }
 
-        if (!($date instanceof \DateTime) && !($date instanceof \DateTimeInterface)) {
+        if (!($date instanceof \DateTimeInterface)) {
             throw new \InvalidArgumentException(
                 $message.'DateTime or DateTimeInterface, '.(is_object($date) ? get_class($date) : gettype($date)).' given'
             );
@@ -243,19 +243,17 @@ if (!function_exists('drewlabs_core_datetime_resolve')) {
      * @param \DateTimeInterface|string|null $current_date
      * @param \DateTimeInterface|string|null $date
      *
-     * @return \DateTimeInterface|DateTime
+     * @return \DateTimeInterface
      */
     function drewlabs_core_datetime_resolve($current_date, $date = null)
     {
-        if (!$date) {
+        if (null === $date) {
             return drewlabs_core_datetime_now_with_tz();
         }
         if (is_string($date)) {
             return new \DateTimeImmutable($date, $current_date->getTimezone());
         }
-        drewlabs_core_datetime_expect_date_time($date, ['null', 'String']);
-
-        return ($date instanceof \DateTime) || ($date instanceof \DateTimeInterface) ? $date : drewlabs_core_datetime_make_date($date);
+        return drewlabs_core_datetime_make_date($date);
     }
 }
 
@@ -263,18 +261,17 @@ if (!function_exists('drewlabs_core_datetime_make_date')) {
     /**
      * Create a DateUtils from a DateTime.
      *
-     * @param \DateTime|\DateTimeInterface $date
+     * @param \DateTimeInterface|string|null $date
      *
-     * @return \DateTimeInterface|\DateTime
+     * @return \DateTimeInterface
      */
-    function drewlabs_core_datetime_make_date($date)
+    function drewlabs_core_datetime_make_date($date = null, \DateTimeZone $timezone = null)
     {
-        if (($date instanceof \DateTimeInterface) || ($date instanceof \DateTime)) {
+        if ($date instanceof \DateTimeInterface) {
             return clone $date;
         }
-        drewlabs_core_datetime_expect_date_time($date);
-
-        return new \DateTimeImmutable($date->format('Y-m-d H:i:s.u'), $date->getTimezone());
+        drewlabs_core_datetime_expect_date_time($date, ['string', 'null']);
+        return new \DateTimeImmutable($date ?? 'now', $timezone);
     }
 }
 
@@ -282,8 +279,8 @@ if (!function_exists('drewlabs_core_datetime_hrs_diff')) {
     /**
      * Get the difference in hours.
      *
-     * @param \DateTime|string|null $source_date
-     * @param \DateTime|string|null $date
+     * @param \DateTimeInterface|string|null $source_date
+     * @param \DateTimeInterface|string|null $date
      * @param bool                  $exact       Get the exact of the difference
      *
      * @return int
@@ -314,8 +311,8 @@ if (!function_exists('drewlabs_core_datetime_secs_diff')) {
     /**
      * Get the difference in seconds.
      *
-     * @param \DateTime      $source
-     * @param \DateTime|null $date
+     * @param \DateTimeInterface      $source
+     * @param \DateTimeInterface|null $date
      * @param bool           $exact  Get the exact of the difference
      *
      * @return int
