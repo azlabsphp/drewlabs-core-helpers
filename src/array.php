@@ -441,7 +441,6 @@ if (!function_exists('drewlabs_core_array_is_assoc')) {
         if (null === $value) {
             return false;
         }
-
         return array_keys($value) !== range(0, count($value) - 1);
     }
 }
@@ -656,10 +655,10 @@ if (!function_exists('drewlabs_core_array_is_no_assoc_array_list')) {
      */
     function drewlabs_core_array_is_no_assoc_array_list(array $items)
     {
-        if (drewlabs_core_array_is_assoc($items)) {
+        // Check if the list is an associative list, and return false if it is
+        if (count(array_filter(array_keys($items), 'is_string')) !== 0) {
             return false;
         }
-
         return !empty($items) && array_filter($items, 'is_array') === $items;
     }
 }
