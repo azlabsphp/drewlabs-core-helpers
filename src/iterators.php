@@ -128,3 +128,25 @@ if (!function_exists('drewlabs_core_iter_only')) {
         );
     }
 }
+
+if (!function_exists('drewlabs_core_iter_collapse')) {
+    /**
+     * Collapse an array of arrays into a single array.
+     *
+     * @param \Iterable  $list
+     * @return array
+     */
+    function drewlabs_core_iter_collapse($list)
+    {
+        $results = [];
+        foreach ($list as $value) {
+            if (is_object($value) && method_exists($value, 'all')) {
+                $value = $value->all();
+            } elseif (!is_array($value)) {
+                continue;
+            }
+            $results[] = $value;
+        }
+        return array_merge([], ...$results);
+    }
+}

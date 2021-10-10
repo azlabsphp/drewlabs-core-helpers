@@ -97,3 +97,17 @@ if (!function_exists('filter_fn_params')) {
         return drewlabs_core_filter_fn_params($value);
     }
 }
+
+if (!function_exists('drewlabs_core_is_closure')) {
+
+    /**
+     * Determine if the given value is callable, but not a string.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    function drewlabs_core_is_closure($value)
+    {
+        return !is_string($value) && is_callable($value);
+    }
+}

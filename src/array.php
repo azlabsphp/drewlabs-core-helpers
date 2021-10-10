@@ -885,3 +885,62 @@ if (!function_exists('drewlabs_core_array_only')) {
         }, $use_keys ? ARRAY_FILTER_USE_KEY : ARRAY_FILTER_USE_BOTH);
     }
 }
+
+if (!function_exists('drewlabs_core_array_wrap')) {
+
+    /**
+     * Wrap the value to an array if not an array, or return it if it is an array
+     *
+     * @param array|mixed $value
+     * @return array
+     */
+    function drewlabs_core_array_wrap($value)
+    {
+        if (is_null($value)) {
+            return [];
+        }
+
+        return is_array($value) ? $value : [$value];
+    }
+}
+
+if (!function_exists('drewlabs_core_array_exists')) {
+    /**
+     * Enhanced implementation of the array_key_exists function
+     * 
+     * @param array|\ArrayAccess|mixed $array 
+     * @param mixed $key 
+     * @return mixed 
+     */
+    function drewlabs_core_array_exists($array, $key)
+    {
+        if (is_object($array) && method_exists($array, 'has')) {
+            return $array->has($key);
+        }
+        if ($array instanceof ArrayAccess) {
+            return $array->offsetExists($key);
+        }
+        return array_key_exists($key, $array);
+    }
+}
+
+if (!function_exists('drewlabs_core_array_shuffle')) {
+    /**
+     * Shuffle the list of element in an array
+     * 
+     * @param array $list 
+     * @param int $seed 
+     * @return array 
+     */
+    function drewlabs_core_array_shuffle(array $list, int $seed)
+    {
+        if (is_null($seed)) {
+            shuffle($list);
+        } else {
+            mt_srand($seed);
+            shuffle($list);
+            mt_srand();
+        }
+        return $list;
+    }
+}
