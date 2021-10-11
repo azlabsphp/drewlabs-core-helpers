@@ -197,13 +197,13 @@ if (!function_exists('drewlabs_core_strings_to_array')) {
      *
      * @return array
      */
-    function drewlabs_core_strings_to_array($value, $delimiter = ',')
+    function drewlabs_core_strings_to_array(string $value, $delimiter = ',')
     {
         if (!drewlabs_core_strings_is_str($value)) {
             throw new \RuntimeException('Error parsing value... Provides a string value as parameter');
         }
 
-        return \explode($delimiter, $value);
+        return \explode($delimiter, (string)$value);
     }
 }
 

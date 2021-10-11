@@ -271,7 +271,7 @@ if (!function_exists('drewlabs_core_array_has')) {
                 continue;
             }
 
-            foreach (explode('.', $key) as $segment) {
+            foreach (explode('.', (string)$key) as $segment) {
                 if (drewlabs_core_array_is_arrayable($sub_key) && drewlabs_core_array_key_exists($sub_key, $segment)) {
                     $sub_key = $sub_key[$segment];
                 } else {
@@ -319,7 +319,7 @@ if (!function_exists('drewlabs_core_array_get')) {
             return $array[$key] ?? ($default instanceof \Closure ? $default() : $default);
         }
 
-        foreach (explode('.', $key) as $segment) {
+        foreach (explode('.', (string)$key) as $segment) {
             if (drewlabs_core_array_is_arrayable($array) && drewlabs_core_array_key_exists($array, $segment)) {
                 $array = $array[$segment];
             } else {
@@ -349,7 +349,7 @@ if (!function_exists('drewlabs_core_array_set')) {
             return $array = $value;
         }
 
-        $keys = explode('.', $key);
+        $keys = explode('.', (string)$key);
 
         while (count($keys) > 1) {
             $key = array_shift($keys);
@@ -536,7 +536,7 @@ if (!function_exists('drewlabs_core_array_remove')) {
                 unset($array[$key_]);
                 continue;
             }
-            $parts = explode('.', $key);
+            $parts = explode('.', (string)$key);
             // clean up before each pass
             $array = &$original;
             while (count($parts) > 1) {
@@ -932,7 +932,7 @@ if (!function_exists('drewlabs_core_array_shuffle')) {
      * @param int $seed 
      * @return array 
      */
-    function drewlabs_core_array_shuffle(array $list, int $seed)
+    function drewlabs_core_array_shuffle(array $list, ?int $seed = null)
     {
         if (is_null($seed)) {
             shuffle($list);

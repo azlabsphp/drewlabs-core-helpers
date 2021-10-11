@@ -21,7 +21,7 @@ class CSV
     ) {
         if ($content) {
             // Transform string into an array, using newline separator
-            $array = explode(PHP_EOL, $content);
+            $array = explode(PHP_EOL, (string)$content);
             $out = [];
             // Read CSV file contents
             foreach ($array as $value) {
