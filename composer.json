@@ -9,11 +9,11 @@
             "email": "asmyns.platonnas29@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "alpha",
     "require": {
         "php": ">=7.0",
         "psr/http-message": "^1.0",
-        "drewlabs/contracts": "^1.0",
+        "drewlabs/contracts": "^2.0",
         "tuupola/base62": "^2.1",
         "ramsey/uuid": "^4.1",
         "psr/http-factory": "^1.0"
