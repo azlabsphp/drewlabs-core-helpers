@@ -281,3 +281,52 @@ if (!function_exists('build_data_provider')) {
         return $provider;
     }
 }
+
+if (!function_exists('drewlabs_core_get')) {
+
+    /**
+     * Get value from an object or array using the . seperator
+     * 
+     * @param mixed $target 
+     * @param mixed $key 
+     * @param mixed|null $default 
+     * @return mixed 
+     */
+    function drewlabs_core_get($target, $key, $default = null)
+    {
+        if (null === $key) {
+            return $target;
+        }
+        $key = is_array($key) ? $key : explode('.', (string)$key);
+        foreach ($key as $i => $segment) {
+            unset($key[$i]);
+            if (null === $segment) {
+                return $target;
+            }
+            if ($segment === '*') {
+                if (method_exists($target, 'all')) {
+                    $target = $target->all();
+                } elseif (!is_array($target)) {
+                    return $default instanceof \Closure ? $default() : $default;
+                }
+                $result = [];
+                foreach ($target as $item) {
+                    $result[] = drewlabs_core_get($item, $key);
+                }
+                return in_array('*', $key) ? drewlabs_core_iter_collapse($result) : $result;
+            }
+            if (drewlabs_core_array_is_arrayable($target)) {
+                $target = drewlabs_core_array_get($target, $segment);
+            } elseif (
+                is_object($target) &&
+                (null !== ($target_ = drewlabs_core_get_attribute($target, $segment)))
+            ) {
+                $target = $target_;
+            } else {
+                return $default instanceof \Closure ? $default() : $default;
+            }
+        }
+
+        return $target;
+    }
+}
