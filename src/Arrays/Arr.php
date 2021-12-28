@@ -95,7 +95,6 @@ class Arr
         $high = $end ?? \count($items) - 1;
 
         while ($low <= $high) {
-            // code...
             $mid = floor(($low + $high) / 2);
             $searched_item = \is_object($items[$mid]) ? $items[$mid]->{$by} : $items[$mid][$by];
             if (drewlabs_core_is_same($searched_item, $search)) {
