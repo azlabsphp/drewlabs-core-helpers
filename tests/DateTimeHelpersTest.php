@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests;
 
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class DateTimeHelpersTest extends TestCase
@@ -27,12 +26,12 @@ class DateTimeHelpersTest extends TestCase
 
     public function testDateTimeIsFuture()
     {
-        $this->assertTrue(drewlabs_core_datetime_is_future(new DateTimeImmutable('2021-10-02T09:19:01.012345Z')), 'Expect the provided date to be a future date');
+        $this->assertTrue(drewlabs_core_datetime_is_future((new \DateTimeImmutable('now'))->modify('+1day')), 'Expect the provided date to be a future date');
     }
 
     public function testDateTimeIsPast()
     {
-        $this->assertTrue(drewlabs_core_datetime_is_past(new DateTimeImmutable('2020-10-02T09:18:01.012345Z')), 'Expect the provided date to be a past date');
+        $this->assertTrue(drewlabs_core_datetime_is_past(new \DateTimeImmutable('2020-10-02T09:18:01.012345Z')), 'Expect the provided date to be a past date');
     }
 
     public function testDateTimeFromTimeStampFunction()
@@ -55,7 +54,7 @@ class DateTimeHelpersTest extends TestCase
 
     public function testMakeDateFunction()
     {
-        $this->assertInstanceOf(\DateTimeInterface::class, drewlabs_core_datetime_make_date(new DateTimeImmutable()), 'Expect the result of the make function to return a date time instance');
+        $this->assertInstanceOf(\DateTimeInterface::class, drewlabs_core_datetime_make_date(new \DateTimeImmutable()), 'Expect the result of the make function to return a date time instance');
     }
 
     public function testAddMinutesFunction()

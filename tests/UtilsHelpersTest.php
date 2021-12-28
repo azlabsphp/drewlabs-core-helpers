@@ -16,7 +16,6 @@ namespace Drewlabs\Core\Helpers\Tests;
 use Drewlabs\Core\Helpers\Tests\Stubs\Person;
 use Drewlabs\Core\Helpers\Tests\Stubs\PersonValueObject;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class UtilsHelpersTest extends TestCase
 {
@@ -194,13 +193,13 @@ class UtilsHelpersTest extends TestCase
 
     public function testIsEmptyFunction()
     {
-        $p = new stdClass;
+        $p = new \stdClass();
 
-        $p2 = new stdClass;
+        $p2 = new \stdClass();
         $p2->name = null;
         $p2->lastname = 'Azandrew';
         $p2->age = 32;
-    
+
         $this->assertTrue(drewlabs_core_is_empty($p), 'Expect $p to be empty');
         $this->assertTrue(!drewlabs_core_is_empty($p2), 'Expect $p2 to be be empty');
         $this->assertTrue(drewlabs_core_is_empty([]), 'Expect an empty array to be empty');

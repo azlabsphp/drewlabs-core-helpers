@@ -62,7 +62,7 @@ if (!function_exists('is_param_subclass_of')) {
     }
 }
 
-if (!function_exists('drewlabs_core_get_attributes') && version_compare(PHP_VERSION, '8.0', '>=')) {
+if (!function_exists('drewlabs_core_get_attributes') && version_compare(\PHP_VERSION, '8.0', '>=')) {
     /**
      * Return the list of attributes bound to a given class.
      *
@@ -85,7 +85,7 @@ if (!function_exists('drewlabs_core_get_attributes') && version_compare(PHP_VERS
     }
 }
 
-if (!function_exists('drewlabs_core_get_has_attribute') && version_compare(PHP_VERSION, '8.0', '>=')) {
+if (!function_exists('drewlabs_core_get_has_attribute') && version_compare(\PHP_VERSION, '8.0', '>=')) {
     /**
      * Check if the parameter has a given attribute.
      *
@@ -108,7 +108,7 @@ if (!function_exists('drewlabs_core_get_has_attribute') && version_compare(PHP_V
     }
 }
 
-if (!function_exists('drewlabs_core_get_get_attribute') && version_compare(PHP_VERSION, '8.0', '>=')) {
+if (!function_exists('drewlabs_core_get_get_attribute') && version_compare(\PHP_VERSION, '8.0', '>=')) {
     /**
      * Get a given reflection attribute from a parameter list of attributes.
      *

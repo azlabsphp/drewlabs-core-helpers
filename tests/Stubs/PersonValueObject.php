@@ -15,8 +15,24 @@ namespace Drewlabs\Core\Helpers\Tests\Stubs;
 
 use Drewlabs\Contracts\EntityObject\AbstractEntityObject;
 
-final class PersonValueObject extends AbstractEntityObject
+final class PersonValueObject
 {
+
+    public function __construct($attributes = [])
+    {
+        $this->copyWith($attributes);
+    }
+
+    public function copyWith($attributes)
+    {
+        $self = clone $this;
+        foreach ($this->getJsonableAttributes() as $key) {
+            if (array_key_exists($key, $attributes)) {
+                $self->{$key} = $attributes[$key];
+            }
+        }
+        return $self;
+    }
     protected function getJsonableAttributes()
     {
         return [

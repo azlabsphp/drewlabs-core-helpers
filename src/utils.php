@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the Drewlabs package.
+ *
+ * (c) Sidoine Azandrew <azandrewdevelopper@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use Drewlabs\Core\Helpers\ValueObject\ModelTypeAttributeRValue;
 
 /*
@@ -101,7 +110,7 @@ if (!function_exists('drewlabs_core_convert_size_to_human_readable')) {
         foreach ($arBytes as $arItem) {
             if ($bytes >= $arItem['value']) {
                 $result = $bytes / $arItem['value'];
-                $result = str_replace('.', $separator, (string) (round($result, 2))) . ' ' . $arItem['unit'];
+                $result = str_replace('.', $separator, (string) (round($result, 2))).' '.$arItem['unit'];
                 break;
             }
         }
@@ -209,31 +218,32 @@ if (!function_exists('drewlabs_core_create_php_class_instance')) {
         }
         // If there exists a global function that return the container object, call it a build the class with the make method
         $app = function_exists('app') ? call_user_func('app') : null;
+
         return $app ?
             (method_exists($app, 'make') ?
                 $app->make($clazz) :
                 $app->get($clazz)) :
-            new $clazz;
+            new $clazz();
     }
 }
 
-
 if (!function_exists('drewlabs_core_is_empty')) {
     /**
-     * Provides a wrapper arround PHP empty method. It allows to
-     * 
+     * Provides a wrapper arround PHP empty method. It allows to.
+     *
      * check if an object is empty.
-     * 
+     *
      * By definition, an object is empty is it properties are null or not set
      *
      * @param object|array|string $value
+     *
      * @return bool
      */
     function drewlabs_core_is_empty($value)
     {
-        $is_object_empty = function ($obj) {
+        $is_object_empty = static function ($obj) {
             if (method_exists($obj, 'isEmpty')) {
-                return  call_user_func([$obj, 'isEmpty'], []);
+                return call_user_func([$obj, 'isEmpty'], []);
             }
             if (empty(get_object_vars($obj))) {
                 return true;
@@ -250,6 +260,7 @@ if (!function_exists('drewlabs_core_is_empty')) {
         if (is_object($value)) {
             return $is_object_empty($value);
         }
+
         return empty($value);
     }
 }
@@ -257,27 +268,29 @@ if (!function_exists('drewlabs_core_is_empty')) {
 if (!function_exists('build_data_provider')) {
 
     /**
-     * Helper global method for building data provider based on a closure or a class name
+     * Helper global method for building data provider based on a closure or a class name.
      *
      * @param \Closure|string $callback
-     * @param array $params
+     * @param array           $params
+     *
      * @return DataProviderInterface
      */
     function build_data_provider($callback, $params = [])
     {
         $provider = null;
-        if (is_string($callback) && (\drewlabs_core_strings_contains($callback, ['\\', '\\\\']) === true)) {
+        if (is_string($callback) && (true === drewlabs_core_strings_contains($callback, ['\\', '\\\\']))) {
             // Add condition check for global application helper
             $app = function_exists('app') ? call_user_func('app') : null;
             $provider = $app ?
                 (method_exists($app, 'make') ?
                     $app->make($callback) :
                     $app->get($callback)) :
-                new $callback;
+                new $callback();
         }
         if ($callback instanceof \Closure) {
             $provider = $callback(...$params);
         }
+
         return $provider;
     }
 }
@@ -285,25 +298,26 @@ if (!function_exists('build_data_provider')) {
 if (!function_exists('drewlabs_core_get')) {
 
     /**
-     * Get value from an object or array using the . seperator
-     * 
-     * @param mixed $target 
-     * @param mixed $key 
-     * @param mixed|null $default 
-     * @return mixed 
+     * Get value from an object or array using the . seperator.
+     *
+     * @param mixed      $target
+     * @param mixed      $key
+     * @param mixed|null $default
+     *
+     * @return mixed
      */
     function drewlabs_core_get($target, $key, $default = null)
     {
         if (null === $key) {
             return $target;
         }
-        $key = is_array($key) ? $key : explode('.', (string)$key);
+        $key = is_array($key) ? $key : explode('.', (string) $key);
         foreach ($key as $i => $segment) {
             unset($key[$i]);
             if (null === $segment) {
                 return $target;
             }
-            if ($segment === '*') {
+            if ('*' === $segment) {
                 if (method_exists($target, 'all')) {
                     $target = $target->all();
                 } elseif (!is_array($target)) {
@@ -313,7 +327,8 @@ if (!function_exists('drewlabs_core_get')) {
                 foreach ($target as $item) {
                     $result[] = drewlabs_core_get($item, $key);
                 }
-                return in_array('*', $key) ? drewlabs_core_iter_collapse($result) : $result;
+
+                return in_array('*', $key, true) ? drewlabs_core_iter_collapse($result) : $result;
             }
             if (drewlabs_core_array_is_arrayable($target)) {
                 $target = drewlabs_core_array_get($target, $segment);

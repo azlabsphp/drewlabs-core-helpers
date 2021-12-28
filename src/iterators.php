@@ -14,11 +14,10 @@ declare(strict_types=1);
 if (!function_exists('drewlabs_core_iter_map')) {
     /**
      * Map through the values of a given iterator.
-     * 
-     * @param Iterator $it 
-     * @param Closure $callback 
-     * @param bool $preserve_keys 
-     * @return ArrayIterator 
+     *
+     * @param bool $preserve_keys
+     *
+     * @return ArrayIterator
      */
     function drewlabs_core_iter_map(Iterator $it, Closure $callback, $preserve_keys = true)
     {
@@ -41,11 +40,10 @@ if (!function_exists('drewlabs_core_iter_map')) {
 if (!function_exists('drewlabs_core_iter_reduce')) {
     /**
      * Apply a reducer to the values of a given iterator.
-     * 
-     * @param Iterator $it 
-     * @param Closure $reducer 
-     * @param mixed|null $initial_value 
-     * @return mixed 
+     *
+     * @param mixed|null $initial_value
+     *
+     * @return mixed
      */
     function drewlabs_core_iter_reduce(Iterator $it, Closure $reducer, $initial_value = null)
     {
@@ -65,25 +63,24 @@ if (!function_exists('drewlabs_core_iter_filter')) {
     /**
      * Apply a filter to the values of a given iterator.
      *
-     * @param Iterator $it
-     * @param Closure $filterFn
      * @param bool $preserve_keys
-     * @param int $flags // Indicates whether to use keys or 
-     * both $key and value in the filter function
+     * @param int  $flags         // Indicates whether to use keys or
+     *                            both $key and value in the filter function
+     *
      * @return Iterator
      */
     function drewlabs_core_iter_filter(
         Iterator $it,
         Closure $filterFn,
         $preserve_keys = true,
-        $flags = ARRAY_FILTER_USE_BOTH
+        $flags = \ARRAY_FILTER_USE_BOTH
     ) {
         $out = [];
         iterator_apply(
             $it,
             static function (Iterator $it) use ($filterFn, &$out, $preserve_keys, $flags) {
                 [$current, $key] = [$it->current(), $it->key()];
-                $result = $flags === ARRAY_FILTER_USE_BOTH ? $filterFn($current, $key) : $filterFn($key);
+                $result = \ARRAY_FILTER_USE_BOTH === $flags ? $filterFn($current, $key) : $filterFn($key);
                 if (!$result) {
                     return true;
                 }
@@ -92,6 +89,7 @@ if (!function_exists('drewlabs_core_iter_filter')) {
                 } else {
                     $out[$key] = $current;
                 }
+
                 return true;
             },
             [$it]
@@ -101,16 +99,15 @@ if (!function_exists('drewlabs_core_iter_filter')) {
     }
 }
 
-
 if (!function_exists('drewlabs_core_iter_only')) {
     /**
-     * Filter iterator returning only the values matching the provided keys
-     * 
-     * @param Iterator $list 
-     * @param array $keys 
-     * @param bool $use_keys 
-     * @return Iterator 
-     * @throws InvalidArgumentException 
+     * Filter iterator returning only the values matching the provided keys.
+     *
+     * @param array $keys
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return Iterator
      */
     function drewlabs_core_iter_only(Iterator $list, $keys = [], bool $use_keys = true)
     {
@@ -118,13 +115,14 @@ if (!function_exists('drewlabs_core_iter_only')) {
             throw new InvalidArgumentException('$keys parameter must be a PHP string|array or a validate iterator');
         }
         $keys = is_string($keys) ? [$keys] : (is_array($keys) ? $keys : iterator_to_array($keys));
+
         return drewlabs_core_iter_filter(
             $list,
-            function ($current) use ($keys) {
-                return in_array($current, $keys);
+            static function ($current) use ($keys) {
+                return in_array($current, $keys, true);
             },
             true,
-            $use_keys ? ARRAY_FILTER_USE_KEY : ARRAY_FILTER_USE_BOTH
+            $use_keys ? \ARRAY_FILTER_USE_KEY : \ARRAY_FILTER_USE_BOTH
         );
     }
 }
@@ -133,7 +131,8 @@ if (!function_exists('drewlabs_core_iter_collapse')) {
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param \Iterable  $list
+     * @param \Iterable $list
+     *
      * @return array
      */
     function drewlabs_core_iter_collapse($list)
@@ -147,6 +146,7 @@ if (!function_exists('drewlabs_core_iter_collapse')) {
             }
             $results[] = $value;
         }
+
         return array_merge([], ...$results);
     }
 }

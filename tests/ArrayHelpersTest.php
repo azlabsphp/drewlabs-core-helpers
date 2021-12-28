@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests;
 
-use ArrayIterator;
 use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
 use PHPUnit\Framework\TestCase;
 
@@ -172,7 +171,7 @@ class ArrayHelpersTest extends TestCase
                 'type' => 'Dynamic Language',
             ],
         ];
-        $this->assertSame(drewlabs_core_array_get($list, function ($values) {
+        $this->assertSame(drewlabs_core_array_get($list, static function ($values) {
             return $values['java']['lang'];
         }), 'JAVA', 'Expect array get to return PHP as result');
     }
@@ -216,7 +215,7 @@ class ArrayHelpersTest extends TestCase
             'python' => [
                 'lang' => 'Python',
                 'type' => 'Dynamic Language',
-            ]
+            ],
         ];
         $this->assertSame(drewlabs_core_array_map($list, static function ($i) {
             return $i['lang'];
@@ -233,36 +232,38 @@ class ArrayHelpersTest extends TestCase
 
     public function testZipMethod()
     {
-        $list = \drewlabs_core_array_szip((object)["one" => 1, "two" => 2, "thee" => 3], [4, 5, 6], [7, 8, 9]);
-        $this->assertTrue(\drewlabs_core_array_is_arrayable($list), 'Expect the returned list ot be an array');
-        $this->assertEquals(count($list[0]), 3, 'Expect the total items in the first index of the list to have a total length equals 3');
-        $this->assertTrue($list[0][0] === 1, 'Expect first item of the list first element to equal 1');
+        $list = drewlabs_core_array_szip((object) ['one' => 1, 'two' => 2, 'thee' => 3], [4, 5, 6], [7, 8, 9]);
+        $this->assertTrue(drewlabs_core_array_is_arrayable($list), 'Expect the returned list ot be an array');
+        $this->assertSame(\count($list[0]), 3, 'Expect the total items in the first index of the list to have a total length equals 3');
+        $this->assertTrue(1 === $list[0][0], 'Expect first item of the list first element to equal 1');
     }
 
-    public function  testIteratorMap()
+    public function testIteratorMap()
     {
-        $list = new ArrayIterator([
+        $list = new \ArrayIterator([
             'english' => 'Hello!',
             'french' => 'Salut!',
             'spanish' => 'Hola!',
             'latin' => 'Salve!',
-            'german' => 'Guten Tag!'
+            'german' => 'Guten Tag!',
         ]);
 
-        $values = drewlabs_core_iter_map($list, function ($item) {
+        $values = drewlabs_core_iter_map($list, static function ($item) {
             return strtoupper($item);
         }, true);
-        return $this->assertInstanceOf(ArrayIterator::class, $values, 'Expect drewlabs_core_iter_map to return an Array Iterator');
-    } // 
+
+        return $this->assertInstanceOf(\ArrayIterator::class, $values, 'Expect drewlabs_core_iter_map to return an Array Iterator');
+    }
 
     public function testIteratorReduceFunction()
     {
-        $list = new ArrayIterator([1, 2, 3, 4, 5]);
+        $list = new \ArrayIterator([1, 2, 3, 4, 5]);
 
-        $result = drewlabs_core_iter_reduce($list, function ($carry, $item) {
+        $result = drewlabs_core_iter_reduce($list, static function ($carry, $item) {
             return $carry + $item;
         }, 0);
-        return $this->assertTrue($result === 15);
+
+        return $this->assertTrue(15 === $result);
     }
 
     public function testIsAssocFunction()
@@ -279,7 +280,7 @@ class ArrayHelpersTest extends TestCase
             [
                 'lang' => 'Python',
                 'type' => 'Dynamic Language',
-            ]
+            ],
         ];
         $this->assertFalse(drewlabs_core_array_is_full_assoc($array), 'Expect the array to not be an associative array');
     }
@@ -309,12 +310,17 @@ class ArrayHelpersTest extends TestCase
             ],
         ];
         sort($array);
-        $this->assertEquals(drewlabs_core_array_bsearch($array, 'JAVA', function ($curr, $item) {
-            if (strcmp($curr['lang'], $item) === 0) {
-                return BinarySearchResult::FOUND;
-            }
-            return strcmp($curr['lang'], $item) > 0 ? BinarySearchResult::LEFT : BinarySearchResult::RIGHT;
-        }), 0, 'Expect drewlabs_core_array_bsearch function to return 0');
+        $this->assertSame(
+            drewlabs_core_array_bsearch($array, 'JAVA', static function ($curr, $item) {
+                if (0 === strcmp($curr['lang'], $item)) {
+                    return BinarySearchResult::FOUND;
+                }
+
+                return strcmp($curr['lang'], $item) > 0 ? BinarySearchResult::LEFT : BinarySearchResult::RIGHT;
+            }),
+            0,
+            'Expect drewlabs_core_array_bsearch function to return 0'
+        );
     }
 
     public function testArrayOnlyFunction()
@@ -323,19 +329,19 @@ class ArrayHelpersTest extends TestCase
             'user' => 'admin',
             'password' => 'homestead',
             'host' => '127.0.0.1',
-            'port' => 22
+            'port' => 22,
         ];
         $result = drewlabs_core_array_only($test_array, ['password']);
-        $this->assertTrue(count($result) !== 4, 'Expect test to fail');
-        $this->assertEquals(1, count($result), 'Assert only on item in array');
-        $this->assertTrue(in_array('password', array_keys($result)), 'Assert password key is in result array');
+        $this->assertTrue(4 !== \count($result), 'Expect test to fail');
+        $this->assertCount(1, $result, 'Assert only on item in array');
+        $this->assertTrue(\in_array('password', array_keys($result), true), 'Assert password key is in result array');
 
         // Test filtering on value
 
         $result = drewlabs_core_array_only($test_array, ['127.0.0.1', 'user'], false);
-        $this->assertTrue(count($result) !== 4, 'Expect test to fail');
-        $this->assertEquals(1, count($result), 'Assert only on item in array');
-        $this->assertTrue(in_array('host', array_keys($result)), 'Assert password key is in result array');
-        $this->assertTrue(!in_array('user', array_keys($result)), 'Test for fail case');
+        $this->assertTrue(4 !== \count($result), 'Expect test to fail');
+        $this->assertCount(1, $result, 'Assert only on item in array');
+        $this->assertTrue(\in_array('host', array_keys($result), true), 'Assert password key is in result array');
+        $this->assertTrue(!\in_array('user', array_keys($result), true), 'Test for fail case');
     }
 }

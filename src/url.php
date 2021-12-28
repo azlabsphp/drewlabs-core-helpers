@@ -46,6 +46,7 @@ if (!function_exists('drewlabs_core_url_has_correct_signature')) {
         $query_params = drewlabs_core_url_request_query_as_array($request);
         $signature = drewlabs_core_url_signature_from_server_request($request, $key_resolver, $absolute);
         $signature_query = $query_params['signature'] ?? '';
+
         return hash_equals((string) $signature, (string) $signature_query);
     }
 }
@@ -107,7 +108,6 @@ if (!function_exists('drewlabs_core_url_get_url_without_query_string')) {
     }
 }
 
-
 if (!function_exists('drewlabs_core_url_get_request_path')) {
 
     /**
@@ -118,6 +118,7 @@ if (!function_exists('drewlabs_core_url_get_request_path')) {
     function drewlabs_core_url_get_request_path(ServerRequestInterface $request)
     {
         $requestURI = $request->getUri();
+
         return drewlabs_core_url_get_normalize_request_path(trim($requestURI->getPath(), '/'));
     }
 }
@@ -154,12 +155,10 @@ if (!function_exists('drewlabs_core_url_is_http_url')) {
     }
 }
 
-
 if (!function_exists('drewlabs_core_url_query_string_to_array')) {
     /**
-     * Parse a PHP query string into a array
+     * Parse a PHP query string into a array.
      *
-     * @param string $query
      * @return array<string,string>
      */
     function drewlabs_core_url_query_string_to_array(string $query): array
@@ -170,7 +169,8 @@ if (!function_exists('drewlabs_core_url_query_string_to_array')) {
         $query = str_replace('?', '&', $result['query'] ?? '');
         parse_str($path, $tmp1);
         parse_str($query, $tmp2);
-        return array_filter(array_merge($tmp1, $tmp2), function($value) {
+
+        return array_filter(array_merge($tmp1, $tmp2), static function ($value) {
             return null !== $value && !empty($value);
         });
     }
@@ -178,9 +178,8 @@ if (!function_exists('drewlabs_core_url_query_string_to_array')) {
 
 if (!function_exists('drewlabs_core_url_request_query_as_array')) {
     /**
-     * Parse a {ServerRequestInterface} query parameters into a array
+     * Parse a {ServerRequestInterface} query parameters into a array.
      *
-     * @param ServerRequestInterface $request
      * @return array<string,string>
      */
     function drewlabs_core_url_request_query_as_array(ServerRequestInterface $request): array
@@ -190,48 +189,49 @@ if (!function_exists('drewlabs_core_url_request_query_as_array')) {
             $url = $request->getUri()->getQuery();
             $array = drewlabs_core_url_query_string_to_array($url);
         }
+
         return $array;
     }
 }
 
 if (!function_exists('drewlabs_core_url_signature_from_server_request')) {
     /**
-     * Creates a signature from a given URI scheme
+     * Creates a signature from a given URI scheme.
      *
-     * @param ServerRequestInterface $request
      * @param \Closure|string $key_resolver
-     * @param bool $absolute
+     *
      * @return string
      */
     function drewlabs_core_url_signature_from_server_request(ServerRequestInterface $request, $key_resolver, bool $absolute)
     {
         $query_params = drewlabs_core_url_request_query_as_array($request);
-        $url = $absolute ? drewlabs_core_url_get_request_url($request) : '/' . drewlabs_core_url_get_request_path($request);
-        $original = rtrim($url . '?' . drewlabs_core_url_array_to_query_string(
+        $url = $absolute ? drewlabs_core_url_get_request_url($request) : '/'.drewlabs_core_url_get_request_path($request);
+        $original = rtrim($url.'?'.drewlabs_core_url_array_to_query_string(
             drewlabs_core_array_except($query_params, ['signature'])
         ), '?');
         $key = (is_callable($key_resolver) || ($key_resolver instanceof \Closure)) ? call_user_func($key_resolver) : $key_resolver;
+
         return hash_hmac('sha256', $original, $key);
     }
 }
 
 if (!function_exists('drewlabs_core_url_signature_from_url')) {
     /**
-     * Creates a signature from a given URI scheme
+     * Creates a signature from a given URI scheme.
      *
-     * @param ServerRequestInterface $request
      * @param \Closure|string $key_resolver
-     * @param bool $absolute
+     *
      * @return string
      */
     function drewlabs_core_url_signature_from_url(string $url, $key_resolver, bool $absolute = true)
     {
         $query_params = drewlabs_core_url_query_string_to_array($url);
-        $url = $absolute ? drewlabs_core_url_get_url_without_query_string($url) : '/' . drewlabs_core_url_get_normalize_request_path($url);
-        $original = rtrim($url . '?' . drewlabs_core_url_array_to_query_string(
+        $url = $absolute ? drewlabs_core_url_get_url_without_query_string($url) : '/'.drewlabs_core_url_get_normalize_request_path($url);
+        $original = rtrim($url.'?'.drewlabs_core_url_array_to_query_string(
             drewlabs_core_array_except($query_params, ['signature'])
         ), '?');
         $key = (is_callable($key_resolver) || ($key_resolver instanceof \Closure)) ? call_user_func($key_resolver) : $key_resolver;
+
         return hash_hmac('sha256', $original, $key);
     }
 }

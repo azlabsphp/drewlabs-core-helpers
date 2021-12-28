@@ -145,8 +145,8 @@ if (!function_exists('drewlabs_core_datetime_is_less_than')) {
     /**
      * Determines if the instance is less (before) than another.
      *
-     * @param \DateTimeInterface $lhs
-     * @param \DateTimeInterface|mixed     $rhs
+     * @param \DateTimeInterface       $lhs
+     * @param \DateTimeInterface|mixed $rhs
      *
      * @return bool
      */
@@ -161,9 +161,9 @@ if (!function_exists('drewlabs_core_datetime_add_minutes')) {
      * Add user provided minutes to the datetime instance.
      *
      * @param \DateTimeImmutable|\DateTime $date
-     * @param int       $minutes
+     * @param int                          $minutes
      *
-     * @return  \DateTimeInterface
+     * @return \DateTimeInterface
      */
     function drewlabs_core_datetime_add_minutes($date, $minutes = 0)
     {
@@ -253,6 +253,7 @@ if (!function_exists('drewlabs_core_datetime_resolve')) {
         if (is_string($date)) {
             return new \DateTimeImmutable($date, $current_date->getTimezone());
         }
+
         return drewlabs_core_datetime_make_date($date);
     }
 }
@@ -265,12 +266,13 @@ if (!function_exists('drewlabs_core_datetime_make_date')) {
      *
      * @return \DateTimeInterface
      */
-    function drewlabs_core_datetime_make_date($date = null, \DateTimeZone $timezone = null)
+    function drewlabs_core_datetime_make_date($date = null, ?DateTimeZone $timezone = null)
     {
         if ($date instanceof \DateTimeInterface) {
             return clone $date;
         }
         drewlabs_core_datetime_expect_date_time($date, ['string', 'null']);
+
         return new \DateTimeImmutable($date ?? 'now', $timezone);
     }
 }
@@ -281,7 +283,7 @@ if (!function_exists('drewlabs_core_datetime_hrs_diff')) {
      *
      * @param \DateTimeInterface|string|null $source_date
      * @param \DateTimeInterface|string|null $date
-     * @param bool                  $exact       Get the exact of the difference
+     * @param bool                           $exact       Get the exact of the difference
      *
      * @return int
      */
@@ -313,7 +315,7 @@ if (!function_exists('drewlabs_core_datetime_secs_diff')) {
      *
      * @param \DateTimeInterface      $source
      * @param \DateTimeInterface|null $date
-     * @param bool           $exact  Get the exact of the difference
+     * @param bool                    $exact  Get the exact of the difference
      *
      * @return int
      */
