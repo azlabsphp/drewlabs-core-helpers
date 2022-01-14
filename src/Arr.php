@@ -11,9 +11,10 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Drewlabs\Core\Helpers\Arrays;
+namespace Drewlabs\Core\Helpers;
 
 use Closure;
+use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
 use Iterator;
 
 class Arr
@@ -199,7 +200,7 @@ class Arr
     public static function fromObject($value)
     {
         $entryToArray = static function ($item) use (&$entryToArray) {
-            if (drewlabs_core_array_is_arrayable($item)) {
+            if (Arr::isArrayable($item)) {
                 return $item;
             }
             if (\is_object($item)) {
@@ -246,12 +247,12 @@ class Arr
         foreach ($keys as $key) {
             $sub_key = $array;
 
-            if (drewlabs_core_array_key_exists($array, $key)) {
+            if (Arr::keyExists($array, $key)) {
                 continue;
             }
 
             foreach (explode('.', (string) $key) as $segment) {
-                if (drewlabs_core_array_is_arrayable($sub_key) && drewlabs_core_array_key_exists($sub_key, $segment)) {
+                if (Arr::isArrayable($sub_key) && Arr::keyExists($sub_key, $segment)) {
                     $sub_key = $sub_key[$segment];
                 } else {
                     return false;
@@ -273,7 +274,7 @@ class Arr
      */
     public static function get($array, $key, $default = null)
     {
-        if (!drewlabs_core_array_is_arrayable($array)) {
+        if (!Arr::isArrayable($array)) {
             return $default instanceof \Closure ? $default() : $default;
         }
 
@@ -286,7 +287,7 @@ class Arr
         }
 
         if (
-            drewlabs_core_array_key_exists($array, $key) ||
+            Arr::keyExists($array, $key) ||
             isset($array[$key])
         ) {
             return $array[$key];
@@ -297,7 +298,7 @@ class Arr
         }
 
         foreach (explode('.', (string) $key) as $segment) {
-            if (drewlabs_core_array_is_arrayable($array) && drewlabs_core_array_key_exists($array, $segment)) {
+            if (Arr::isArrayable($array) && Arr::keyExists($array, $segment)) {
                 $array = $array[$segment];
             } else {
                 return $default instanceof \Closure ? $default() : $default;
@@ -405,7 +406,7 @@ class Arr
      *
      * Performs a O(n) comparison in a worst case scenario
      *
-     * Use it instead of {drewlabs_core_array_is_assoc} to increase
+     * Use it instead of {Arr::isAssociative} to increase
      * error checking on full associative arrays
      *
      * @return bool
@@ -416,7 +417,7 @@ class Arr
             return false;
         }
 
-        return -1 === drewlabs_core_array_ssearch(array_keys($value), null, static function ($item) {
+        return -1 === Arr::ssearch(array_keys($value), null, static function ($item) {
             return !\is_string($item);
         });
     }
@@ -447,8 +448,7 @@ class Arr
      */
     public static function except(array $array, $keys)
     {
-        drewlabs_core_array_remove($array, $keys);
-
+        Arr::remove($array, $keys);
         return $array;
     }
 
@@ -472,11 +472,11 @@ class Arr
         }
         foreach ($keys as $key) {
             // if the exact key exists in the top-level, remove it
-            if (drewlabs_core_array_is_assoc($array) && drewlabs_core_array_key_exists($array, $key)) {
+            if (Arr::isAssociative($array) && Arr::keyExists($array, $key)) {
                 unset($array[$key]);
                 continue;
             }
-            if (!drewlabs_core_array_is_assoc($array) && ($key_ = array_search($key, $array, true))) {
+            if (!Arr::isAssociative($array) && ($key_ = array_search($key, $array, true))) {
                 unset($array[$key_]);
                 continue;
             }
@@ -519,11 +519,11 @@ class Arr
             } elseif (method_exists($value, 'toJson')) {
                 $value = json_decode($value->toJson(), true);
             } else {
-                $value = drewlabs_core_array_object_to_array($value);
+                $value = Arr::fromObject($value) ?? [];
             }
         }
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of'.\Traversable::class.', '.\JsonSerializable::class);
+            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of' . \Traversable::class . ', ' . \JsonSerializable::class);
         }
 
         return $preserve_keys ? $value : array_values($value);
@@ -540,9 +540,9 @@ class Arr
     public static function zip($lhs, ...$rhs)
     {
         $variadic_params = \array_slice(\func_get_args(), 1);
-        $lhs = drewlabs_core_array_udt_to_array($lhs, false);
+        $lhs = Arr::udtToArray($lhs, false);
         $arrayableItems = array_map(static function ($item) {
-            return drewlabs_core_array_udt_to_array($item, false);
+            return Arr::udtToArray($item, false);
         }, $variadic_params);
         $params = array_merge([static function () {
             return \func_get_args();
@@ -564,11 +564,11 @@ class Arr
     public static function szip($lhs, ...$rhs)
     {
         $variadic_params = \array_slice(\func_get_args(), 1);
-        $lhs = drewlabs_core_array_udt_to_array($lhs, false);
+        $lhs = Arr::udtToArray($lhs, false);
         $count = \count($lhs);
         // Transform all variadic params to array to ensure data integrity
         $arrayableItems = array_map(static function ($item) {
-            return drewlabs_core_array_udt_to_array($item, false);
+            return Arr::udtToArray($item, false);
         }, $variadic_params);
         // Ensure that all arrays are of the same size
         $all_same_size = array_filter($arrayableItems, static function ($v) use ($count) {
@@ -578,7 +578,7 @@ class Arr
             throw new \InvalidArgumentException('All params must be of the same size');
         }
 
-        return drewlabs_core_array_zip($lhs, ...$rhs);
+        return Arr::zip($lhs, ...$rhs);
     }
 
     /**
@@ -610,7 +610,7 @@ class Arr
                 return $item;
             }
 
-            return drewlabs_core_array_get($item, $value);
+            return Arr::get($item, $value);
         };
     }
 
@@ -625,7 +625,7 @@ class Arr
      */
     public static function unique($haystack, ?string $key = null, $strict = false)
     {
-        $callback = drewlabs_core_array_value_retriever_func($key);
+        $callback = Arr::valueRetriever($key);
         $exists = [];
         $out = [];
         foreach ($haystack as $key => $value) {
@@ -709,8 +709,8 @@ class Arr
             ?int $start = null,
             ?int $end = null
         ) use (&$search) {
-            $start = $start ?? (!empty($array) ? drewlabs_core_array_key_first($array) : 0);
-            $end = $end ?? (!empty($array) ? drewlabs_core_array_key_last($array) : 0);
+            $start = $start ?? (!empty($array) ? Arr::keyFirst($array) : 0);
+            $end = $end ?? (!empty($array) ? Arr::keyLast($array) : 0);
             if ($end >= $start) {
                 $mid = (int) (ceil($start + ($end - $start) / 2));
                 $result = $predicate ? $predicate($array[$mid], $item) : null;
@@ -856,5 +856,50 @@ class Arr
         }
 
         return $list;
+    }
+
+    /**
+     * Removes all null values from an array
+     * 
+     * @param array $array 
+     * @return array 
+     */
+    public static function filterNull(array $array)
+    {
+        return array_filter($array, function ($value) {
+            return null !== $value;
+        });
+    }
+
+    /**
+     * Apply filtering on an array removing values not matching the predicate
+     * 
+     * @param array $array 
+     * @param mixed $predicate 
+     * @param null|int $flag 
+     * @return array 
+     */
+    public static function filter(array $array, ?callable $predicate = null, ?int $flag = 0)
+    {
+        return array_filter($array, $predicate, $flag);
+    }
+
+    /**
+     * Apply transformation function on filtered list
+     * 
+     * @param array $values 
+     * @param callable $transform 
+     * @param null|callable $predicate 
+     * @return array 
+     */
+    public static function filterMap(
+        array $values,
+        callable $transform,
+        ?callable $predicate = null
+    ) {
+        return Arr::map(
+            Arr::filter($values, $predicate),
+            $transform
+        );
     }
 }

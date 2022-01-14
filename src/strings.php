@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Drewlabs\Core\Helpers\Str;
+
 /*
  * This file is part of the Drewlabs package.
  *
@@ -22,7 +24,7 @@ if (!function_exists('drewlabs_core_strings_starts_with')) {
      */
     function drewlabs_core_strings_starts_with($haystack, $needle)
     {
-        return ('' === $needle) || (mb_substr($haystack, 0, mb_strlen($needle)) === $needle);
+        return Str::startsWith($haystack, $needle);
     }
 }
 
@@ -37,7 +39,7 @@ if (!function_exists('drewlabs_core_strings_ends_with')) {
      */
     function drewlabs_core_strings_ends_with($haystack, $needle)
     {
-        return ('' === $needle) || (mb_substr($haystack, -(int) (mb_strlen($needle))) === $needle);
+        return Str::endsWith($haystack, $needle);
     }
 }
 if (!function_exists('drewlabs_core_strings_sanitize')) {
@@ -46,14 +48,14 @@ if (!function_exists('drewlabs_core_strings_sanitize')) {
      * Removes some characters from the string.
      *
      * @param string $search
-     * @param string $str_to_sanitize
+     * @param string $haystack
      * @param string $replacement
      *
      * @return string|string[]
      */
-    function drewlabs_core_strings_sanitize($search, $str_to_sanitize, $replacement = '')
+    function drewlabs_core_strings_sanitize($search, $haystack, $replacement = '')
     {
-        return str_replace($search, $replacement, $str_to_sanitize);
+        return Str::sanitize($search, $haystack, $replacement);
     }
 }
 
@@ -67,7 +69,7 @@ if (!function_exists('drewlabs_core_strings_is_str')) {
      */
     function drewlabs_core_strings_is_str($value)
     {
-        return is_string($value);
+        return Str::isStr($value);
     }
 }
 
@@ -79,9 +81,9 @@ if (!function_exists('drewlabs_core_strings_to_lower_case')) {
      *
      * @return string
      */
-    function drewlabs_core_strings_to_lower_case($value)
+    function drewlabs_core_strings_to_lower_case(string $value)
     {
-        return mb_strtolower($value);
+        return Str::lower($value);
     }
 }
 
@@ -95,7 +97,7 @@ if (!function_exists('drewlabs_core_strings_to_upper_case')) {
      */
     function drewlabs_core_strings_to_upper_case($value)
     {
-        return mb_strtoupper($value);
+        return Str::upper($value);
     }
 }
 
@@ -109,7 +111,7 @@ if (!function_exists('drewlabs_core_strings_capitalize')) {
      */
     function drewlabs_core_strings_capitalize($value)
     {
-        return ucfirst($value);
+        return Str::capitalize($value);
     }
 }
 
@@ -124,20 +126,7 @@ if (!function_exists('drewlabs_core_strings_contains')) {
      */
     function drewlabs_core_strings_contains($haystack, $needle)
     {
-        if (null === $haystack) {
-            return false;
-        }
-        // Code patch for searching for string directly without converting it to an array of character
-        if (drewlabs_core_strings_is_str($needle)) {
-            return '' !== $needle && false !== mb_strpos($haystack, $needle);
-        }
-        foreach ((array) $needle as $n) {
-            if ('' !== $n && false !== mb_strpos($haystack, $n)) {
-                return true;
-            }
-        }
-
-        return false;
+        return Str::contains($haystack, $needle);
     }
 }
 
@@ -152,7 +141,7 @@ if (!function_exists('drewlabs_core_strings_is_same')) {
      */
     function drewlabs_core_strings_is_same($lhs, $rhs)
     {
-        return 0 === strcmp($lhs, $rhs) ? true : false;
+        return Str::same($lhs, $rhs);
     }
 }
 
@@ -167,9 +156,7 @@ if (!function_exists('drewlabs_core_strings_concat')) {
      */
     function drewlabs_core_strings_concat($separator, ...$values)
     {
-        $entries = array_merge([], $values);
-
-        return drewlabs_core_strings_from_array($entries, $separator);
+        return Str::concat($separator, ...$values);
     }
 }
 
@@ -181,11 +168,7 @@ if (!function_exists('drewlabs_core_strings_from_array')) {
      */
     function drewlabs_core_strings_from_array(array $values, $delimiter = ',')
     {
-        if (!is_array($values)) {
-            throw new \RuntimeException('Error parsing value... Provides an array value as parameter');
-        }
-
-        return implode($delimiter, $values);
+        return Str::join($values, $delimiter);
     }
 }
 
@@ -199,11 +182,7 @@ if (!function_exists('drewlabs_core_strings_to_array')) {
      */
     function drewlabs_core_strings_to_array(string $value, $delimiter = ',')
     {
-        if (!drewlabs_core_strings_is_str($value)) {
-            throw new \RuntimeException('Error parsing value... Provides a string value as parameter');
-        }
-
-        return explode($delimiter, (string) $value);
+        return Str::split($value, $delimiter);
     }
 }
 
@@ -218,7 +197,7 @@ if (!function_exists('drewlabs_core_strings_rtrim')) {
      */
     function drewlabs_core_strings_rtrim($str, $char = null)
     {
-        return rtrim($str, $char);
+        return Str::rtrim($str, $char);
     }
 }
 
@@ -233,7 +212,7 @@ if (!function_exists('drewlabs_core_strings_ltrim')) {
      */
     function drewlabs_core_strings_ltrim($str, $char = null)
     {
-        return ltrim($str, $char);
+        return Str::ltrim($str, $char);
     }
 }
 
@@ -243,7 +222,7 @@ if (!function_exists('drewlabs_core_strings_rand_md5')) {
      */
     function drewlabs_core_strings_rand_md5()
     {
-        return md5(uniqid().microtime());
+        return Str::md5();
     }
 }
 
@@ -260,7 +239,7 @@ if (!function_exists('drewlabs_core_strings_replace')) {
      */
     function drewlabs_core_strings_replace($search, $replacement, $subject, $count = null)
     {
-        return str_replace($search, $replacement, $subject, $count);
+        return Str::replace($search, $replacement, $subject, $count);
     }
 }
 
@@ -275,11 +254,7 @@ if (!function_exists('drewlabs_core_strings_after')) {
      */
     function drewlabs_core_strings_after($character, $haystack)
     {
-        if (!is_bool(mb_strpos($haystack, $character))) {
-            return mb_substr($haystack, mb_strpos($haystack, $character) + mb_strlen($character));
-        }
-
-        return '';
+        return Str::after($character, $haystack);
     }
 }
 
@@ -294,9 +269,7 @@ if (!function_exists('drewlabs_core_strings_after_last')) {
      */
     function drewlabs_core_strings_after_last($character, $haystack)
     {
-        if (!is_bool(drewlabs_core_strings_strrevpos($haystack, $character))) {
-            return mb_substr($haystack, drewlabs_core_strings_strrevpos($haystack, $character) + mb_strlen($character));
-        }
+        return Str::afterLast($character, $haystack);
     }
 }
 
@@ -311,12 +284,7 @@ if (!function_exists('drewlabs_core_strings_before')) {
      */
     function drewlabs_core_strings_before($character, $haystack)
     {
-        $pos = mb_strpos($haystack, $character);
-        if ($pos) {
-            return mb_substr($haystack, 0, $pos);
-        }
-
-        return '';
+        return Str::before($character, $haystack);
     }
 }
 
@@ -331,7 +299,7 @@ if (!function_exists('drewlabs_core_strings_before_last')) {
      */
     function drewlabs_core_strings_before_last($character, $haystack)
     {
-        return mb_substr($haystack, 0, drewlabs_core_strings_strrevpos($haystack, $character));
+        return Str::beforeLast($character, $haystack);
     }
 }
 
@@ -347,7 +315,7 @@ if (!function_exists('drewlabs_core_strings_between')) {
      */
     function drewlabs_core_strings_between($character, $that, $haystack)
     {
-        return drewlabs_core_strings_before($that, drewlabs_core_strings_after($character, $haystack));
+        return Str::between($character, $that, $haystack);
     }
 }
 
@@ -363,7 +331,7 @@ if (!function_exists('drewlabs_core_strings_between_last')) {
      */
     function drewlabs_core_strings_between_last($character, $that, $haystack)
     {
-        return drewlabs_core_strings_after_last($character, drewlabs_core_strings_before_last($that, $haystack));
+        return Str::betweenLast($character, $that, $haystack);
     }
 }
 
@@ -371,19 +339,14 @@ if (!function_exists('drewlabs_core_strings_strrevpos')) {
     /**
      * Return the provided string in the reverse order.
      *
-     * @param string $instr
+     * @param string $haystack
      * @param string $needle
      *
      * @return int|null
      */
-    function drewlabs_core_strings_strrevpos($instr, $needle)
+    function drewlabs_core_strings_strrevpos($haystack, $needle)
     {
-        $rev_pos = mb_strpos(strrev($instr), strrev($needle));
-        if (false === $rev_pos) {
-            return false;
-        }
-
-        return mb_strlen($instr) - $rev_pos - mb_strlen($needle);
+        return Str::strrevpos($haystack, $needle);
     }
 }
 
@@ -409,19 +372,7 @@ if (!function_exists('drewlabs_core_strings_parse_tpl')) {
      */
     function drewlabs_core_strings_parse_tpl($str, $data)
     {
-        if (!is_array($data)) {
-            $data = (array) $data;
-        }
-        $patterns = [];
-        $replacements = [];
-        // Foreach values in the data attributes
-        foreach ($data as $key => $value) {
-            // code...
-            $patterns[] = '/(\{){2}[ ]?\$'.$key.'[ ]?(\}){2}/i';
-            $replacements[] = $value;
-        }
-
-        return preg_replace($patterns, $replacements, $str);
+        return Str::parse($str, $data);
     }
 }
 if (!function_exists('drewlabs_core_strings_value_or_nullable')) {
@@ -433,11 +384,7 @@ if (!function_exists('drewlabs_core_strings_value_or_nullable')) {
      */
     function drewlabs_core_strings_value_or_nullable($value)
     {
-        if (!(drewlabs_core_strings_is_str($value))) {
-            throw new InvalidArgumentException(sprintf('Helper %s requires a valid PHP string', __FUNCTION__));
-        }
-
-        return '' === trim($value) ? null : $value;
+        return Str::valueOrNull($value);
     }
 }
 
@@ -454,18 +401,7 @@ if (!function_exists('drewlabs_core_strings_as_camel_case')) {
      */
     function drewlabs_core_strings_as_camel_case(string $str, $capitalize_first_chr = true, $delimiter = '_')
     {
-        return drewlabs_core_fn_compose_array(
-            static function ($params) {
-                if (count($params) < 2) {
-                    throw new \RuntimeException();
-                }
-
-                return str_replace($params[1], '', ucwords($params[0], $params[1]));
-            },
-            static function ($param) use ($capitalize_first_chr) {
-                return !$capitalize_first_chr ? lcfirst($param) : $param;
-            }
-        )($str, $delimiter);
+        return Str::camelize($str, $capitalize_first_chr, $delimiter);
     }
 }
 
@@ -482,18 +418,7 @@ if (!function_exists('drewlabs_core_strings_as_camel_case_regex')) {
      */
     function drewlabs_core_strings_as_camel_case_regex(string $str, $capitalize_first_chr = true, $delimiter = '{[_]+}')
     {
-        return drewlabs_core_fn_compose_array(
-            static function ($params) {
-                if (count($params) < 2) {
-                    throw new \RuntimeException();
-                }
-
-                return preg_replace($params[1], '', ucwords($params[0], $params[1]));
-            },
-            static function ($param) use ($capitalize_first_chr) {
-                return !$capitalize_first_chr ? lcfirst($param) : $param;
-            }
-        )($str, $delimiter);
+        return Str::regexCamelize($str, $capitalize_first_chr, $delimiter);
     }
 }
 
@@ -507,28 +432,7 @@ if (!function_exists('drewlabs_core_strings_as_snake_case')) {
      */
     function drewlabs_core_strings_as_snake_case(string $str, $delimiter = '_', $delimiter_escape_char = '\\')
     {
-        if ((null === $str) || empty($str)) {
-            return $str;
-        }
-
-        return str_replace(
-            ' ',
-            '',
-            str_replace(
-                [sprintf('%s%s', $delimiter_escape_char, $delimiter), $delimiter_escape_char],
-                $delimiter,
-                trim(
-                    drewlabs_core_strings_to_lower_case(
-                        preg_replace(
-                            '/([A-Z])([a-z\d])/',
-                            $delimiter.'$0',
-                            preg_replace("/[$delimiter]/", $delimiter_escape_char, $str)
-                        )
-                    ),
-                    $delimiter
-                )
-            )
-        );
+        return Str::snakeCase($str, $delimiter, $delimiter_escape_char);
     }
 }
 
@@ -542,10 +446,7 @@ if (!function_exists('drewlabs_core_strings_as_snake_case_regex')) {
      */
     function drewlabs_core_strings_as_snake_case_regex(string $str, $delimiter = '{[_]+}')
     {
-        // Convert all capital letters to $delimiter + lowercaseLetter
-        $str = preg_replace([' ', $delimiter], '', lcfirst($str));
-
-        return mb_strtolower(preg_replace('/([A-Z])([a-z\d])/', $delimiter.'\\0', $str));
+        return Str::regexSnakeCase($str, $delimiter);
     }
 }
 
@@ -553,16 +454,13 @@ if (!function_exists('drewlabs_core_strings_is_upper')) {
 
     /**
      * Checks if a given character is upper case or lowercase.
-     *
-     * @return bool
+     * 
+     * @param mixed $chr 
+     * @return bool 
      */
     function drewlabs_core_strings_is_upper($chr)
     {
-        return (function_exists('ctype_upper') ? static function ($source) {
-            return ctype_upper($source);
-        } : static function ($source) {
-            preg_match('/[A-Z]/', $source) ? true : false;
-        })($chr);
+        return Str::isUpper($chr);
     }
 }
 
@@ -572,30 +470,9 @@ if (!function_exists('drewlabs_core_strings_cadena_rtf')) {
      *
      * @return string
      */
-    function drewlabs_core_strings_cadena_rtf(string $txt)
+    function drewlabs_core_strings_cadena_rtf(string $haystack)
     {
-        $result = null;
-        for ($pos = 0; $pos < mb_strlen($txt); ++$pos) {
-            $char = mb_substr($txt, $pos, 1);
-            if (!preg_match('/[A-Za-z1-9,.]/', $char)) {
-                //unicode ord real!!!
-                $k = mb_convert_encoding($char, 'UCS-2LE', 'UTF-8');
-                $k1 = ord(mb_substr($k, 0, 1));
-                $k2 = ord(mb_substr($k, 1, 1));
-                $ord = $k2 * 256 + $k1;
-                if ($ord > 255) {
-                    $result .= '\uc1\u'.$ord.'*';
-                } elseif ($ord > 32768) {
-                    $result .= '\uc1\u'.($ord - 65535).'*';
-                } else {
-                    $result .= "\\'".dechex($ord);
-                }
-            } else {
-                $result .= $char;
-            }
-        }
-
-        return $result;
+        return Str::cadenartf($haystack);
     }
 }
 
@@ -609,28 +486,6 @@ if (!function_exists('drewlabs_core_strings_ordutf8')) {
      */
     function drewlabs_core_strings_ordutf8(string $string, &$offset)
     {
-        $code = ord(mb_substr($string, $offset, 1));
-        if ($code >= 128) {
-            if ($code < 224) {
-                $bytesnumber = 2;
-            } elseif ($code < 240) {
-                $bytesnumber = 3;
-            } elseif ($code < 248) {
-                $bytesnumber = 4;
-            }
-            $codetemp = $code - 192 - ($bytesnumber > 2 ? 32 : 0) - ($bytesnumber > 3 ? 16 : 0);
-            for ($i = 2; $i <= $bytesnumber; ++$i) {
-                ++$offset;
-                $code2 = ord(mb_substr($string, $offset, 1)) - 128;
-                $codetemp = $codetemp * 64 + $code2;
-            }
-            $code = $codetemp;
-        }
-        ++$offset;
-        if ($offset >= mb_strlen($string)) {
-            $offset = -1;
-        }
-
-        return $code;
+        return Str::ordutf8($string, $offset);
     }
 }
