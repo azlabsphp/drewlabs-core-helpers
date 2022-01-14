@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Drewlabs\Core\Helpers\Str;
-
 /*
  * This file is part of the Drewlabs package.
  *
@@ -12,6 +10,8 @@ use Drewlabs\Core\Helpers\Str;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+use Drewlabs\Core\Helpers\Str;
 
 if (!function_exists('drewlabs_core_strings_starts_with')) {
     /**
@@ -76,8 +76,6 @@ if (!function_exists('drewlabs_core_strings_is_str')) {
 if (!function_exists('drewlabs_core_strings_to_lower_case')) {
     /**
      * Converts string to lowercase.
-     *
-     * @param string $value
      *
      * @return string
      */
@@ -454,9 +452,10 @@ if (!function_exists('drewlabs_core_strings_is_upper')) {
 
     /**
      * Checks if a given character is upper case or lowercase.
-     * 
-     * @param mixed $chr 
-     * @return bool 
+     *
+     * @param mixed $chr
+     *
+     * @return bool
      */
     function drewlabs_core_strings_is_upper($chr)
     {

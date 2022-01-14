@@ -1,22 +1,31 @@
 <?php
 
-namespace Drewlabs\Core\Helpers;
+declare(strict_types=1);
 
-use InvalidArgumentException;
-use RuntimeException;
+/*
+ * This file is part of the Drewlabs package.
+ *
+ * (c) Sidoine Azandrew <azandrewdevelopper@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Drewlabs\Core\Helpers;
 
 class Str
 {
     /**
-     * Generates a random string
-     * 
-     * @param null|int $length 
-     * @param bool $capitalize 
-     * @return string|false 
+     * Generates a random string.
+     *
+     * @param bool $capitalize
+     *
+     * @return string|false
      */
     public static function rand(?int $length, $capitalize = true)
     {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
         return $capitalize ? strtoupper(
             substr(
                 str_shuffle($chars),
@@ -34,9 +43,6 @@ class Str
     /**
      * Check if a given string starts with a substring.
      *
-     * @param string $haystack
-     * @param string $needle
-     *
      * @return bool
      */
     public static function startsWith(string $haystack, string $needle)
@@ -46,9 +52,6 @@ class Str
 
     /**
      * Check if a given string ends with a substring.
-     *
-     * @param string $haystack
-     * @param string $needle
      *
      * @return bool
      */
@@ -71,7 +74,6 @@ class Str
         return str_replace($search, $replacement, $haystack);
     }
 
-
     /**
      * Check if a given variable is a string.
      *
@@ -81,46 +83,39 @@ class Str
      */
     public static function isStr($value)
     {
-        return is_string($value);
+        return \is_string($value);
     }
-
 
     /**
      * Converts string to lowercase.
-     *
-     * @param string $value
      *
      * @return string
      */
     public static function lower(string $value)
     {
-        if (function_exists('mb_strtolower')) {
+        if (\function_exists('mb_strtolower')) {
             return mb_strtolower($value);
         }
+
         return strtolower($value);
     }
 
-
     /**
      * Converts string to uppercase.
-     *
-     * @param string $value
      *
      * @return string
      */
     public static function upper(string $value)
     {
-        if (function_exists('mb_strtoupper')) {
+        if (\function_exists('mb_strtoupper')) {
             return mb_strtoupper($value);
         }
+
         return strtoupper($value);
     }
 
-
     /**
      * Converts first character of a string to uppercase.
-     *
-     * @param string $value
      *
      * @return string
      */
@@ -132,7 +127,6 @@ class Str
     /**
      * Determine if a given string contains a given substring.
      *
-     * @param string       $haystack
      * @param string|array $needle
      *
      * @return bool
@@ -143,7 +137,7 @@ class Str
             return false;
         }
         // Code patch for searching for string directly without converting it to an array of character
-        if (Str::isStr($needle)) {
+        if (self::isStr($needle)) {
             return '' !== $needle && false !== mb_strpos($haystack, $needle);
         }
         foreach ((array) $needle as $n) {
@@ -155,12 +149,8 @@ class Str
         return false;
     }
 
-
     /**
      * Checks if two strings are same.
-     *
-     * @param string $lhs
-     * @param string $rhs
      *
      * @return bool
      */
@@ -172,7 +162,6 @@ class Str
     /**
      * Glue together other function parameters with the first {$separator} parameter.
      *
-     * @param string      $separator
      * @param array|mixed ...$values
      *
      * @return string
@@ -181,41 +170,42 @@ class Str
     {
         $entries = array_merge([], $values);
 
-        return Str::join($entries, $separator);
+        return self::join($entries, $separator);
     }
 
     /**
-     * 
-     * @param array $values 
-     * @param string $delimiter 
-     * @return string 
-     * @throws RuntimeException 
+     * @param string $delimiter
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
      */
     public static function join(array $values, $delimiter = ',')
     {
-        if (!is_array($values)) {
+        if (!\is_array($values)) {
             throw new \RuntimeException('Error parsing value... Provides an array value as parameter');
         }
+
         return implode($delimiter, $values);
     }
 
     /**
      * Explode a string variable into an array.
-     * 
-     * @param string $value 
-     * @param string $delimiter 
-     * @return string[]|false 
-     * @throws RuntimeException 
+     *
+     * @param string $delimiter
+     *
+     * @throws \RuntimeException
+     *
+     * @return string[]|false
      */
     public static function split(string $value, $delimiter = ',')
     {
-        if (!Str::isStr($value)) {
+        if (!self::isStr($value)) {
             throw new \RuntimeException('Error parsing value... Provides a string value as parameter');
         }
 
         return explode($delimiter, (string) $value);
     }
-
 
     /**
      * Strip the $char character from the end of the $str string.
@@ -243,21 +233,19 @@ class Str
         return ltrim($haystack, $char);
     }
 
-
     /**
      * Generate a random string using PHP md5() uniqid() and microtime() functions.
      */
     public static function md5()
     {
-        return md5(uniqid() . microtime());
+        return md5(uniqid().microtime());
     }
-
 
     /**
      * Replace provided subjects in the provided string.
      *
-     * @param string|string[]          $search
-     * @param string|string[]          $replacement
+     * @param string|string[] $search
+     * @param string|string[] $replacement
      * @param string|string[] $subject
      * @param int             $count
      *
@@ -268,46 +256,34 @@ class Str
         return str_replace($search, $replacement, $subject, $count);
     }
 
-
     /**
      * Returns the string after the first occurence of the provided character.
-     *
-     * @param string $character
-     * @param string $haystack
      *
      * @return string
      */
     public static function after(string $character, string $haystack)
     {
-        if (!is_bool(mb_strpos($haystack, $character))) {
+        if (!\is_bool(mb_strpos($haystack, $character))) {
             return mb_substr($haystack, mb_strpos($haystack, $character) + mb_strlen($character));
         }
 
         return '';
     }
 
-
     /**
      * Returns the string after the last occurence of the provided character.
-     *
-     * @param string $character
-     * @param string $haystack
      *
      * @return string
      */
     public static function afterLast(string $character, string $haystack)
     {
-        if (!is_bool(Str::strrevpos($haystack, $character))) {
-            return mb_substr($haystack, Str::strrevpos($haystack, $character) + mb_strlen($character));
+        if (!\is_bool(self::strrevpos($haystack, $character))) {
+            return mb_substr($haystack, self::strrevpos($haystack, $character) + mb_strlen($character));
         }
     }
 
-
     /**
      * Returns the string before the first occurence of the provided character.
-     *
-     * @param string $character
-     * @param string $haystack
      *
      * @return string
      */
@@ -321,56 +297,38 @@ class Str
         return '';
     }
 
-
     /**
      * Returns the string before the last occurence of the provided character.
-     *
-     * @param string $character
-     * @param string $haystack
      *
      * @return string
      */
     public static function beforeLast(string $character, string $haystack)
     {
-        return mb_substr($haystack, 0, Str::strrevpos($haystack, $character));
+        return mb_substr($haystack, 0, self::strrevpos($haystack, $character));
     }
-
 
     /**
      * Returns the string between the first occurence of both provided characters.
-     *
-     * @param string $character
-     * @param string $that
-     * @param string $haystack
      *
      * @return string
      */
     public static function between(string $character, string $that, string $haystack)
     {
-        return Str::before($that, Str::after($character, $haystack));
+        return self::before($that, self::after($character, $haystack));
     }
-
 
     /**
      * Returns the string between the last occurence of both provided characters.
-     *
-     * @param string $character
-     * @param string $that
-     * @param string $haystack
      *
      * @return string
      */
     public static function betweenLast(string $character, string $that, string $haystack)
     {
-        return Str::afterLast($character, Str::beforeLast($that, $haystack));
+        return self::afterLast($character, self::beforeLast($that, $haystack));
     }
-
 
     /**
      * Return the provided string in the reverse order.
-     *
-     * @param string $haystack
-     * @param string $needle
      *
      * @return int|null
      */
@@ -383,8 +341,6 @@ class Str
 
         return mb_strlen($haystack) - $rev_pos - mb_strlen($needle);
     }
-
-
 
     /**
      * Simple template parsing function for replacing properties|keys of an associative
@@ -399,14 +355,13 @@ class Str
      *  $parsed_str = parse_tpl_str('This is a program just for saying {{$param1}}, to the {{ $param2 }} !!!', $data)
      * ```
      *
-     * @param string       $template
      * @param array|object $data
      *
      * @return string
      */
     public static function parse(string $template, $data)
     {
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             $data = (array) $data;
         }
         $patterns = [];
@@ -414,13 +369,12 @@ class Str
         // Foreach values in the data attributes
         foreach ($data as $key => $value) {
             // code...
-            $patterns[] = '/(\{){2}[ ]?\$' . $key . '[ ]?(\}){2}/i';
+            $patterns[] = '/(\{){2}[ ]?\$'.$key.'[ ]?(\}){2}/i';
             $replacements[] = $value;
         }
 
         return preg_replace($patterns, $replacements, $template);
     }
-
 
     /**
      * Convert an enpty striing into PHP Nullable type.
@@ -429,13 +383,12 @@ class Str
      */
     public static function valueOrNull($value)
     {
-        if (!(Str::isStr($value))) {
-            throw new InvalidArgumentException(sprintf('Helper %s requires a valid PHP string', __FUNCTION__));
+        if (!(self::isStr($value))) {
+            throw new \InvalidArgumentException(sprintf('Helper %s requires a valid PHP string', __FUNCTION__));
         }
 
         return '' === trim($value) ? null : $value;
     }
-
 
     /**
      * Convert provided word into camel case.
@@ -451,7 +404,7 @@ class Str
     {
         return drewlabs_core_fn_compose_array(
             static function ($params) {
-                if (count($params) < 2) {
+                if (\count($params) < 2) {
                     throw new \RuntimeException();
                 }
 
@@ -462,7 +415,6 @@ class Str
             }
         )($haystack, $delimiter);
     }
-
 
     /**
      * Convert provided word into camel case.
@@ -478,7 +430,7 @@ class Str
     {
         return drewlabs_core_fn_compose_array(
             static function ($params) {
-                if (count($params) < 2) {
+                if (\count($params) < 2) {
                     throw new \RuntimeException();
                 }
 
@@ -489,7 +441,6 @@ class Str
             }
         )($haystack, $delimiter);
     }
-
 
     /**
      * Convert provided string into snake case.
@@ -511,10 +462,10 @@ class Str
                 [sprintf('%s%s', $delimiter_escape_char, $delimiter), $delimiter_escape_char],
                 $delimiter,
                 trim(
-                    Str::lower(
+                    self::lower(
                         preg_replace(
                             '/([A-Z])([a-z\d])/',
-                            $delimiter . '$0',
+                            $delimiter.'$0',
                             preg_replace("/[$delimiter]/", $delimiter_escape_char, $haystack)
                         )
                     ),
@@ -523,7 +474,6 @@ class Str
             )
         );
     }
-
 
     /**
      * Convert provided string into snake case using regular expression.
@@ -537,24 +487,24 @@ class Str
         // Convert all capital letters to $delimiter + lowercaseLetter
         $haystack = preg_replace([' ', $delimiter], '', lcfirst($haystack));
 
-        return mb_strtolower(preg_replace('/([A-Z])([a-z\d])/', $delimiter . '\\0', $haystack));
+        return mb_strtolower(preg_replace('/([A-Z])([a-z\d])/', $delimiter.'\\0', $haystack));
     }
 
     /**
      * Checks if a given character is upper case or lowercase.
-     * 
-     * @param mixed $chr 
-     * @return bool 
+     *
+     * @param mixed $chr
+     *
+     * @return bool
      */
     public static function isUpper($chr)
     {
-        return (function_exists('ctype_upper') ? static function ($source) {
+        return (\function_exists('ctype_upper') ? static function ($source) {
             return ctype_upper($source);
         } : static function ($source) {
             preg_match('/[A-Z]/', $source) ? true : false;
         })($chr);
     }
-
 
     /**
      * String to cadena rtf.
@@ -569,15 +519,15 @@ class Str
             if (!preg_match('/[A-Za-z1-9,.]/', $char)) {
                 //unicode ord real!!!
                 $k = mb_convert_encoding($char, 'UCS-2LE', 'UTF-8');
-                $k1 = ord(mb_substr($k, 0, 1));
-                $k2 = ord(mb_substr($k, 1, 1));
+                $k1 = \ord(mb_substr($k, 0, 1));
+                $k2 = \ord(mb_substr($k, 1, 1));
                 $ord = $k2 * 256 + $k1;
                 if ($ord > 255) {
-                    $result .= '\uc1\u' . $ord . '*';
+                    $result .= '\uc1\u'.$ord.'*';
                 } elseif ($ord > 32768) {
-                    $result .= '\uc1\u' . ($ord - 65535) . '*';
+                    $result .= '\uc1\u'.($ord - 65535).'*';
                 } else {
-                    $result .= "\\'" . dechex($ord);
+                    $result .= "\\'".dechex($ord);
                 }
             } else {
                 $result .= $char;
@@ -586,7 +536,6 @@ class Str
 
         return $result;
     }
-
 
     /**
      * String to UTF-8 encoded.
@@ -597,7 +546,7 @@ class Str
      */
     public static function ordutf8(string $haystack, &$offset)
     {
-        $code = ord(mb_substr($haystack, $offset, 1));
+        $code = \ord(mb_substr($haystack, $offset, 1));
         if ($code >= 128) {
             if ($code < 224) {
                 $bytesnumber = 2;
@@ -609,7 +558,7 @@ class Str
             $codetemp = $code - 192 - ($bytesnumber > 2 ? 32 : 0) - ($bytesnumber > 3 ? 16 : 0);
             for ($i = 2; $i <= $bytesnumber; ++$i) {
                 ++$offset;
-                $code2 = ord(mb_substr($haystack, $offset, 1)) - 128;
+                $code2 = \ord(mb_substr($haystack, $offset, 1)) - 128;
                 $codetemp = $codetemp * 64 + $code2;
             }
             $code = $codetemp;

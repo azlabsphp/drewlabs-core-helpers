@@ -796,7 +796,7 @@ if (!function_exists('drewlabs_core_array_bsearch')) {
                 $result = $predicate ? $predicate($array[$mid], $item) : null;
                 // If the predicate return not null 0, match is found
                 if ((null !== $result) ? (BinarySearchResult::FOUND === $result) : $array[$mid] === $item) {
-                    return intval(floor($mid));
+                    return (int) (floor($mid));
                 }
                 // If the predicate return not null == 1, search the lower bound
                 if ((null !== $result) ? BinarySearchResult::LEFT === $result : $array[$mid] > $item) {

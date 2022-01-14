@@ -200,7 +200,7 @@ class Arr
     public static function fromObject($value)
     {
         $entryToArray = static function ($item) use (&$entryToArray) {
-            if (Arr::isArrayable($item)) {
+            if (self::isArrayable($item)) {
                 return $item;
             }
             if (\is_object($item)) {
@@ -247,12 +247,12 @@ class Arr
         foreach ($keys as $key) {
             $sub_key = $array;
 
-            if (Arr::keyExists($array, $key)) {
+            if (self::keyExists($array, $key)) {
                 continue;
             }
 
             foreach (explode('.', (string) $key) as $segment) {
-                if (Arr::isArrayable($sub_key) && Arr::keyExists($sub_key, $segment)) {
+                if (self::isArrayable($sub_key) && self::keyExists($sub_key, $segment)) {
                     $sub_key = $sub_key[$segment];
                 } else {
                     return false;
@@ -274,7 +274,7 @@ class Arr
      */
     public static function get($array, $key, $default = null)
     {
-        if (!Arr::isArrayable($array)) {
+        if (!self::isArrayable($array)) {
             return $default instanceof \Closure ? $default() : $default;
         }
 
@@ -287,7 +287,7 @@ class Arr
         }
 
         if (
-            Arr::keyExists($array, $key) ||
+            self::keyExists($array, $key) ||
             isset($array[$key])
         ) {
             return $array[$key];
@@ -298,7 +298,7 @@ class Arr
         }
 
         foreach (explode('.', (string) $key) as $segment) {
-            if (Arr::isArrayable($array) && Arr::keyExists($array, $segment)) {
+            if (self::isArrayable($array) && self::keyExists($array, $segment)) {
                 $array = $array[$segment];
             } else {
                 return $default instanceof \Closure ? $default() : $default;
@@ -417,7 +417,7 @@ class Arr
             return false;
         }
 
-        return -1 === Arr::ssearch(array_keys($value), null, static function ($item) {
+        return -1 === self::ssearch(array_keys($value), null, static function ($item) {
             return !\is_string($item);
         });
     }
@@ -448,7 +448,8 @@ class Arr
      */
     public static function except(array $array, $keys)
     {
-        Arr::remove($array, $keys);
+        self::remove($array, $keys);
+
         return $array;
     }
 
@@ -472,11 +473,11 @@ class Arr
         }
         foreach ($keys as $key) {
             // if the exact key exists in the top-level, remove it
-            if (Arr::isAssociative($array) && Arr::keyExists($array, $key)) {
+            if (self::isAssociative($array) && self::keyExists($array, $key)) {
                 unset($array[$key]);
                 continue;
             }
-            if (!Arr::isAssociative($array) && ($key_ = array_search($key, $array, true))) {
+            if (!self::isAssociative($array) && ($key_ = array_search($key, $array, true))) {
                 unset($array[$key_]);
                 continue;
             }
@@ -519,11 +520,11 @@ class Arr
             } elseif (method_exists($value, 'toJson')) {
                 $value = json_decode($value->toJson(), true);
             } else {
-                $value = Arr::fromObject($value) ?? [];
+                $value = self::fromObject($value) ?? [];
             }
         }
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of' . \Traversable::class . ', ' . \JsonSerializable::class);
+            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of'.\Traversable::class.', '.\JsonSerializable::class);
         }
 
         return $preserve_keys ? $value : array_values($value);
@@ -540,9 +541,9 @@ class Arr
     public static function zip($lhs, ...$rhs)
     {
         $variadic_params = \array_slice(\func_get_args(), 1);
-        $lhs = Arr::udtToArray($lhs, false);
+        $lhs = self::udtToArray($lhs, false);
         $arrayableItems = array_map(static function ($item) {
-            return Arr::udtToArray($item, false);
+            return self::udtToArray($item, false);
         }, $variadic_params);
         $params = array_merge([static function () {
             return \func_get_args();
@@ -564,11 +565,11 @@ class Arr
     public static function szip($lhs, ...$rhs)
     {
         $variadic_params = \array_slice(\func_get_args(), 1);
-        $lhs = Arr::udtToArray($lhs, false);
+        $lhs = self::udtToArray($lhs, false);
         $count = \count($lhs);
         // Transform all variadic params to array to ensure data integrity
         $arrayableItems = array_map(static function ($item) {
-            return Arr::udtToArray($item, false);
+            return self::udtToArray($item, false);
         }, $variadic_params);
         // Ensure that all arrays are of the same size
         $all_same_size = array_filter($arrayableItems, static function ($v) use ($count) {
@@ -578,7 +579,7 @@ class Arr
             throw new \InvalidArgumentException('All params must be of the same size');
         }
 
-        return Arr::zip($lhs, ...$rhs);
+        return self::zip($lhs, ...$rhs);
     }
 
     /**
@@ -610,7 +611,7 @@ class Arr
                 return $item;
             }
 
-            return Arr::get($item, $value);
+            return self::get($item, $value);
         };
     }
 
@@ -625,7 +626,7 @@ class Arr
      */
     public static function unique($haystack, ?string $key = null, $strict = false)
     {
-        $callback = Arr::valueRetriever($key);
+        $callback = self::valueRetriever($key);
         $exists = [];
         $out = [];
         foreach ($haystack as $key => $value) {
@@ -709,8 +710,8 @@ class Arr
             ?int $start = null,
             ?int $end = null
         ) use (&$search) {
-            $start = $start ?? (!empty($array) ? Arr::keyFirst($array) : 0);
-            $end = $end ?? (!empty($array) ? Arr::keyLast($array) : 0);
+            $start = $start ?? (!empty($array) ? self::keyFirst($array) : 0);
+            $end = $end ?? (!empty($array) ? self::keyLast($array) : 0);
             if ($end >= $start) {
                 $mid = (int) (ceil($start + ($end - $start) / 2));
                 $result = $predicate ? $predicate($array[$mid], $item) : null;
@@ -859,25 +860,23 @@ class Arr
     }
 
     /**
-     * Removes all null values from an array
-     * 
-     * @param array $array 
-     * @return array 
+     * Removes all null values from an array.
+     *
+     * @return array
      */
     public static function filterNull(array $array)
     {
-        return array_filter($array, function ($value) {
+        return array_filter($array, static function ($value) {
             return null !== $value;
         });
     }
 
     /**
-     * Apply filtering on an array removing values not matching the predicate
-     * 
-     * @param array $array 
-     * @param mixed $predicate 
-     * @param null|int $flag 
-     * @return array 
+     * Apply filtering on an array removing values not matching the predicate.
+     *
+     * @param mixed $predicate
+     *
+     * @return array
      */
     public static function filter(array $array, ?callable $predicate = null, ?int $flag = 0)
     {
@@ -885,20 +884,17 @@ class Arr
     }
 
     /**
-     * Apply transformation function on filtered list
-     * 
-     * @param array $values 
-     * @param callable $transform 
-     * @param null|callable $predicate 
-     * @return array 
+     * Apply transformation function on filtered list.
+     *
+     * @return array
      */
     public static function filterMap(
         array $values,
         callable $transform,
         ?callable $predicate = null
     ) {
-        return Arr::map(
-            Arr::filter($values, $predicate),
+        return self::map(
+            self::filter($values, $predicate),
             $transform
         );
     }

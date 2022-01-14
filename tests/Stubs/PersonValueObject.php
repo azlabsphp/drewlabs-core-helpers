@@ -13,11 +13,8 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests\Stubs;
 
-use Drewlabs\Contracts\EntityObject\AbstractEntityObject;
-
 final class PersonValueObject
 {
-
     public function __construct($attributes = [])
     {
         $this->copyWith($attributes);
@@ -27,13 +24,15 @@ final class PersonValueObject
     {
         $self = clone $this;
         foreach ($this->getJsonableAttributes() as $key) {
-            if (array_key_exists($key, $attributes)) {
+            if (\array_key_exists($key, $attributes)) {
                 $self->{$key} = $attributes[$key];
             }
         }
+
         return $self;
     }
-    protected function getJsonableAttributes()
+
+    private function getJsonableAttributes()
     {
         return [
             'login',
