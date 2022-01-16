@@ -127,11 +127,12 @@ class Str
     /**
      * Determine if a given string contains a given substring.
      *
-     * @param string|array $needle
+     * @param string          $haystack
+     * @param string|string[] $needle
      *
      * @return bool
      */
-    public static function contains(string $haystack, $needle)
+    public static function contains(?string $haystack, $needle)
     {
         if (null === $haystack) {
             return false;
@@ -164,6 +165,8 @@ class Str
      *
      * @param array|mixed ...$values
      *
+     * @throws \RuntimeException
+     *
      * @return string
      */
     public static function concat(string $separator, ...$values)
@@ -174,7 +177,10 @@ class Str
     }
 
     /**
-     * @param string $delimiter
+     * Concatenate the list of strings using the specify delimiter.
+     *
+     * @param string[] $values
+     * @param string   $delimiter
      *
      * @throws \RuntimeException
      *

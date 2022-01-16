@@ -124,6 +124,10 @@ if (!function_exists('drewlabs_core_strings_contains')) {
      */
     function drewlabs_core_strings_contains($haystack, $needle)
     {
+        if (null === $haystack) {
+            return false;
+        }
+
         return Str::contains($haystack, $needle);
     }
 }
