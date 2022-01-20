@@ -82,4 +82,23 @@ class IteratorHelpersTest extends TestCase
         $this->assertTrue(!\in_array('host', array_keys($result), true));
         $this->assertTrue(!\in_array('user', array_keys($result), true));
     }
+
+    public function testRange()
+    {
+        $list1 = iterator_to_array(
+            Iter::filter(
+                Iter::range(0, 10),
+                function ($value) {
+                    return $value % 2 === 0;
+                }
+            ),
+            false
+        );
+        $list2 = array_values(
+            array_filter(range(0, 10), function ($value) {
+                return $value % 2 === 0;
+            })
+        );
+        $this->assertEquals($list1, $list2);
+    }
 }

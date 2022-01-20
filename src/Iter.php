@@ -4,8 +4,10 @@ namespace Drewlabs\Core\Helpers;
 
 use ArrayIterator;
 use Closure;
+use Generator;
 use InvalidArgumentException;
 use Iterator;
+use LogicException;
 use Traversable;
 
 class Iter
@@ -194,5 +196,31 @@ class Iter
             $results[] = $value;
         }
         return array_merge([], ...$results);
+    }
+
+    /**
+     * Creates a Traversable of values in between $start and $limit
+     * 
+     * @param int $start 
+     * @param int $limit 
+     * @param int $step 
+     * @return Generator<int, int, mixed, void> 
+     * @throws LogicException 
+     */
+    public static function range(int $start, int $limit, int $step = 1)
+    {
+        if ((($start <= $limit) && ($step <= 0)) || (!($start <= $limit) && $step >= 0)) {
+            throw new LogicException('Step must be positive');
+        }
+        if ($start <= $limit) {
+            for ($index = $start; $index <= $limit; $index += $step) {
+                yield $index;
+            }
+        } else {
+            for ($index = $start; $index >= $limit; $index += $step) {
+                yield $index;
+            }
+        }
+        
     }
 }
