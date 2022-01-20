@@ -2,6 +2,7 @@
 
 namespace Drewlabs\Core\Helpers;
 
+use ArrayIterator;
 use Closure;
 use InvalidArgumentException;
 use Iterator;
@@ -12,34 +13,42 @@ class Iter
     /**
      * Map through the values of a given iterator.
      * 
+     * Note: The function returns an array iterator.
+     * 
      * @param Iterator $iterator 
      * @param Closure $callback 
      * @param bool $preserveKeys 
-     * @return Traversable 
+     * @return Iterator 
      */
     public static function map(
         Iterator $iterator,
         Closure $callback,
         $preserveKeys = true
     ) {
-        foreach ($iterator as $key => $value) {
-            if ($preserveKeys) {
-                yield $key => $callback($value, $key);
-            } else {
-                yield $callback($value, $key);
-            }
-        }
+        return new ArrayIterator(
+            iterator_to_array((function () use ($iterator, $preserveKeys, &$callback) {
+                foreach ($iterator as $key => $value) {
+                    if ($preserveKeys) {
+                        yield $key => $callback($value, $key);
+                    } else {
+                        yield $callback($value, $key);
+                    }
+                }
+            })())
+        );
     }
 
     /**
      * Apply a filter to the values of a given iterator.
+     * 
+     * Note: The function returns an array iterator.
      *
      * @param Iterator $iterator
      * @param Closure $predicate
      * @param boolean $preserveKeys
      * @param int  $flags         // Indicates whether to use keys or
      *                            both $key and value in the filter function
-     * @return Traversable
+     * @return Iterator
      */
     public static function filter(
         Iterator $iterator,
@@ -47,16 +56,25 @@ class Iter
         $preserveKeys = true,
         $flags = \ARRAY_FILTER_USE_BOTH
     ) {
-        foreach ($iterator as $key => $value) {
-            if (!(\ARRAY_FILTER_USE_BOTH === $flags ? $predicate($value, $key) : $predicate($key))) {
-                continue;
-            }
-            if ($preserveKeys) {
-                yield $key => $value;
-            } else {
-                yield $value;
-            }
-        }
+        return new ArrayIterator(
+            iterator_to_array((function () use (
+                $iterator,
+                $preserveKeys,
+                &$predicate,
+                $flags
+            ) {
+                foreach ($iterator as $key => $value) {
+                    if (!(\ARRAY_FILTER_USE_BOTH === $flags ? $predicate($value, $key) : $predicate($key))) {
+                        continue;
+                    }
+                    if ($preserveKeys) {
+                        yield $key => $value;
+                    } else {
+                        yield $value;
+                    }
+                }
+            })())
+        );
     }
 
     /**
@@ -99,10 +117,17 @@ class Iter
         $keys = [],
         bool $useKeys = true
     ) {
-        if (!is_string($keys) && !is_array($keys) && !($keys instanceof Iterator)) {
+        if (
+            !is_string($keys) &&
+            !is_array($keys) &&
+            !($keys instanceof Iterator)
+        ) {
             throw new InvalidArgumentException('$keys parameter must be a PHP string|array or a validate iterator');
         }
-        $keys = is_string($keys) ? [$keys] : (is_array($keys) ? $keys : iterator_to_array($keys));
+        $keys = is_string($keys) ?
+            [$keys] : (is_array($keys) ?
+                $keys :
+                iterator_to_array($keys));
 
         return self::filter(
             $iterator,
@@ -128,10 +153,17 @@ class Iter
         $values = [],
         bool $useKeys = true
     ) {
-        if (!is_string($values) && !is_array($values) && !($values instanceof Iterator)) {
+        if (
+            !is_string($values) &&
+            !is_array($values) &&
+            !($values instanceof Iterator)
+        ) {
             throw new InvalidArgumentException('$keys parameter must be a PHP string|array or a validate iterator');
         }
-        $values = is_string($values) ? [$values] : (is_array($values) ? $values : iterator_to_array($values));
+        $values = is_string($values) ?
+            [$values] : (is_array($values) ?
+                $values :
+                iterator_to_array($values));
 
         return self::filter(
             $iterator,
