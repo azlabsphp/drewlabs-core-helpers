@@ -1,0 +1,5 @@
+# v202201202110
+
+- Added Iter class offering static method for working with Traversable types
+- Added Str class providing static method working with strings
+- Add Arr class for working with lists
