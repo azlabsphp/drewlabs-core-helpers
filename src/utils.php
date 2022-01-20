@@ -22,8 +22,8 @@ use Drewlabs\Core\Helpers\ValueObject\ModelTypeAttributeRValue;
  * file that was distributed with this source code.
  */
 
-define('DREWLABS_CORE_ORD_ASC', 'ASC');
-define('DREWLABS_CORE_ORD_DESC', 'DESC');
+defined('DREWLABS_CORE_ORD_ASC') or define('DREWLABS_CORE_ORD_ASC', 'ASC');
+defined('DREWLABS_CORE_ORD_DESC') or define('DREWLABS_CORE_ORD_DESC', 'DESC');
 
 if (!function_exists('drewlabs_core_compare_numeric')) {
     /**
@@ -110,7 +110,7 @@ if (!function_exists('drewlabs_core_convert_size_to_human_readable')) {
         foreach ($arBytes as $arItem) {
             if ($bytes >= $arItem['value']) {
                 $result = $bytes / $arItem['value'];
-                $result = str_replace('.', $separator, (string) (round($result, 2))).' '.$arItem['unit'];
+                $result = str_replace('.', $separator, (string) (round($result, 2))) . ' ' . $arItem['unit'];
                 break;
             }
         }
@@ -343,5 +343,26 @@ if (!function_exists('drewlabs_core_get')) {
         }
 
         return $target;
+    }
+}
+
+if (!function_exists('drewlabs_class_recusive_uses')) {
+    /**
+     * 
+     * @param mixed $clazz 
+     * @param bool $autoload 
+     * @return string[]|false 
+     */
+    function drewlabs_class_recusive_uses($clazz, $autoload = true)
+    {
+        // TODO : Find an optimized implementation
+        $traits = array_merge(class_uses($clazz, $autoload), []);
+        while ($clazz = get_parent_class($clazz)) {
+            $traits = array_merge(class_uses($clazz, $autoload), $traits);
+        }
+        foreach ($traits as $trait => $same) {
+            $traits = array_merge(class_uses($trait, $autoload), $traits);
+        }
+        return array_unique($traits);
     }
 }

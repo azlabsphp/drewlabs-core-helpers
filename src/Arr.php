@@ -15,7 +15,6 @@ namespace Drewlabs\Core\Helpers;
 
 use Closure;
 use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
-use Iterator;
 
 class Arr
 {
@@ -365,20 +364,21 @@ class Arr
      *
      * @param \Traversable|array $items
      *
-     * @return \Iterator
+     * @return \Traversable
      */
     public static function iter($items, callable $callback)
     {
         foreach ($items as $value) {
-            // code...
             yield \call_user_func($callback, $value);
         }
     }
 
     /**
      * Checks if a source array contains all the elements of another array.
-     *
-     * @return bool
+     * 
+     * @param array $array 
+     * @param array $sub 
+     * @return bool 
      */
     public static function containsAll(array $source, array $innerArray)
     {
@@ -387,10 +387,11 @@ class Arr
 
     /**
      * Checks if an array is an associative array.
-     *
-     * @return bool
+     * 
+     * @param array $value 
+     * @return bool 
      */
-    public static function isAssociative(array $value)
+    public static function isassoc(array $value)
     {
         if (null === $value) {
             return false;
@@ -406,45 +407,55 @@ class Arr
      *
      * Performs a O(n) comparison in a worst case scenario
      *
-     * Use it instead of {Arr::isAssociative} to increase
+     * Use it instead of {drewlabs_core_array_is_assoc} to increase
      * error checking on full associative arrays
-     *
-     * @return bool
+     * 
+     * @param array $value 
+     * @return bool 
      */
-    public static function isFullyAssociative(array $value)
+    public static function isallassoc(array $value)
     {
         if (null === $value) {
             return false;
         }
 
-        return -1 === self::ssearch(array_keys($value), null, static function ($item) {
-            return !\is_string($item);
-        });
+        return -1 === self::ssearch(
+            array_keys($value),
+            null,
+            static function ($item) {
+                return !\is_string($item);
+            }
+        );
     }
 
     /**
      * Group array values by the number of their occurence in the array.
-     *
-     * @return array
+     * 
+     * @param array $array 
+     * @return array 
      */
     public static function groupCount(array $array)
     {
-        return array_reduce(array_values($array), static function ($carry, $current) {
-            return array_merge(
-                $carry,
-                [
-                    $current => \array_key_exists($current, $carry) ? $carry[$current] + 1 : 1,
-                ]
-            );
-        }, []);
+        return array_reduce(
+            array_values($array),
+            static function ($carry, $current) {
+                return array_merge(
+                    $carry,
+                    [
+                        $current => \array_key_exists($current, $carry) ? $carry[$current] + 1 : 1,
+                    ]
+                );
+            },
+            []
+        );
     }
 
     /**
      * Return all items in an array execpt the specified keys.
-     *
-     * @param string[]|string $keys
-     *
-     * @return array
+     * 
+     * @param array $array 
+     * @param mixed $keys 
+     * @return array 
      */
     public static function except(array $array, $keys)
     {
@@ -473,11 +484,11 @@ class Arr
         }
         foreach ($keys as $key) {
             // if the exact key exists in the top-level, remove it
-            if (self::isAssociative($array) && self::keyExists($array, $key)) {
+            if (self::isassoc($array) && self::keyExists($array, $key)) {
                 unset($array[$key]);
                 continue;
             }
-            if (!self::isAssociative($array) && ($key_ = array_search($key, $array, true))) {
+            if (!self::isassoc($array) && ($key_ = array_search($key, $array, true))) {
                 unset($array[$key_]);
                 continue;
             }
@@ -524,7 +535,7 @@ class Arr
             }
         }
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of'.\Traversable::class.', '.\JsonSerializable::class);
+            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of' . \Traversable::class . ', ' . \JsonSerializable::class);
         }
 
         return $preserve_keys ? $value : array_values($value);
@@ -587,7 +598,7 @@ class Arr
      *
      * @return bool
      */
-    public static function isNotAssociativeList(array $items)
+    public static function isnotassoclist(array $items)
     {
         // Check if the list is an associative list, and return false if it is
         if (0 !== \count(array_filter(array_keys($items), 'is_string'))) {
@@ -717,7 +728,7 @@ class Arr
                 $result = $predicate ? $predicate($array[$mid], $item) : null;
                 // If the predicate return not null 0, match is found
                 if ((null !== $result) ? (BinarySearchResult::FOUND === $result) : $array[$mid] === $item) {
-                    return floor($mid);
+                    return intval(floor($mid));
                 }
                 // If the predicate return not null == 1, search the lower bound
                 if ((null !== $result) ? BinarySearchResult::LEFT === $result : $array[$mid] > $item) {
@@ -729,7 +740,6 @@ class Arr
                         $mid - 1
                     );
                 }
-
                 // Else, search the upper bound
                 return $search(
                     $array,
@@ -739,7 +749,6 @@ class Arr
                     $end
                 );
             }
-
             // We reach here when element
             // is not present in array
             return -1;

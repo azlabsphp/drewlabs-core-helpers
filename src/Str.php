@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
+use Closure;
+
 class Str
 {
     /**
@@ -244,7 +246,7 @@ class Str
      */
     public static function md5()
     {
-        return md5(uniqid().microtime());
+        return md5(uniqid() . microtime());
     }
 
     /**
@@ -375,7 +377,7 @@ class Str
         // Foreach values in the data attributes
         foreach ($data as $key => $value) {
             // code...
-            $patterns[] = '/(\{){2}[ ]?\$'.$key.'[ ]?(\}){2}/i';
+            $patterns[] = '/(\{){2}[ ]?\$' . $key . '[ ]?(\}){2}/i';
             $replacements[] = $value;
         }
 
@@ -471,7 +473,7 @@ class Str
                     self::lower(
                         preg_replace(
                             '/([A-Z])([a-z\d])/',
-                            $delimiter.'$0',
+                            $delimiter . '$0',
                             preg_replace("/[$delimiter]/", $delimiter_escape_char, $haystack)
                         )
                     ),
@@ -493,7 +495,7 @@ class Str
         // Convert all capital letters to $delimiter + lowercaseLetter
         $haystack = preg_replace([' ', $delimiter], '', lcfirst($haystack));
 
-        return mb_strtolower(preg_replace('/([A-Z])([a-z\d])/', $delimiter.'\\0', $haystack));
+        return mb_strtolower(preg_replace('/([A-Z])([a-z\d])/', $delimiter . '\\0', $haystack));
     }
 
     /**
@@ -529,11 +531,11 @@ class Str
                 $k2 = \ord(mb_substr($k, 1, 1));
                 $ord = $k2 * 256 + $k1;
                 if ($ord > 255) {
-                    $result .= '\uc1\u'.$ord.'*';
+                    $result .= '\uc1\u' . $ord . '*';
                 } elseif ($ord > 32768) {
-                    $result .= '\uc1\u'.($ord - 65535).'*';
+                    $result .= '\uc1\u' . ($ord - 65535) . '*';
                 } else {
-                    $result .= "\\'".dechex($ord);
+                    $result .= "\\'" . dechex($ord);
                 }
             } else {
                 $result .= $char;
@@ -575,5 +577,60 @@ class Str
         }
 
         return $code;
+    }
+
+    /**
+     * Convert string into a base62 encoded value
+     * 
+     * @param string $value 
+     * @return string 
+     */
+    public static function base62encode(string $value)
+    {
+        return (new \Tuupola\Base62())->encode($value);
+    }
+
+    /**
+     * Convert a base62 encoded value to a normal string
+     * 
+     * @param string $value 
+     * @return string 
+     * @throws InvalidArgumentException 
+     */
+    public static function base62decode(string $value)
+    {
+        return (new \Tuupola\Base62())->decode($value);
+    }
+
+    /**
+     * Creates a hash value from the provided string.
+     *
+     * @param string   $source
+     * @param \Closure $keyResolver
+     *
+     * @return string
+     */
+    public static function hash(string $source, Closure $keyResolver)
+    {
+        if ($keyResolver instanceof \Closure) {
+            $keyResolver = call_user_func($keyResolver);
+        }
+        if (!is_string($keyResolver)) {
+            throw new \RuntimeException(sprintf('%s : requires either a Closure<string> or a string as second parameter', __FUNCTION__));
+        }
+        return hash_hmac('sha256', self::base62encode($source), $keyResolver);
+    }
+    /**
+     * Compare the has value of the source string against the user provided hash.
+     *
+     * @param string          $source
+     * @param string          $match
+     * @param \Closure|string $keyResolver
+     *
+     * @return bool
+     */
+    public static function compare(string $source, string $match, $keyResolver)
+    {
+        return hash_equals(self::hash($source, $keyResolver), $match);
     }
 }

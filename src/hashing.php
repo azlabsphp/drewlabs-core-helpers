@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Drewlabs\Core\Helpers\Str;
+
 /*
  * This file is part of the Drewlabs package.
  *
@@ -12,16 +14,28 @@ declare(strict_types=1);
  */
 
 if (!function_exists('drewlabs_core_hashing_base62encode')) {
+
+    /**
+     * 
+     * @param string $value 
+     * @return string 
+     */
     function drewlabs_core_hashing_base62encode($value)
     {
-        return (new \Tuupola\Base62())->encode($value);
+        return Str::base62encode($value);
     }
 }
 
 if (!function_exists('drewlabs_core_hashing_base62decode')) {
+
+    /**
+     * 
+     * @param string $value 
+     * @return string 
+     */
     function drewlabs_core_hashing_base62decode($value)
     {
-        return (new \Tuupola\Base62())->decode($value);
+        return Str::base62decode($value);
     }
 }
 
@@ -30,20 +44,13 @@ if (!function_exists('drewlabs_core_hashing_hash_str')) {
      * Creates a hash value from the provided string.
      *
      * @param string   $source
-     * @param \Closure $key_resolver
+     * @param \Closure $keyResolver
      *
      * @return string
      */
-    function drewlabs_core_hashing_hash_str($source, Closure $key_resolver)
+    function drewlabs_core_hashing_hash_str($source, Closure $keyResolver)
     {
-        if ($key_resolver instanceof \Closure) {
-            $key_resolver = call_user_func($key_resolver);
-        }
-        if (!is_string($key_resolver)) {
-            throw new \RuntimeException('%s : Requires either a PHP Closure or a string as 2nd parameter', __METHOD__);
-        }
-
-        return hash_hmac('sha256', drewlabs_core_hashing_base62encode($source), $key_resolver);
+        return Str::hash($source, $keyResolver);
     }
 }
 
@@ -53,14 +60,12 @@ if (!function_exists('drewlabs_core_hashing_hash_str_compare')) {
      *
      * @param string          $source
      * @param string          $match
-     * @param \Closure|string $key_resolver
+     * @param \Closure|string $keyResolver
      *
      * @return bool
      */
-    function drewlabs_core_hashing_hash_str_compare($source, $match, $key_resolver)
+    function drewlabs_core_hashing_hash_str_compare($source, $match, $keyResolver)
     {
-        $result = drewlabs_core_hashing_hash_str($source, $key_resolver);
-
-        return hash_equals($result, $match);
+        return Str::compare($source, $match, $keyResolver);
     }
 }

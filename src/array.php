@@ -11,6 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
+use Drewlabs\Core\Helpers\Arr;
 use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
 
 if (!function_exists('drewlabs_core_array_sort')) {
@@ -23,9 +24,7 @@ if (!function_exists('drewlabs_core_array_sort')) {
      */
     function drewlabs_core_array_sort(array &$items, $callback)
     {
-        usort($items, $callback);
-
-        return $items;
+        return Arr::sort($items, $callback);
     }
 }
 
@@ -37,7 +36,7 @@ if (!function_exists('drewlabs_core_array_is_array_list')) {
      */
     function drewlabs_core_array_is_array_list(array $items)
     {
-        return array_filter($items, 'is_array') === $items;
+        return Arr::isList($items);
     }
 }
 
@@ -50,36 +49,7 @@ if (!function_exists('drewlabs_core_array_sort_by')) {
      */
     function drewlabs_core_array_sort_by(array &$items, $by, $order = DREWLABS_CORE_ORD_ASC)
     {
-        $compare = static function ($a, $b) use ($order, $by) {
-            // Check first if is standard type in order to avoid error
-            if (drewlabs_core_strings_is_str($a) || drewlabs_core_strings_is_str($b)) {
-                return drewlabs_core_compare_str($a, $b, $order, $order);
-            }
-            if (is_numeric($a) || is_numeric($b)) {
-                return drewlabs_core_compare_numeric($a, $b, $order);
-            }
-            // Check if is arrayable
-            if (($a instanceof \ArrayAccess || is_array($a)) && ($b instanceof \ArrayAccess || is_array($b))) {
-                $a = $a[$by];
-                $b = $b[$by];
-            }
-            // Check if is stdClass type
-            if (is_object($a) && is_object($b)) {
-                $a = $a->{$by};
-                $b = $b->{$by};
-            }
-            if (drewlabs_core_strings_is_str($a) || drewlabs_core_strings_is_str($b)) {
-                return drewlabs_core_compare_str($a, $b, $order);
-            }
-            if (is_numeric($a) || is_numeric($b)) {
-                return drewlabs_core_compare_numeric($a, $b, $order);
-            }
-
-            return DREWLABS_CORE_ORD_DESC === $order ? -1 : 1;
-        };
-        usort($items, $compare);
-
-        return $items;
+        return Arr::sortBy($items, $by, $order);
     }
 }
 
@@ -91,26 +61,9 @@ if (!function_exists('drewlabs_core_array_find_index_by')) {
      *
      * @return int|null
      */
-    function drewlabs_core_array_find_index_by(array $items, $by, $search, $start = null, $end = null): int
+    function drewlabs_core_array_find_index_by(array $items, $by, $search, $start = null, $end = null): ?int
     {
-        $low = $start ?? 0;
-        $high = $end ?? count($items) - 1;
-
-        while ($low <= $high) {
-            // code...
-            $mid = floor(($low + $high) / 2);
-            $searched_item = is_object($items[$mid]) ? $items[$mid]->{$by} : $items[$mid][$by];
-            if (drewlabs_core_is_same($searched_item, $search)) {
-                return $mid;
-            }
-            if ($search < $searched_item) {
-                $high = $mid - 1;
-            } else {
-                $low = $mid + 1;
-            }
-        }
-
-        return -1;
+        return Arr::findIndexBy($items, $by, $search, $start, $end);
     }
 }
 
@@ -122,7 +75,7 @@ if (!function_exists('drewlabs_core_array_combine')) {
      */
     function drewlabs_core_array_combine(array $lvalue, array $rvalue)
     {
-        return array_merge($lvalue, $rvalue);
+        return Arr::combine($lvalue, $rvalue);
     }
 }
 
@@ -138,7 +91,7 @@ if (!function_exists('drewlabs_core_array_search')) {
      */
     function drewlabs_core_array_search($needle, array $items, $strict_mode = false)
     {
-        return array_search($needle, $items, $strict_mode);
+        return Arr::search($needle, $items, $strict_mode);
     }
 }
 
@@ -147,13 +100,13 @@ if (!function_exists('drewlabs_core_array_where')) {
      * Filter the array using the given callback.
      *
      * @param array $array
-     * @param bool  $preserve_keys
+     * @param bool  $preserveKeys
      *
      * @return array
      */
-    function drewlabs_core_array_where($array, callable $callback, $preserve_keys = true)
+    function drewlabs_core_array_where($array, callable $callback, $preserveKeys = true)
     {
-        return $preserve_keys ? array_filter($array, $callback, \ARRAY_FILTER_USE_BOTH) : array_values(array_filter($array, $callback, \ARRAY_FILTER_USE_BOTH));
+        return Arr::where($array, $callback, $preserveKeys);
     }
 }
 
@@ -184,11 +137,7 @@ if (!function_exists('drewlabs_core_array_key_exists')) {
      */
     function drewlabs_core_array_key_exists($array, $key)
     {
-        if ($array instanceof \ArrayAccess) {
-            return $array->offsetExists($key);
-        }
-
-        return array_key_exists($key, $array);
+        return  Arr::keyExists($array, $key);
     }
 }
 
@@ -202,7 +151,7 @@ if (!function_exists('drewlabs_core_array_is_arrayable')) {
      */
     function drewlabs_core_array_is_arrayable($value)
     {
-        return is_array($value) || $value instanceof \ArrayAccess;
+        return Arr::isArrayable($value);
     }
 }
 
@@ -216,25 +165,7 @@ if (!function_exists('drewlabs_core_array_object_to_array')) {
      */
     function drewlabs_core_array_object_to_array($value)
     {
-        $entryToArray = static function ($item) use (&$entryToArray) {
-            if (drewlabs_core_array_is_arrayable($item)) {
-                return $item;
-            }
-            if (is_object($item)) {
-                $item = (array) $item;
-                foreach ($item as $k => $v) {
-                    if (is_object($v)) {
-                        $item[$k] = $entryToArray($v);
-                    }
-                }
-
-                return $item;
-            }
-
-            return null;
-        };
-
-        return $entryToArray($value);
+        return Arr::fromObject($value);
     }
 }
 
@@ -250,37 +181,7 @@ if (!function_exists('drewlabs_core_array_has')) {
      */
     function drewlabs_core_array_has($array, $keys)
     {
-        if (null === $keys) {
-            return false;
-        }
-
-        $keys = (array) $keys;
-
-        if (!$array) {
-            return false;
-        }
-
-        if ([] === $keys) {
-            return false;
-        }
-
-        foreach ($keys as $key) {
-            $sub_key = $array;
-
-            if (drewlabs_core_array_key_exists($array, $key)) {
-                continue;
-            }
-
-            foreach (explode('.', (string) $key) as $segment) {
-                if (drewlabs_core_array_is_arrayable($sub_key) && drewlabs_core_array_key_exists($sub_key, $segment)) {
-                    $sub_key = $sub_key[$segment];
-                } else {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return Arr::has($array, $keys);
     }
 }
 
@@ -296,38 +197,7 @@ if (!function_exists('drewlabs_core_array_get')) {
      */
     function drewlabs_core_array_get($array, $key, $default = null)
     {
-        if (!drewlabs_core_array_is_arrayable($array)) {
-            return $default instanceof \Closure ? $default() : $default;
-        }
-
-        if (null === $key) {
-            return $array;
-        }
-
-        if ($key instanceof \Closure) {
-            return $key($array) ?? ($default instanceof \Closure ? $default() : $default);
-        }
-
-        if (
-            drewlabs_core_array_key_exists($array, $key) ||
-            isset($array[$key])
-        ) {
-            return $array[$key];
-        }
-
-        if (false === strpos($key, '.')) {
-            return $array[$key] ?? ($default instanceof \Closure ? $default() : $default);
-        }
-
-        foreach (explode('.', (string) $key) as $segment) {
-            if (drewlabs_core_array_is_arrayable($array) && drewlabs_core_array_key_exists($array, $segment)) {
-                $array = $array[$segment];
-            } else {
-                return $default instanceof \Closure ? $default() : $default;
-            }
-        }
-
-        return $array;
+        return Arr::get($array, $key, $default);
     }
 }
 
@@ -345,28 +215,7 @@ if (!function_exists('drewlabs_core_array_set')) {
      */
     function drewlabs_core_array_set(&$array, $key, $value)
     {
-        if (null === $key) {
-            return $array = $value;
-        }
-
-        $keys = explode('.', (string) $key);
-
-        while (count($keys) > 1) {
-            $key = array_shift($keys);
-
-            // If the key doesn't exist at this depth, we will just create an empty array
-            // to hold the next value, allowing us to create the arrays to hold final
-            // values at the correct depth. Then we'll keep digging into the array.
-            if (!isset($array[$key]) || !is_array($array[$key])) {
-                $array[$key] = [];
-            }
-
-            $array = &$array[$key];
-        }
-
-        $array[array_shift($keys)] = $value;
-
-        return $array;
+        return Arr::set($array, $key, $value);
     }
 }
 
@@ -380,10 +229,7 @@ if (!function_exists('drewlabs_core_array_map')) {
      */
     function drewlabs_core_array_map($items, callable $callback)
     {
-        $keys = array_keys($items);
-        $items = array_map($callback, $items, $keys);
-
-        return array_combine($keys, $items);
+        return Arr::map($items, $callback);
     }
 }
 
@@ -393,56 +239,54 @@ if (!function_exists('drewlabs_core_array_iter')) {
      *
      * @param \Traversable|array $items
      *
-     * @return \Iterator
+     * @return \Traversable
      */
     function drewlabs_core_array_iter($items, callable $callback)
     {
-        foreach ($items as $value) {
-            // code...
-            yield call_user_func($callback, $value);
-        }
+        return Arr::iter($items, $callback);
     }
 }
 
 if (!function_exists('drewlabs_core_array_contains_all')) {
+
     /**
      * Checks if a source array contains all the elements of another array.
-     *
-     * @return bool
+     * 
+     * @param array $array 
+     * @param array $sub 
+     * @return bool 
      */
-    function drewlabs_core_array_contains_all(array $source, array $innerArray)
+    function drewlabs_core_array_contains_all(array $array, array $sub)
     {
-        return count(array_intersect($source, $innerArray)) === count($innerArray);
+        return Arr::containsAll($array, $sub);
     }
 }
 
 if (!function_exists('is_assoc')) {
+
     /**
      * Checks if an array is an associative array.
-     *
+     * 
      * @deprecated 1.0.0
-     *
-     * @return bool
+     * @param array $value 
+     * @return bool 
      */
     function is_assoc(array $value)
     {
-        return array_keys($value) !== range(0, count($value) - 1);
+        return Arr::isassoc($value);
     }
 }
 
 if (!function_exists('drewlabs_core_array_is_assoc')) {
     /**
      * Checks if an array is an associative array.
-     *
-     * @return bool
+     * 
+     * @param array $value 
+     * @return bool 
      */
     function drewlabs_core_array_is_assoc(array $value)
     {
-        if (null === $value) {
-            return false;
-        }
-
-        return array_keys($value) !== range(0, count($value) - 1);
+        return Arr::isassoc($value);
     }
 }
 
@@ -456,53 +300,41 @@ if (!function_exists('drewlabs_core_array_is_full_assoc')) {
      *
      * Use it instead of {drewlabs_core_array_is_assoc} to increase
      * error checking on full associative arrays
-     *
-     * @return bool
+     * 
+     * @param array $value 
+     * @return bool 
      */
     function drewlabs_core_array_is_full_assoc(array $value)
     {
-        if (null === $value) {
-            return false;
-        }
-
-        return -1 === drewlabs_core_array_ssearch(array_keys($value), null, static function ($item) {
-            return !is_string($item);
-        });
+        return Arr::isallassoc($value);
     }
 }
 
 if (!function_exists('drewlabs_core_array_group_count')) {
+
     /**
      * Group array values by the number of their occurence in the array.
-     *
-     * @return array
+     * 
+     * @param array $array 
+     * @return array 
      */
     function drewlabs_core_array_group_count(array $array)
     {
-        return array_reduce(array_values($array), static function ($carry, $current) {
-            return array_merge(
-                $carry,
-                [
-                    $current => array_key_exists($current, $carry) ? $carry[$current] + 1 : 1,
-                ]
-            );
-        }, []);
+        return Arr::groupCount($array);
     }
 }
 
 if (!function_exists('drewlabs_core_array_except')) {
     /**
      * Return all items in an array execpt the specified keys.
-     *
-     * @param string[]|string $keys
-     *
-     * @return array
+     * 
+     * @param array $array 
+     * @param mixed $keys 
+     * @return array 
      */
     function drewlabs_core_array_except(array $array, $keys)
     {
-        drewlabs_core_array_remove($array, $keys);
-
-        return $array;
+        return Arr::except($array, $keys);
     }
 }
 
@@ -518,37 +350,7 @@ if (!function_exists('drewlabs_core_array_remove')) {
      */
     function drewlabs_core_array_remove(&$array, $keys)
     {
-        if (empty($array)) {
-            return;
-        }
-        $original = &$array;
-        $keys = (array) $keys;
-        if (0 === count($keys)) {
-            return;
-        }
-        foreach ($keys as $key) {
-            // if the exact key exists in the top-level, remove it
-            if (drewlabs_core_array_is_assoc($array) && drewlabs_core_array_key_exists($array, $key)) {
-                unset($array[$key]);
-                continue;
-            }
-            if (!drewlabs_core_array_is_assoc($array) && ($key_ = array_search($key, $array, true))) {
-                unset($array[$key_]);
-                continue;
-            }
-            $parts = explode('.', (string) $key);
-            // clean up before each pass
-            $array = &$original;
-            while (count($parts) > 1) {
-                $part = array_shift($parts);
-                if (isset($array[$part]) && is_array($array[$part])) {
-                    $array = &$array[$part];
-                } else {
-                    continue;
-                }
-            }
-            unset($array[array_shift($parts)]);
-        }
+        return Arr::remove($array, $keys);
     }
 }
 
@@ -559,35 +361,13 @@ if (!function_exists('drewlabs_core_array_udt_to_array')) {
      * If $preserve_keys = false the first layer of the array is
      *
      * @param mixed $value
-     * @param bool  $preserve_keys
+     * @param bool  $preserveKeys
      *
      * @return array|null
      */
-    function drewlabs_core_array_udt_to_array($value, $preserve_keys = true)
+    function drewlabs_core_array_udt_to_array($value, $preserveKeys = true)
     {
-        // $entryToArray = static function ($item) use (&$entryToArray, $preserve_keys) {
-        // };
-        // return $entryToArray($value);
-        if ($value instanceof \Traversable) {
-            $value = iterator_to_array($value);
-        } elseif ($value instanceof JsonSerializable) {
-            $value = (array) $value->jsonSerialize();
-        } elseif (is_object($value)) {
-            if (method_exists($value, 'all')) {
-                $value = $value->all();
-            } elseif (method_exists($value, 'toArray')) {
-                $value = $value->toArray();
-            } elseif (method_exists($value, 'toJson')) {
-                $value = json_decode($value->toJson(), true);
-            } else {
-                $value = drewlabs_core_array_object_to_array($value);
-            }
-        }
-        if (!is_array($value)) {
-            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of'.\Traversable::class.', '.\JsonSerializable::class);
-        }
-
-        return $preserve_keys ? $value : array_values($value);
+        return Arr::udtToArray($value, $preserveKeys);
     }
 }
 
@@ -602,16 +382,7 @@ if (!function_exists('drewlabs_core_array_zip')) {
      */
     function drewlabs_core_array_zip($lhs, ...$rhs)
     {
-        $variadic_params = array_slice(func_get_args(), 1);
-        $lhs = drewlabs_core_array_udt_to_array($lhs, false);
-        $arrayableItems = array_map(static function ($item) {
-            return drewlabs_core_array_udt_to_array($item, false);
-        }, $variadic_params);
-        $params = array_merge([static function () {
-            return func_get_args();
-        }, $lhs], $arrayableItems);
-
-        return array_map(...$params);
+        return Arr::zip($lhs, ...$rhs);
     }
 }
 
@@ -628,22 +399,7 @@ if (!function_exists('drewlabs_core_array_szip')) {
      */
     function drewlabs_core_array_szip($lhs, ...$rhs)
     {
-        $variadic_params = array_slice(func_get_args(), 1);
-        $lhs = drewlabs_core_array_udt_to_array($lhs, false);
-        $count = count($lhs);
-        // Transform all variadic params to array to ensure data integrity
-        $arrayableItems = array_map(static function ($item) {
-            return drewlabs_core_array_udt_to_array($item, false);
-        }, $variadic_params);
-        // Ensure that all arrays are of the same size
-        $all_same_size = array_filter($arrayableItems, static function ($v) use ($count) {
-            return count($v) === $count;
-        }) === $arrayableItems;
-        if (!$all_same_size) {
-            throw new \InvalidArgumentException('All params must be of the same size');
-        }
-
-        return drewlabs_core_array_zip($lhs, ...$rhs);
+        return Arr::szip($lhs, ...$rhs);
     }
 }
 
@@ -655,12 +411,7 @@ if (!function_exists('drewlabs_core_array_is_no_assoc_array_list')) {
      */
     function drewlabs_core_array_is_no_assoc_array_list(array $items)
     {
-        // Check if the list is an associative list, and return false if it is
-        if (0 !== count(array_filter(array_keys($items), 'is_string'))) {
-            return false;
-        }
-
-        return !empty($items) && array_filter($items, 'is_array') === $items;
+        return Arr::isnotassoclist($items);
     }
 }
 
@@ -674,19 +425,13 @@ if (!function_exists('drewlabs_core_array_value_retriever_func')) {
      */
     function drewlabs_core_array_value_retriever_func($value = null)
     {
-        return static function ($item) use ($value) {
-            if (null === $value || !is_string($value)) {
-                return $item;
-            }
-
-            return drewlabs_core_array_get($item, $value);
-        };
+        return Arr::valueRetriever($value);
     }
 }
 
 if (!function_exists('drewlabs_core_array_unique')) {
     /**
-     * Undocumented function.
+     * Returns the unique values in the list
      *
      * @param array  $haystack
      * @param string $key
@@ -696,18 +441,7 @@ if (!function_exists('drewlabs_core_array_unique')) {
      */
     function drewlabs_core_array_unique($haystack, ?string $key = null, $strict = false)
     {
-        $callback = drewlabs_core_array_value_retriever_func($key);
-        $exists = [];
-        $out = [];
-        foreach ($haystack as $key => $value) {
-            // code...
-            if (!in_array($id = $callback($value), $exists, $strict)) {
-                $out[$key] = $value;
-            }
-            $exists[] = $id;
-        }
-
-        return $out;
+        return Arr::unique($haystack, $key, $strict);
     }
 }
 if (!function_exists('drewlabs_core_array_key_last')) {
@@ -718,11 +452,7 @@ if (!function_exists('drewlabs_core_array_key_last')) {
      */
     function drewlabs_core_array_key_last(array $list)
     {
-        if (function_exists('array_key_last')) {
-            return array_key_last($list);
-        }
-
-        return !empty($list) ? key(array_slice($list, -1, 1, true)) : null;
+        return Arr::keyLast($list);
     }
 }
 
@@ -734,11 +464,7 @@ if (!function_exists('drewlabs_core_array_key_first')) {
      */
     function drewlabs_core_array_key_first(array $list)
     {
-        if (function_exists('array_key_first')) {
-            return array_key_first($list);
-        }
-
-        return key($list);
+        return Arr::keyFirst($list);
     }
 }
 
@@ -750,7 +476,7 @@ if (!function_exists('drewlabs_core_array_last')) {
      */
     function drewlabs_core_array_last(array $list)
     {
-        return !empty($list) ? array_slice($list, -1, 1, false)[0] : null;
+        return Arr::last($list);
     }
 }
 
@@ -762,7 +488,7 @@ if (!function_exists('drewlabs_core_array_first')) {
      */
     function drewlabs_core_array_first(array $list)
     {
-        return !empty($list) ? array_slice($list, 0, 1, false)[0] : null;
+        return Arr::first($list);
     }
 }
 
@@ -780,56 +506,14 @@ if (!function_exists('drewlabs_core_array_bsearch')) {
      *
      * @return int
      */
-    function drewlabs_core_array_bsearch(array $list, $needle = null, ?Closure $fn = null, ?int $l = null, ?int $r = null)
-    {
-        $search = static function (
-            array $array,
-            $item = null,
-            ?Closure $predicate = null,
-            ?int $start = null,
-            ?int $end = null
-        ) use (&$search) {
-            $start = $start ?? (!empty($array) ? drewlabs_core_array_key_first($array) : 0);
-            $end = $end ?? (!empty($array) ? drewlabs_core_array_key_last($array) : 0);
-            if ($end >= $start) {
-                $mid = (int) (ceil($start + ($end - $start) / 2));
-                $result = $predicate ? $predicate($array[$mid], $item) : null;
-                // If the predicate return not null 0, match is found
-                if ((null !== $result) ? (BinarySearchResult::FOUND === $result) : $array[$mid] === $item) {
-                    return (int) (floor($mid));
-                }
-                // If the predicate return not null == 1, search the lower bound
-                if ((null !== $result) ? BinarySearchResult::LEFT === $result : $array[$mid] > $item) {
-                    return $search(
-                        $array,
-                        $item,
-                        $predicate,
-                        $start,
-                        $mid - 1
-                    );
-                }
-
-                // Else, search the upper bound
-                return $search(
-                    $array,
-                    $item,
-                    $predicate,
-                    $mid + 1,
-                    $end
-                );
-            }
-
-            // We reach here when element
-            // is not present in array
-            return -1;
-        };
-        if (empty($list)) {
-            return BinarySearchResult::LEFT;
-        }
-        // First convert array to numeric array to avoid dealing with associative array
-        $list = array_values($list);
-
-        return $search($list, $needle, $fn, $l, $r);
+    function drewlabs_core_array_bsearch(
+        array $list,
+        $needle = null,
+        ?Closure $fn = null,
+        ?int $l = null,
+        ?int $r = null
+    ) {
+        return Arr::bsearch($list, $needle, $fn, $l, $r);
     }
 }
 
@@ -842,22 +526,12 @@ if (!function_exists('drewlabs_core_array_ssearch')) {
      *
      * @return int
      */
-    function drewlabs_core_array_ssearch(array $list, $x = null, ?Closure $fn = null)
-    {
-        $index = -1;
-        if (empty($list)) {
-            return $index;
-        }
-        $it = new ArrayIterator($list);
-        while (($value = $it->current()) !== null) {
-            if ($fn ? $fn($value, $x) : $value === $x) {
-                $index = $it->key();
-                break;
-            }
-            $it->next();
-        }
-
-        return $index;
+    function drewlabs_core_array_ssearch(
+        array $list,
+        $x = null,
+        ?Closure $fn = null
+    ) {
+        return Arr::ssearch($list, $x, $fn);
     }
 }
 
@@ -874,17 +548,7 @@ if (!function_exists('drewlabs_core_array_only')) {
      */
     function drewlabs_core_array_only(array $list, $keys = [], bool $use_keys = true)
     {
-        if (!is_string($keys) && !is_array($keys) && !($keys instanceof Iterator)) {
-            throw new InvalidArgumentException('$keys parameter must be a PHP string|array or a validate iterator');
-        }
-        $keys = is_string($keys) ? [$keys] : (is_array($keys) ? $keys : iterator_to_array($keys));
-        if (empty($keys)) {
-            return [];
-        }
-
-        return array_filter($list, static function ($current) use ($keys) {
-            return in_array($current, $keys, true);
-        }, $use_keys ? \ARRAY_FILTER_USE_KEY : \ARRAY_FILTER_USE_BOTH);
+        return Arr::only($list, $keys, $use_keys);
     }
 }
 
@@ -899,11 +563,7 @@ if (!function_exists('drewlabs_core_array_wrap')) {
      */
     function drewlabs_core_array_wrap($value)
     {
-        if (null === $value) {
-            return [];
-        }
-
-        return is_array($value) ? $value : [$value];
+        return Arr::wrap($value);
     }
 }
 
@@ -918,14 +578,7 @@ if (!function_exists('drewlabs_core_array_exists')) {
      */
     function drewlabs_core_array_exists($array, $key)
     {
-        if (is_object($array) && method_exists($array, 'has')) {
-            return $array->has($key);
-        }
-        if ($array instanceof ArrayAccess) {
-            return $array->offsetExists($key);
-        }
-
-        return array_key_exists($key, $array);
+        return Arr::exists($array, $key);
     }
 }
 
@@ -939,14 +592,7 @@ if (!function_exists('drewlabs_core_array_shuffle')) {
      */
     function drewlabs_core_array_shuffle(array $list, ?int $seed = null)
     {
-        if (null === $seed) {
-            shuffle($list);
-        } else {
-            mt_srand($seed);
-            shuffle($list);
-            mt_srand();
-        }
 
-        return $list;
+        return Arr::shuffle($list, $seed);
     }
 }

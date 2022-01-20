@@ -252,7 +252,7 @@ class ArrayHelpersTest extends TestCase
             return strtoupper($item);
         }, true);
 
-        return $this->assertInstanceOf(\ArrayIterator::class, $values, 'Expect drewlabs_core_iter_map to return an Array Iterator');
+        return $this->assertInstanceOf(\Traversable::class, $values, 'Expect drewlabs_core_iter_map to return an Array Iterator');
     }
 
     public function testIteratorReduceFunction()
@@ -287,14 +287,6 @@ class ArrayHelpersTest extends TestCase
 
     public function testBinarySearchFunction()
     {
-        // $array = [1, 2, 3, 4, 5, 6];
-        // $this->assertEquals(drewlabs_core_array_bsearch($array, 5, function ($curr, $item) {
-        //     if ($curr === $item) {
-        //         return BinarySearchBoundEnum::FOUND;
-        //     }
-        //     return $curr > $item ? BinarySearchBoundEnum::LOWER : BinarySearchBoundEnum::UPPER;
-        // }), 4, 'Expect drewlabs_core_array_bsearch function to return 5');
-
         $array = [
             'php' => [
                 'lang' => 'PHP',
@@ -343,5 +335,36 @@ class ArrayHelpersTest extends TestCase
         $this->assertCount(1, $result, 'Assert only on item in array');
         $this->assertTrue(\in_array('host', array_keys($result), true), 'Assert password key is in result array');
         $this->assertTrue(!\in_array('user', array_keys($result), true), 'Test for fail case');
+    }
+
+    public function testArrayRemove()
+    {
+        $arr = range(0, 10);
+        drewlabs_core_array_remove($arr, [4, 6]);
+        $this->assertEquals(9, count($arr));
+    }
+
+    public function testArrayExcept()
+    {
+        $arr = range(0, 9);
+        $arr2 = drewlabs_core_array_except($arr, [0, 4, 8]);
+        $this->assertEquals(7, count($arr2));
+    }
+
+    public function testZip()
+    {
+        $arr = range(0, 9);
+        $arr2 = range(10, 19);
+        $zip  = drewlabs_core_array_zip($arr, $arr2);
+        $this->assertEquals([0, 10], $zip[0]);
+        $this->assertEquals([9, 19], drewlabs_core_array_last($zip));
+    }
+
+    public function testUniqe()
+    {
+        $arr = range(0, 20);
+        $arr[] = 19;
+        $arr[] = 15;
+        $this->assertEquals(range(0, 20), drewlabs_core_array_unique($arr));
     }
 }
