@@ -500,20 +500,20 @@ if (!function_exists('drewlabs_core_array_bsearch')) {
      * Return BinarySearchResult::FOUND, BinarySearchResult::LEFT or BinarySearchResult::RIGHT to indicate
      * whether to search in in the lower or upper bound
      *
-     * @param mixed    $needle
-     * @param int|null $l      First item key
-     * @param int|null $r      Last item key
+     * @param mixed    $value
+     * @param int|null $start      First item key
+     * @param int|null $end      Last item key
      *
      * @return int
      */
     function drewlabs_core_array_bsearch(
-        array $list,
-        $needle = null,
-        ?Closure $fn = null,
-        ?int $l = null,
-        ?int $r = null
+        array $haystack,
+        $value = null,
+        ?Closure $predicate = null,
+        ?int $start = null,
+        ?int $end = null
     ) {
-        return Arr::bsearch($list, $needle, $fn, $l, $r);
+        return Arr::bsearch($haystack, $value, $predicate, $start, $end);
     }
 }
 

@@ -221,6 +221,5 @@ class Iter
                 yield $index;
             }
         }
-        
     }
 }

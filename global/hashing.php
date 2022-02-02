@@ -66,6 +66,6 @@ if (!function_exists('drewlabs_core_hashing_hash_str_compare')) {
      */
     function drewlabs_core_hashing_hash_str_compare($source, $match, $keyResolver)
     {
-        return Str::compare($source, $match, $keyResolver);
+        return Str::hequals(Str::hash($source, $keyResolver), $match);
     }
 }

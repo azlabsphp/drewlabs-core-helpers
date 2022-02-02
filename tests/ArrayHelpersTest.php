@@ -13,8 +13,12 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests;
 
+use ArrayIterator;
+use Drewlabs\Core\Helpers\Arr;
 use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
+use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
+use Traversable;
 
 class ArrayHelpersTest extends TestCase
 {
@@ -366,5 +370,43 @@ class ArrayHelpersTest extends TestCase
         $arr[] = 19;
         $arr[] = 15;
         $this->assertEquals(range(0, 20), drewlabs_core_array_unique($arr));
+    }
+
+    public function testCreate_Array_From_Traversable()
+    {
+        $iterator = new ArrayIterator(range(0, 10));
+        $this->assertSame(range(0, 10), Arr::create($iterator));
+    }
+
+    public function testCreate_Array_From_Object_With_ToArray()
+    {
+        $object = new class
+        {
+            public function toArray()
+            {
+                return range(0, 10);
+            }
+        };
+        $this->assertSame(range(0, 10), Arr::create($object));
+    }
+
+    public function testCreate_Array_From_IteratorAggregate()
+    {
+        $object = new class implements IteratorAggregate
+        {
+            public function getIterator(): Traversable
+            {
+                return new ArrayIterator(range(0, 10));
+            }
+        };
+        $this->assertSame(range(0, 10), Arr::create($object));
+    }
+
+    public function testCreate_Array_From_String_And_Number()
+    {
+        $val = 3;
+        $strval = "Hello World!";
+        $this->assertSame([3], Arr::create($val));
+        $this->assertSame(["Hello World!"], Arr::create($strval));
     }
 }

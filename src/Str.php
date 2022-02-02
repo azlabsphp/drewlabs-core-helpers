@@ -606,31 +606,41 @@ class Str
      * Creates a hash value from the provided string.
      *
      * @param string   $source
-     * @param \Closure $keyResolver
+     * @param callable $key
      *
      * @return string
      */
-    public static function hash(string $source, Closure $keyResolver)
+    public static function hash(string $source, callable $key, $algo = 'sha256')
     {
-        if ($keyResolver instanceof \Closure) {
-            $keyResolver = call_user_func($keyResolver);
+        $key = Functional::isCallable($key) ? call_user_func($key) : $key;
+        if (!is_string($key)) {
+            throw new \RuntimeException(sprintf('%s : requires either a Closure<void,string> or a string as second parameter', __FUNCTION__));
         }
-        if (!is_string($keyResolver)) {
-            throw new \RuntimeException(sprintf('%s : requires either a Closure<string> or a string as second parameter', __FUNCTION__));
-        }
-        return hash_hmac('sha256', self::base62encode($source), $keyResolver);
+        return hash_hmac($algo, self::base62encode($source), $key);
     }
+
     /**
-     * Compare the has value of the source string against the user provided hash.
+     * Time attacking safe strings comparison
      *
-     * @param string          $source
+     * @param string          $hash
      * @param string          $match
-     * @param \Closure|string $keyResolver
      *
      * @return bool
      */
-    public static function compare(string $source, string $match, $keyResolver)
+    public static function hequals(string $hash, string $match)
     {
-        return hash_equals(self::hash($source, $keyResolver), $match);
+        return hash_equals($hash, $match);
+    }
+
+    /**
+     * Binary safe string comparison
+     * 
+     * @param string $string1 
+     * @param string $string2 
+     * @return bool 
+     */
+    public function equals(string $string1, string $string2)
+    {
+        return strcmp($string1, $string1) === 0;
     }
 }

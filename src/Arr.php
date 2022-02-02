@@ -14,7 +14,10 @@ declare(strict_types=1);
 namespace Drewlabs\Core\Helpers;
 
 use Closure;
+use Drewlabs\Contracts\Support\ArrayableInterface;
 use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
+use InvalidArgumentException;
+use Traversable;
 
 class Arr
 {
@@ -703,63 +706,42 @@ class Arr
      * Perform a binary search while providing a closure as predicate that provide the compison expression
      * If no closure is provided it use === sign to compare values.
      *
-     * Return BinarySearchResult::FOUND, BinarySearchResult::LEFT or BinarySearchResult::RIGHT to indicate
+     * Note: The predicate function should return BinarySearchResult::FOUND, BinarySearchResult::LEFT or BinarySearchResult::RIGHT to indicate
      * whether to search in in the lower or upper bound
-     *
-     * @param mixed    $needle
-     * @param int|null $l      First item key
-     * @param int|null $r      Last item key
-     *
-     * @return int
+     * 
+     * @param array $haystack 
+     * @param mixed $value 
+     * @param null|Closure $predicate 
+     * @param null|int $start 
+     * @param null|int $end 
+     * @return int 
      */
-    public static function bsearch(array $list, $needle = null, ?\Closure $fn = null, ?int $l = null, ?int $r = null)
+    public static function bsearch(array $haystack, $value = null, ?\Closure $predicate = null, ?int $start = null, ?int $end = null)
     {
-        $search = static function (
-            array $array,
-            $item = null,
-            ?\Closure $predicate = null,
-            ?int $start = null,
-            ?int $end = null
-        ) use (&$search) {
-            $start = $start ?? (!empty($array) ? self::keyFirst($array) : 0);
-            $end = $end ?? (!empty($array) ? self::keyLast($array) : 0);
-            if ($end >= $start) {
-                $mid = (int) (ceil($start + ($end - $start) / 2));
-                $result = $predicate ? $predicate($array[$mid], $item) : null;
-                // If the predicate return not null 0, match is found
-                if ((null !== $result) ? (BinarySearchResult::FOUND === $result) : $array[$mid] === $item) {
-                    return intval(floor($mid));
-                }
-                // If the predicate return not null == 1, search the lower bound
-                if ((null !== $result) ? BinarySearchResult::LEFT === $result : $array[$mid] > $item) {
-                    return $search(
-                        $array,
-                        $item,
-                        $predicate,
-                        $start,
-                        $mid - 1
-                    );
-                }
-                // Else, search the upper bound
-                return $search(
-                    $array,
-                    $item,
-                    $predicate,
-                    $mid + 1,
-                    $end
-                );
+        $start = $start ?? 0;
+        $end = $end ?? (!empty($haystack) ? self::keyLast($haystack) : 0);
+        $predicate = $predicate ?? function($source, $match) {
+            if ($source === $match) {
+                return 0;
             }
-            // We reach here when element
-            // is not present in array
-            return -1;
+            if ($source > $match) {
+                return -1;
+            }
+            return 1;
         };
-        if (empty($list)) {
-            return BinarySearchResult::LEFT;
+        while($start <= $end) {
+            $mid = (int) (ceil($start + ($end - $start) / 2));
+            $result = $predicate($haystack[$mid], $value);
+            if (BinarySearchResult::FOUND === $result) {
+                return $mid;
+            }
+            if (BinarySearchResult::LEFT === $result) {
+                $end = $mid - 1;
+            } else {
+                $start = $mid + 1;
+            }
         }
-        // First convert array to numeric array to avoid dealing with associative array
-        $list = array_values($list);
-
-        return $search($list, $needle, $fn, $l, $r);
+        return -1;
     }
 
     /**
@@ -906,5 +888,62 @@ class Arr
             self::filter($values, $predicate),
             $transform
         );
+    }
+
+    /**
+     * Create a PHP Array from  user provided value
+     * 
+     * @param ArrayableInterface|Traversable|array|mixed|null $values 
+     * @return array 
+     */
+    public static function create($values = null)
+    {
+        if (null === $values) {
+            return [];
+        }
+
+        if ($values instanceof Traversable) {
+            return iterator_to_array($values);
+        }
+
+        if ($values instanceof ArrayableInterface) {
+            return $values->toArray();
+        }
+
+        if (is_object($values) && method_exists($values, 'all')) {
+            return $values->all();
+        }
+
+        if (is_object($values) && method_exists($values, 'toArray')) {
+            return $values->toArray();
+        }
+        return (array)$values;
+    }
+
+    /**
+     * Get the values from a list data structure
+     * 
+     * @param ArrayableInterface|Traversable|array|mixed $values 
+     * @return array 
+     */
+    public static function values($values)
+    {
+
+        if ($values instanceof Traversable) {
+            return iterator_to_array($values, false);
+        }
+
+        if ($values instanceof ArrayableInterface) {
+            return array_values($values->toArray());
+        }
+
+        if (is_object($values) && method_exists($values, 'all')) {
+            return array_values($values->all());
+        }
+
+        if (is_object($values) && method_exists($values, 'toArray')) {
+            return array_values($values->toArray());
+        }
+        throw new InvalidArgumentException('Unsupported type provided as parameter!');
     }
 }

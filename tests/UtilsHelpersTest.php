@@ -31,7 +31,10 @@ class UtilsHelpersTest extends TestCase
             static function ($value) {
                 return drewlabs_core_create_attribute_getter('repetition', null)($value);
             }
-        )('repetition is the act of repeating or restating something more than once. In writing, repetition can occur at many levels: with individual letters and sounds, single words, phrases, or even ideas. repetition can be problematic in writing if it leads to dull work, but it can also be an effective poetic or rhetorical strategy to strengthen your message, as our examples of repetition in writing demonstrate.', ' ');
+        )(
+            'repetition is the act of repeating or restating something more than once. In writing, repetition can occur at many levels: with individual letters and sounds, single words, phrases, or even ideas. repetition can be problematic in writing if it leads to dull work, but it can also be an effective poetic or rhetorical strategy to strengthen your message, as our examples of repetition in writing demonstrate.',
+            ' '
+        );
         $this->assertIsInt($result, 'Expects the test to complete successfully');
         $this->assertSame($result, 4, 'Expect the word repetition to appear 4 times in the source array');
     }
@@ -180,8 +183,8 @@ class UtilsHelpersTest extends TestCase
             'secret' => 'SuperSecretPassword',
         ]);
         $person2 = $person->copyWith([
-           'login' => 'Azandrew',
-           'email' => 'azandrewdevelopper@gmail.com',
+            'login' => 'Azandrew',
+            'email' => 'azandrewdevelopper@gmail.com',
         ]);
         $person = drewlabs_core_create_attribute_setter(
             'secret',

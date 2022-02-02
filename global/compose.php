@@ -75,15 +75,7 @@ if (!function_exists('drewlabs_core_fn_reverse_compose')) {
      */
     function drewlabs_core_fn_reverse_compose(...$funcs)
     {
-        return static function ($source) use ($funcs) {
-            return array_reduce(
-                array_reverse($funcs),
-                static function ($carry, $func) {
-                    return $func($carry);
-                },
-                $source
-            );
-        };
+        return drewlabs_core_fn_compose(...array_reverse($funcs));
     }
 }
 
@@ -101,14 +93,6 @@ if (!function_exists('drewlabs_core_fn_reverse_compose_array')) {
      */
     function drewlabs_core_fn_reverse_compose_array(...$funcs)
     {
-        return static function (...$source) use ($funcs) {
-            return array_reduce(
-                array_reverse($funcs),
-                static function ($carry, $func) {
-                    return $func($carry);
-                },
-                $source
-            );
-        };
+        return drewlabs_core_fn_compose_array(...array_reverse($funcs));
     }
 }
