@@ -12,6 +12,14 @@ declare(strict_types=1);
  */
 
 if (!function_exists('drewlabs_core_format_amount_value')) {
+
+    /**
+     * 
+     * @param mixed $balance 
+     * @param float|int $decimal 
+     * @param string $separator 
+     * @return string 
+     */
     function drewlabs_core_format_amount_value($balance, float $decimal = 0, $separator = ' ')
     {
         if (null === $balance) {

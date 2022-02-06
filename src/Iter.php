@@ -2,8 +2,6 @@
 
 namespace Drewlabs\Core\Helpers;
 
-use ArrayIterator;
-use Closure;
 use Generator;
 use InvalidArgumentException;
 use Iterator;
@@ -18,26 +16,24 @@ class Iter
      * Note: The function returns an array iterator.
      * 
      * @param Iterator $iterator 
-     * @param Closure $callback 
+     * @param callable $callback 
      * @param bool $preserveKeys 
      * @return Iterator 
      */
     public static function map(
         Iterator $iterator,
-        Closure $callback,
+        callable $callback,
         $preserveKeys = true
     ) {
-        return new ArrayIterator(
-            iterator_to_array((function () use ($iterator, $preserveKeys, &$callback) {
-                foreach ($iterator as $key => $value) {
-                    if ($preserveKeys) {
-                        yield $key => $callback($value, $key);
-                    } else {
-                        yield $callback($value, $key);
-                    }
+        return (function () use ($iterator, $preserveKeys, &$callback) {
+            foreach ($iterator as $key => $value) {
+                if ($preserveKeys) {
+                    yield $key => call_user_func($callback, $value, $key);
+                } else {
+                    yield call_user_func($callback, $value, $key);
                 }
-            })())
-        );
+            }
+        })();
     }
 
     /**
@@ -46,7 +42,7 @@ class Iter
      * Note: The function returns an array iterator.
      *
      * @param Iterator $iterator
-     * @param Closure $predicate
+     * @param callable $predicate
      * @param boolean $preserveKeys
      * @param int  $flags         // Indicates whether to use keys or
      *                            both $key and value in the filter function
@@ -54,42 +50,42 @@ class Iter
      */
     public static function filter(
         Iterator $iterator,
-        Closure $predicate,
+        callable $predicate,
         $preserveKeys = true,
         $flags = \ARRAY_FILTER_USE_BOTH
     ) {
-        return new ArrayIterator(
-            iterator_to_array((function () use (
-                $iterator,
-                $preserveKeys,
-                &$predicate,
-                $flags
-            ) {
-                foreach ($iterator as $key => $value) {
-                    if (!(\ARRAY_FILTER_USE_BOTH === $flags ? $predicate($value, $key) : $predicate($key))) {
-                        continue;
-                    }
-                    if ($preserveKeys) {
-                        yield $key => $value;
-                    } else {
-                        yield $value;
-                    }
+        return (function () use (
+            $iterator,
+            $preserveKeys,
+            &$predicate,
+            $flags
+        ) {
+            foreach ($iterator as $key => $value) {
+                if (!(\ARRAY_FILTER_USE_BOTH === $flags ?
+                    call_user_func($predicate, $value, $key) :
+                    call_user_func($predicate, $key))) {
+                    continue;
                 }
-            })())
-        );
+                if ($preserveKeys) {
+                    yield $key => $value;
+                } else {
+                    yield $value;
+                }
+            }
+        })();
     }
 
     /**
      * Apply a reducer to the values of a given iterator.
      * 
      * @param Iterator $iterator 
-     * @param Closure $reducer 
+     * @param callable $reducer 
      * @param mixed $initial 
      * @return mixed 
      */
     public static function reduce(
         Iterator $iterator,
-        Closure $reducer,
+        callable $reducer,
         $initial = null
     ) {
         $output = $initial;
@@ -97,7 +93,7 @@ class Iter
             $iterator,
             static function (Iterator $iterator) use ($reducer, &$output) {
                 [$current, $key] = [$iterator->current(), $iterator->key()];
-                $output = $reducer($output, $current, $key);
+                $output = call_user_func($reducer, $output, $current, $key);
                 return true;
             },
             [$iterator]
@@ -131,7 +127,7 @@ class Iter
                 $keys :
                 iterator_to_array($keys));
 
-        return self::filter(
+        return static::filter(
             $iterator,
             static function ($current) use ($keys) {
                 return in_array($current, $keys, true);
@@ -167,7 +163,7 @@ class Iter
                 $values :
                 iterator_to_array($values));
 
-        return self::filter(
+        return static::filter(
             $iterator,
             static function ($current) use ($values) {
                 return !in_array($current, $values, true);
