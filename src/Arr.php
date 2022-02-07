@@ -719,7 +719,7 @@ class Arr
     public static function bsearch(array $haystack, $value = null, ?\Closure $predicate = null, ?int $start = null, ?int $end = null)
     {
         $start = $start ?? 0;
-        $end = $end ?? (!empty($haystack) ? self::keyLast($haystack) : 0);
+        $end = $end ?? (count($haystack) - 1);
         $predicate = $predicate ?? function($source, $match) {
             if ($source === $match) {
                 return 0;
