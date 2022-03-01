@@ -5,6 +5,7 @@ namespace Drewlabs\Core\Helpers\Tests;
 
 use Drewlabs\Core\Helpers\Functional;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class FunctionalTest extends TestCase
 {
@@ -147,7 +148,7 @@ class FunctionalTest extends TestCase
             }
         };
 
-        $closure = function() {
+        $closure = function () {
             print_r("Hello World!");
         };
 
@@ -158,5 +159,74 @@ class FunctionalTest extends TestCase
         $this->assertFalse(Functional::isCallable($object2));
         $this->assertTrue(Functional::isCallable($closure));
         $this->assertTrue(Functional::isCallable($phpStringFunc));
+    }
+
+    public function test_Tap()
+    {
+        $class = new class extends \stdClass
+        {
+
+            private $totalCalls = 0;
+
+            private $calledWith;
+
+            public function __invoke($param)
+            {
+                ++$this->totalCalls;
+
+                $this->calledWith = $param;
+            }
+
+            public function toBeCalledOnce()
+            {
+                return $this->totalCalls !== 0;
+            }
+
+            public function toBeCalledWith($value)
+            {
+                return $this->calledWith == $value;
+            }
+        };
+        Functional::tap(3, $class);
+
+        $this->assertTrue($class->toBeCalledOnce());
+        $this->assertTrue($class->toBeCalledWith(3));
+    }
+
+
+
+    public function test_Tap_With_Not_String_Callable()
+    {
+        $class = new class extends \stdClass
+        {
+
+            private $calledWith;
+
+            public function __invoke($param)
+            {
+
+                $this->calledWith = $param;
+            }
+            public function toBeCalledWith($value)
+            {
+                return $this->calledWith == $value;
+            }
+        };
+        Functional::tap(function() {
+            return 'Hello World!';
+        }, $class);
+        $this->assertTrue($class->toBeCalledWith('Hello World!'));
+        Functional::tap('is_string', $class);
+        $this->assertTrue($class->toBeCalledWith('is_string'));
+    }
+
+    public function test_Tap_Immutable_For_Simple_Object()
+    {
+        $object = new stdClass;
+        $object->age = 20;
+        Functional::tap($object, function($state) {
+            $state->age = 23;
+        });
+        $this->assertEquals(20, $object->age);
     }
 }

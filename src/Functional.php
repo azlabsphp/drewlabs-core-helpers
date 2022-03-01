@@ -2,6 +2,7 @@
 
 namespace Drewlabs\Core\Helpers;
 
+use Closure;
 use ReflectionException;
 use ReflectionMethod;
 
@@ -114,5 +115,25 @@ class Functional
             return false;
         }
         return false;
+    }
+
+    /**
+     * Call a user defined closure|function on the provided source parameter.
+     * 
+     * Note: It internally call PHP {@see clone} function if the state of the source
+     * object is an object in order to pass a copy of it to the {@see $callback}.
+     * It does not guaranty a deep copy as the developper must make sure clone object
+     * is purely immutable.
+     * 
+     * @param mixed $source 
+     * @param Closure|callable $callback 
+     * @return mixed 
+     */
+    public static function tap($source, callable $callback)
+    {
+        $callback(
+            is_object($state = (is_callable($source) && !is_string($source) ?
+                call_user_func($source) : $source)) ? clone $state : $state
+        );
     }
 }
