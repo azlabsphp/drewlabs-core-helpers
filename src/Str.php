@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
-use Closure;
-
 class Str
 {
     /**
@@ -246,7 +244,7 @@ class Str
      */
     public static function md5()
     {
-        return md5(uniqid() . microtime());
+        return md5(uniqid().microtime());
     }
 
     /**
@@ -377,7 +375,7 @@ class Str
         // Foreach values in the data attributes
         foreach ($data as $key => $value) {
             // code...
-            $patterns[] = '/(\{){2}[ ]?\$' . $key . '[ ]?(\}){2}/i';
+            $patterns[] = '/(\{){2}[ ]?\$'.$key.'[ ]?(\}){2}/i';
             $replacements[] = $value;
         }
 
@@ -473,7 +471,7 @@ class Str
                     self::lower(
                         preg_replace(
                             '/([A-Z])([a-z\d])/',
-                            $delimiter . '$0',
+                            $delimiter.'$0',
                             preg_replace("/[$delimiter]/", $delimiter_escape_char, $haystack)
                         )
                     ),
@@ -495,7 +493,7 @@ class Str
         // Convert all capital letters to $delimiter + lowercaseLetter
         $haystack = preg_replace([' ', $delimiter], '', lcfirst($haystack));
 
-        return mb_strtolower(preg_replace('/([A-Z])([a-z\d])/', $delimiter . '\\0', $haystack));
+        return mb_strtolower(preg_replace('/([A-Z])([a-z\d])/', $delimiter.'\\0', $haystack));
     }
 
     /**
@@ -525,17 +523,17 @@ class Str
         for ($pos = 0; $pos < mb_strlen($txt); ++$pos) {
             $char = mb_substr($txt, $pos, 1);
             if (!preg_match('/[A-Za-z1-9,.]/', $char)) {
-                //unicode ord real!!!
+                // unicode ord real!!!
                 $k = mb_convert_encoding($char, 'UCS-2LE', 'UTF-8');
                 $k1 = \ord(mb_substr($k, 0, 1));
                 $k2 = \ord(mb_substr($k, 1, 1));
                 $ord = $k2 * 256 + $k1;
                 if ($ord > 255) {
-                    $result .= '\uc1\u' . $ord . '*';
+                    $result .= '\uc1\u'.$ord.'*';
                 } elseif ($ord > 32768) {
-                    $result .= '\uc1\u' . ($ord - 65535) . '*';
+                    $result .= '\uc1\u'.($ord - 65535).'*';
                 } else {
-                    $result .= "\\'" . dechex($ord);
+                    $result .= "\\'".dechex($ord);
                 }
             } else {
                 $result .= $char;
@@ -580,10 +578,9 @@ class Str
     }
 
     /**
-     * Convert string into a base62 encoded value
-     * 
-     * @param string $value 
-     * @return string 
+     * Convert string into a base62 encoded value.
+     *
+     * @return string
      */
     public static function base62encode(string $value)
     {
@@ -591,11 +588,11 @@ class Str
     }
 
     /**
-     * Convert a base62 encoded value to a normal string
-     * 
-     * @param string $value 
-     * @return string 
-     * @throws InvalidArgumentException 
+     * Convert a base62 encoded value to a normal string.
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return string
      */
     public static function base62decode(string $value)
     {
@@ -605,25 +602,20 @@ class Str
     /**
      * Creates a hash value from the provided string.
      *
-     * @param string   $source
-     * @param callable $key
-     *
      * @return string
      */
     public static function hash(string $source, callable $key, $algo = 'sha256')
     {
-        $key = Functional::isCallable($key) ? call_user_func($key) : $key;
-        if (!is_string($key)) {
+        $key = Functional::isCallable($key) ? \call_user_func($key) : $key;
+        if (!\is_string($key)) {
             throw new \RuntimeException(sprintf('%s : requires either a Closure<void,string> or a string as second parameter', __FUNCTION__));
         }
+
         return hash_hmac($algo, self::base62encode($source), $key);
     }
 
     /**
-     * Time attacking safe strings comparison
-     *
-     * @param string          $hash
-     * @param string          $match
+     * Time attacking safe strings comparison.
      *
      * @return bool
      */
@@ -633,14 +625,12 @@ class Str
     }
 
     /**
-     * Binary safe string comparison
-     * 
-     * @param string $string1 
-     * @param string $string2 
-     * @return bool 
+     * Binary safe string comparison.
+     *
+     * @return bool
      */
     public function equals(string $string1, string $string2)
     {
-        return strcmp($string1, $string1) === 0;
+        return 0 === strcmp($string1, $string1);
     }
 }

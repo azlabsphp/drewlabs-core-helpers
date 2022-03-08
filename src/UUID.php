@@ -1,29 +1,35 @@
 <?php
 
-namespace Drewlabs\Core\Helpers;
+declare(strict_types=1);
 
-use Exception;
-use ReflectionException;
-use ReflectionMethod;
+/*
+ * This file is part of the Drewlabs package.
+ *
+ * (c) Sidoine Azandrew <azandrewdevelopper@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Drewlabs\Core\Helpers;
 
 class UUID
 {
     /**
-     * 
-     * @param null|callable $factory 
-     * @return string 
-     * @throws ReflectionException 
-     * @throws Exception 
+     * @throws \ReflectionException
+     * @throws \Exception
+     *
+     * @return string
      */
     public static function guid(?callable $factory = null)
     {
         if ($factory) {
-            return (string) call_user_func($factory);
+            return (string) \call_user_func($factory);
         }
         if (class_exists('Ramsey\\Uuid\\Uuid')) {
-            return (string) (new ReflectionMethod('Ramsey\\Uuid\\Uuid', 'uuid4'))->invoke(null, []);
+            return (string) (new \ReflectionMethod('Ramsey\\Uuid\\Uuid', 'uuid4'))->invoke(null, []);
         }
-        if (function_exists('com_create_guid')) {
+        if (\function_exists('com_create_guid')) {
             return trim(com_create_guid(), '{}');
         }
 
@@ -41,23 +47,24 @@ class UUID
     }
 
     /**
-     * 
-     * @param callable $factory 
-     * @return mixed 
-     * @throws Exception 
+     * @param callable $factory
+     *
+     * @throws \Exception
+     *
+     * @return mixed
      */
     public static function orderedUUID(?callable $factory = null)
     {
         if ($factory) {
-            return call_user_func($factory);
+            return \call_user_func($factory);
         }
         if (!class_exists('Ramsey\\Uuid\\UuidFactory')) {
-            throw new Exception(sprintf('%s required the ramsey/uuid library', __FUNCTION__));
+            throw new \Exception(sprintf('%s required the ramsey/uuid library', __FUNCTION__));
         }
         $factoryClazz = 'Ramsey\\Uuid\\UuidFactory';
         $factory = new $factoryClazz();
         if (!class_exists('Ramsey\\Uuid\\Generator\\CombGenerator')) {
-            throw new Exception(sprintf('%s required the ramsey/uuid library', __FUNCTION__));
+            throw new \Exception(sprintf('%s required the ramsey/uuid library', __FUNCTION__));
         }
         $generatorClazz = 'Ramsey\\Uuid\\Generator\\CombGenerator';
         $factory->setRandomGenerator(new $generatorClazz(
@@ -66,7 +73,7 @@ class UUID
         ));
 
         if (!class_exists('Ramsey\\Uuid\\Codec\\TimestampFirstCombCodec')) {
-            throw new Exception(sprintf('%s required the ramsey/uuid library', __FUNCTION__));
+            throw new \Exception(sprintf('%s required the ramsey/uuid library', __FUNCTION__));
         }
         $codecClazz = 'Ramsey\\Uuid\\Codec\\TimestampFirstCombCodec';
         $factory->setCodec(new $codecClazz(
@@ -77,11 +84,10 @@ class UUID
     }
 
     /**
-     * 
-     * @param null|callable $factory 
-     * @return mixed 
-     * @throws ReflectionException 
-     * @throws Exception 
+     * @throws \ReflectionException
+     * @throws \Exception
+     *
+     * @return mixed
      */
     public static function createUUIDUsing(?callable $factory = null)
     {

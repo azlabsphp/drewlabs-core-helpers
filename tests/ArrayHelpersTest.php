@@ -13,12 +13,9 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests;
 
-use ArrayIterator;
 use Drewlabs\Core\Helpers\Arr;
 use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
-use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
-use Traversable;
 
 class ArrayHelpersTest extends TestCase
 {
@@ -345,23 +342,23 @@ class ArrayHelpersTest extends TestCase
     {
         $arr = range(0, 10);
         drewlabs_core_array_remove($arr, [4, 6]);
-        $this->assertEquals(9, count($arr));
+        $this->assertCount(9, $arr);
     }
 
     public function testArrayExcept()
     {
         $arr = range(0, 9);
         $arr2 = drewlabs_core_array_except($arr, [0, 4, 8]);
-        $this->assertEquals(7, count($arr2));
+        $this->assertCount(7, $arr2);
     }
 
     public function testZip()
     {
         $arr = range(0, 9);
         $arr2 = range(10, 19);
-        $zip  = drewlabs_core_array_zip($arr, $arr2);
-        $this->assertEquals([0, 10], $zip[0]);
-        $this->assertEquals([9, 19], drewlabs_core_array_last($zip));
+        $zip = drewlabs_core_array_zip($arr, $arr2);
+        $this->assertSame([0, 10], $zip[0]);
+        $this->assertSame([9, 19], drewlabs_core_array_last($zip));
     }
 
     public function testUniqe()
@@ -369,19 +366,18 @@ class ArrayHelpersTest extends TestCase
         $arr = range(0, 20);
         $arr[] = 19;
         $arr[] = 15;
-        $this->assertEquals(range(0, 20), drewlabs_core_array_unique($arr));
+        $this->assertSame(range(0, 20), drewlabs_core_array_unique($arr));
     }
 
     public function testCreate_Array_From_Traversable()
     {
-        $iterator = new ArrayIterator(range(0, 10));
+        $iterator = new \ArrayIterator(range(0, 10));
         $this->assertSame(range(0, 10), Arr::create($iterator));
     }
 
     public function testCreate_Array_From_Object_With_ToArray()
     {
-        $object = new class
-        {
+        $object = new class() {
             public function toArray()
             {
                 return range(0, 10);
@@ -392,11 +388,10 @@ class ArrayHelpersTest extends TestCase
 
     public function testCreate_Array_From_IteratorAggregate()
     {
-        $object = new class implements IteratorAggregate
-        {
-            public function getIterator(): Traversable
+        $object = new class() implements \IteratorAggregate {
+            public function getIterator(): \Traversable
             {
-                return new ArrayIterator(range(0, 10));
+                return new \ArrayIterator(range(0, 10));
             }
         };
         $this->assertSame(range(0, 10), Arr::create($object));
@@ -405,8 +400,8 @@ class ArrayHelpersTest extends TestCase
     public function testCreate_Array_From_String_And_Number()
     {
         $val = 3;
-        $strval = "Hello World!";
+        $strval = 'Hello World!';
         $this->assertSame([3], Arr::create($val));
-        $this->assertSame(["Hello World!"], Arr::create($strval));
+        $this->assertSame(['Hello World!'], Arr::create($strval));
     }
 }

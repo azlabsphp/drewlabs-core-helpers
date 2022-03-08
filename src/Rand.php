@@ -1,18 +1,24 @@
 <?php
 
-namespace Drewlabs\Core\Helpers;
+declare(strict_types=1);
 
-use Error;
-use Exception;
-use TypeError;
+/*
+ * This file is part of the Drewlabs package.
+ *
+ * (c) Sidoine Azandrew <azandrewdevelopper@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Drewlabs\Core\Helpers;
 
 class Rand
 {
     /**
      * Generate a random api key.
-     * 
-     * @param int $bytes 
-     * @return string|string[] 
+     *
+     * @return string|string[]
      */
     public static function key(int $bytes)
     {
@@ -20,7 +26,7 @@ class Rand
             '=',
             '',
             Str::replace(
-                [chr(92), '+', chr(47), chr(38)],
+                [\chr(92), '+', \chr(47), \chr(38)],
                 '.',
                 base64_encode(openssl_random_pseudo_bytes($bytes))
             )
@@ -30,46 +36,45 @@ class Rand
     /**
      * Generate a new date with added value.
      *
-     * @param string $datetime
-     * @param bool  $date
+     * @param bool $date
      *
      * @return string
      */
     public static function dateTime(string $datetime, $date = false)
     {
         $timestamp = strtotime($datetime, time());
+
         return true === $date ?
             date('Y-m-d', $timestamp) :
             date('Y-m-d H:i:s', $timestamp);
     }
 
     /**
-     * 
-     * @param int $length 
-     * @return mixed 
-     * @throws TypeError 
-     * @throws Error 
-     * @throws Exception 
+     * @throws \TypeError
+     * @throws \Error
+     * @throws \Exception
+     *
+     * @return mixed
      */
     public static function str(int $length = 16)
     {
-        if (is_callable('str_rand')) {
-            return \str_rand($length);
+        if (\is_callable('str_rand')) {
+            return call_user_func('str_rand', $length);
         }
         $x = '';
-        for ($i = 1; $i <= $length; $i++) {
+        for ($i = 1; $i <= $length; ++$i) {
             $x .= dechex(static::int(0, 255));
         }
+
         return substr($x, 0, $length);
     }
 
     /**
-     * 
-     * @param int $iterations 
-     * @return string 
-     * @throws TypeError 
-     * @throws Error 
-     * @throws Exception 
+     * @throws \TypeError
+     * @throws \Error
+     * @throws \Exception
+     *
+     * @return string
      */
     public static function secret(int $iterations = 4)
     {
@@ -77,71 +82,42 @@ class Rand
         for ($index = $iterations; $index > 0; --$index) {
             $tmp .= static::str($index);
         }
+
         return $tmp;
     }
 
-    private static function intval($number, $fail_open = false)
-    {
-        if (is_int($number) || is_float($number)) {
-            $number += 0;
-        } elseif (is_numeric($number)) {
-            /** @psalm-suppress InvalidOperand */
-            $number += 0;
-        }
-        /** @var int|float $number */
-
-        if (
-            is_float($number)
-            &&
-            $number > ~PHP_INT_MAX
-            &&
-            $number < PHP_INT_MAX
-        ) {
-            $number = (int) $number;
-        }
-
-        if (is_int($number)) {
-            return (int) $number;
-        } elseif (!$fail_open) {
-            throw new TypeError(
-                'Expected an integer.'
-            );
-        }
-        return $number;
-    }
-
     /**
-     * 
-     * @param int $bytes 
-     * @return string 
-     * @throws Exception 
+     * @throws \Exception
+     *
+     * @return string
      */
-    function bytes(int $bytes)
+    public function bytes(int $bytes)
     {
-        if (function_exists('random_bytes')) {
+        if (\function_exists('random_bytes')) {
             return random_bytes($bytes);
         }
-        /**
+        /*
          * If we reach here, PHP has failed us.
          */
-        throw new Exception(
+        throw new \Exception(
             'Could not gather sufficient random data'
         );
     }
 
     /**
-     * Random::* Compatibility Library for using the new PHP 7 random_* API in PHP 5 projects
-     * 
+     * Random::* Compatibility Library for using the new PHP 7 random_* API in PHP 5 projects.
+     *
      * @param int $min
      * @param int $max
+     *
      * @return int
      */
     public static function int($min, $max)
     {
-        if (function_exists('random_int')) {
-            return call_user_func('random_int', $min, $max);
+        if (\function_exists('random_int')) {
+            return \call_user_func('random_int', $min, $max);
         }
-        /**
+        /*
          * Type and input logic checks
          *
          * If you pass it a float in the range (~PHP_INT_MAX, PHP_INT_MAX)
@@ -154,8 +130,8 @@ class Rand
         try {
             /** @var int $min */
             $min = static::intval($min);
-        } catch (TypeError $ex) {
-            throw new TypeError(
+        } catch (\TypeError $ex) {
+            throw new \TypeError(
                 'random_int(): $min must be an integer'
             );
         }
@@ -163,19 +139,19 @@ class Rand
         try {
             /** @var int $max */
             $max = static::intval($max);
-        } catch (TypeError $ex) {
-            throw new TypeError(
+        } catch (\TypeError $ex) {
+            throw new \TypeError(
                 'random_int(): $max must be an integer'
             );
         }
 
-        /**
+        /*
          * Now that we've verified our weak typing system has given us an integer,
          * let's validate the logic then we can move forward with generating random
          * integers along a given range.
          */
         if ($min > $max) {
-            throw new Error(
+            throw new \Error(
                 'Minimum value must be less than or equal to the maximum value'
             );
         }
@@ -185,7 +161,7 @@ class Rand
         }
 
         /**
-         * Initialize variables to 0
+         * Initialize variables to 0.
          *
          * We want to store:
          * $bytes => the number of random bytes we need
@@ -208,14 +184,14 @@ class Rand
          */
         $range = $max - $min;
 
-        /**
+        /*
          * Test for integer overflow:
          */
-        if (!is_int($range)) {
+        if (!\is_int($range)) {
 
             /**
              * Still safely calculate wider ranges.
-             * Provided by @CodesInChaos, @oittaa
+             * Provided by @CodesInChaos, @oittaa.
              *
              * @ref https://gist.github.com/CodesInChaos/03f9ea0b58e8b2b8d435
              *
@@ -224,17 +200,17 @@ class Rand
              * @ref https://eval.in/400356 (32-bit)
              * @ref http://3v4l.org/XX9r5  (64-bit)
              */
-            $bytes = PHP_INT_SIZE;
+            $bytes = \PHP_INT_SIZE;
             /** @var int $mask */
             $mask = ~0;
         } else {
 
             /**
              * $bits is effectively ceil(log($range, 2)) without dealing with
-             * type juggling
+             * type juggling.
              */
             while ($range > 0) {
-                if ($bits % 8 === 0) {
+                if (0 === $bits % 8) {
                     ++$bytes;
                 }
                 ++$bits;
@@ -247,28 +223,28 @@ class Rand
 
         /** @var int $val */
         $val = 0;
-        /**
+        /*
          * Now that we have our parameters set up, let's begin generating
          * random integers until one falls between $min and $max
          */
-        /** @psalm-suppress RedundantCondition */
+        /* @psalm-suppress RedundantCondition */
         do {
-            /**
+            /*
              * The rejection probability is at most 0.5, so this corresponds
              * to a failure probability of 2^-128 for a working RNG
              */
             if ($attempts > 128) {
-                throw new Exception(
+                throw new \Exception(
                     'random_int: RNG is broken - too many rejections'
                 );
             }
 
             /**
-             * Let's grab the necessary number of random bytes
+             * Let's grab the necessary number of random bytes.
              */
             $randomByteString = random_bytes($bytes);
 
-            /**
+            /*
              * Let's turn $randomByteString into an integer
              *
              * This uses bitwise operators (<< and |) to build an integer
@@ -280,25 +256,55 @@ class Rand
              */
             $val &= 0;
             for ($i = 0; $i < $bytes; ++$i) {
-                $val |= ord($randomByteString[$i]) << ($i * 8);
+                $val |= \ord($randomByteString[$i]) << ($i * 8);
             }
-            /** @var int $val */
+            /* @var int $val */
 
-            /**
+            /*
              * Apply mask
              */
             $val &= $mask;
             $val += $valueShift;
 
             ++$attempts;
-            /**
+            /*
              * If $val overflows to a floating point number,
              * ... or is larger than $max,
              * ... or smaller than $min,
              * then try again.
              */
-        } while (!is_int($val) || $val > $max || $val < $min);
+        } while (!\is_int($val) || $val > $max || $val < $min);
 
         return (int) $val;
+    }
+
+    private static function intval($number, $fail_open = false)
+    {
+        if (\is_int($number) || \is_float($number)) {
+            $number += 0;
+        } elseif (is_numeric($number)) {
+            /* @psalm-suppress InvalidOperand */
+            $number += 0;
+        }
+        /** @var int|float $number */
+        if (
+            \is_float($number)
+            &&
+            $number > ~\PHP_INT_MAX
+            &&
+            $number < \PHP_INT_MAX
+        ) {
+            $number = (int) $number;
+        }
+
+        if (\is_int($number)) {
+            return (int) $number;
+        } elseif (!$fail_open) {
+            throw new \TypeError(
+                'Expected an integer.'
+            );
+        }
+
+        return $number;
     }
 }

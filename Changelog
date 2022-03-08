@@ -11,3 +11,8 @@
 - Added create static method to Arr class that creates an array from various data structures.
 - Add a URI class for working with uri's
 - Moved global function from src/ to global/
+
+## [2.2.10] 20220308
+
+- Removed dependency to contracts library
+- Removed unused [Drewlabs\Core\Helpers\ValueObject\ModelTypeAttributeRValue] class
