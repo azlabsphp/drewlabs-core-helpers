@@ -262,7 +262,7 @@ class FunctionalTest extends TestCase
             }
         };
 
-        $memoized = Functional::memoize($closure);
+        $memoized = Functional::memoize($closure, 2);
         $memoized([1, 2, 3, 4]); // Call memoized function with [1, 2, 3, 4]
         // Make sure that the memoized function is called at least with arguments [1,2,3,4]
         $this->assertTrue(true === $memoized->calledWith([1, 2, 3, 4]));
@@ -280,5 +280,10 @@ class FunctionalTest extends TestCase
         $this->assertTrue(true === $memoized->callNTimes(3));
         $memoized([1, 2, 3]); // Call memoized function with [1, 2, 3, 4]
         $this->assertTrue(true === $memoized->callNTimes(3));
+        $memoized([1, 2]);
+        $memoized([1]);
+        $memoized([1]);
+        $memoized([1]);
+        $memoized([1]);
     }
 }

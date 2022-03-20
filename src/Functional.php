@@ -183,7 +183,8 @@ class Functional
      */
     public static function memoize($function, $options = null)
     {
-        $memoize = new class() {
+        $memoize = new class()
+        {
             /**
              * @var object
              */
@@ -203,8 +204,7 @@ class Functional
 
             public function setCacheSize(int $size)
             {
-                $this->size = $size;
-
+                $this->cache->size = $size;
                 return $this;
             }
 
@@ -247,7 +247,8 @@ class Functional
                 // list is subject to be the next to be called by the caller.
                 // Therefore we keep the recent callee arguments at the top of
                 // the list so that the searching algorithm will perform better
-                $this->cache = new class() {
+                $this->cache = new class()
+                {
                     public $internal = [];
 
                     /**
@@ -277,22 +278,18 @@ class Functional
                             if (($this->equals)($current->key, $key)) {
                                 $current_ = $current;
                                 $index_ = $index;
-                                // Check if storage size is greater than the max size
-                                // If so, remove the last item from the storage
-                                if (\count($this->internal) === $this->size) {
-                                    array_pop($this->internal);
-                                }
                                 break;
                             }
                         }
                         if (-1 !== $index_ && ($index_ > 0)) {
+                            // Move the recent argument list search to the top of the
+                            // to optimize searching algorithm for subsequent searchs
                             $this->internal = array_merge(
                                 [$current_],
                                 \array_slice($this->internal, 0, $index_),
                                 \array_slice($this->internal, $index_ + 1)
                             );
                         }
-
                         return $current_ ? $current_->value : __MEMOIZED__NOT_FOUND__;
                     }
 
@@ -306,6 +303,11 @@ class Functional
                      */
                     public function set($key, $value)
                     {
+                        if (\count($this->internal) === $this->size) {
+                            // If storage size is equals to the max size
+                            // remove the last item from the storage
+                            array_pop($this->internal);
+                        }
                         $object = new \stdClass();
                         $object->key = $key;
                         $object->value = $value;
@@ -338,7 +340,6 @@ class Functional
                 };
                 // Use deep equality comparison by default
                 $this->cache->equals = [Comparator::class, 'shallowEqual'];
-
                 return $this;
             }
 
@@ -374,7 +375,7 @@ class Functional
         }
         if ($options instanceof MemoizationOptions) {
             if (null === ($cache = $options->useCache())) {
-                throw new \InvalidArgumentException('Expected $option->useCache() to returns a cache instance, '.\is_object($cache) ? \get_class($cache) : \gettype($cache).' given');
+                throw new \InvalidArgumentException('Expected $option->useCache() to returns a cache instance, ' . \is_object($cache) ? \get_class($cache) : \gettype($cache) . ' given');
             }
             $memoize = $memoize->setCache($cache);
             $size = $options->cacheSize() ?? 16;
