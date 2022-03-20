@@ -16,3 +16,7 @@
 
 - Removed dependency to contracts library
 - Removed unused [Drewlabs\Core\Helpers\ValueObject\ModelTypeAttributeRValue] class
+
+## [2.2.11] 20220320
+
+- Add function memoization implementation in PHP Language for fast fast call of long running pure function

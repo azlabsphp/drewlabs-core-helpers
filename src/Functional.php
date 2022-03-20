@@ -154,8 +154,8 @@ class Functional
     }
 
     /**
-     * Function memoization implementation in PHP Language for fast
-     * long running pure function or method optimization
+     * Function memoization memoization implementation in PHP Language for fast call 
+     * of long running pure functions or methods
      * It uses an internal LRU Caching system for algorithm optimization.
      *
      * ```php
