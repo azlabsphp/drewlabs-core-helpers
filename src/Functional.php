@@ -145,7 +145,7 @@ class Functional
      *
      * @return mixed
      */
-    public static function tap($source, callable $callback)
+    public static function tap($source, $callback)
     {
         $callback(
             \is_object($state = (\is_callable($source) && !\is_string($source) ?
@@ -181,7 +181,7 @@ class Functional
      *
      * @return #Class#1cda036d
      */
-    public static function memoize(callable $function, $options = null)
+    public static function memoize($function, $options = null)
     {
         $memoize = new class() {
             /**
@@ -194,7 +194,7 @@ class Functional
              */
             private $internal_;
 
-            public function setEquals(callable $comparator)
+            public function setEquals($comparator)
             {
                 $this->cache->equals = $comparator;
 
@@ -231,7 +231,7 @@ class Functional
                 }
             }
 
-            public function internal(?callable $function = null)
+            public function internal($function = null)
             {
                 if (null !== $function) {
                     $this->internal_ = $function;
@@ -272,11 +272,11 @@ class Functional
                     public function get($key)
                     {
                         $current_ = null;
-                        $index = -1;
-                        foreach ($this->internal ?? [] as $i => $current) {
+                        $index_ = -1;
+                        foreach ($this->internal ?? [] as $index => $current) {
                             if (($this->equals)($current->key, $key)) {
                                 $current_ = $current;
-                                $index = $i;
+                                $index_ = $index;
                                 // Check if storage size is greater than the max size
                                 // If so, remove the last item from the storage
                                 if (\count($this->internal) === $this->size) {
@@ -284,14 +284,12 @@ class Functional
                                 }
                                 break;
                             }
-                            ++$index;
                         }
-                        if (-1 !== $index && ($index > 0)) {
-
+                        if (-1 !== $index_ && ($index_ > 0)) {
                             $this->internal = array_merge(
                                 [$current_],
-                                \array_slice($this->internal, 0, $index),
-                                \array_slice($this->internal, $index + 1)
+                                \array_slice($this->internal, 0, $index_),
+                                \array_slice($this->internal, $index_ + 1)
                             );
                         }
 
@@ -345,7 +343,7 @@ class Functional
             }
 
             #[\ReturnTypeWillChange]
-            public function __invoke(array ...$args)
+            public function __invoke(...$args)
             {
                 $args = $args ?? \func_get_args();
                 if (__MEMOIZED__NOT_FOUND__ === ($value = $this->cache->get($args))) {
