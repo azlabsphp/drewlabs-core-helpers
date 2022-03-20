@@ -59,7 +59,7 @@ class Rand
     public static function str(int $length = 16)
     {
         if (\is_callable('str_rand')) {
-            return call_user_func('str_rand', $length);
+            return \call_user_func('str_rand', $length);
         }
         $x = '';
         for ($i = 1; $i <= $length; ++$i) {

@@ -932,4 +932,54 @@ class Arr
         }
         throw new \InvalidArgumentException('Unsupported type provided as parameter!');
     }
+
+    /**
+     *
+     * @param int|string $index
+     * @param bool       $preserverKeys
+     *
+     * @return array
+     */
+    public static function removeAt(array $array, $index, $preserverKeys = false)
+    {
+        if ($preserverKeys) {
+            unset($array[$index]);
+
+            return $array;
+        }
+        // Creates a new 0 based array removing item at a given index
+        return array_merge(
+            \array_slice($array, 0, $index),
+            \array_slice($array, $index + 1)
+        );
+    }
+
+    /**
+     * Remove item from array item matched a specified predicate.
+     *
+     * ```php
+     * <?php
+     *
+     * $array = [1, 2, 3, 4];
+     *
+     * $array = Arr::removeWhere($array, function() {
+     * });
+     * ```
+     *
+     * @param bool $preserverKeys
+     *
+     * @return array
+     */
+    public static function removeWhere(array $array, callable $predicate, $preserverKeys = false)
+    {
+        $index = -1;
+        foreach ($array ?? [] as $key => $current) {
+            ++$index;
+            if ($predicate($current, $key)) {
+                return self::removeAt($array, $preserverKeys ? $key : $index, $preserverKeys);
+            }
+        }
+
+        return $array;
+    }
 }

@@ -231,4 +231,54 @@ class FunctionalTest extends TestCase
         });
         $this->assertSame(20, $object->age);
     }
+
+    public function test_memoize_function()
+    {
+        $closure = new class() {
+            private $params;
+
+            private $count = 0;
+
+            public function __invoke(...$args)
+            {
+                ++$this->count;
+                $this->params = $args;
+
+                return array_reduce($args[0], static function ($carry, $current) {
+                    $carry += $current;
+
+                    return $carry;
+                }, 0);
+            }
+
+            public function callNTimes(int $times)
+            {
+                return $this->count === $times;
+            }
+
+            public function calledWith(...$args)
+            {
+                return $this->params === $args;
+            }
+        };
+
+        $memoized = Functional::memoize($closure);
+        $memoized([1, 2, 3, 4]); // Call memoized function with [1, 2, 3, 4]
+        // Make sure that the memoized function is called at least with arguments [1,2,3,4]
+        $this->assertTrue(true === $memoized->calledWith([1, 2, 3, 4]));
+        $memoized([1, 2, 3, 4]); // Call memoized function with [1, 2, 3, 4]
+        $memoized([1, 2, 3, 4]); // Call memoized function with [1, 2, 3, 4]
+        $this->assertTrue(true === $memoized->callNTimes(1));
+        $memoized([1, 2, 3]); // Call memoized function with [1, 2, 3]
+        $this->assertTrue(true === $memoized->callNTimes(2));
+        $memoized([1, 2, 3]); // Call memoized function with [1, 2, 3, 4]
+        $this->assertTrue(true === $memoized->callNTimes(2));
+        $memoized->remove([1, 2, 3]); // Call memoized function with [1, 2, 3, 4]
+        $memoized([1, 2, 3]); // Call memoized function with [1, 2, 3, 4]
+        // Expect the method to be called again if the argument list was removed
+        // from the cache
+        $this->assertTrue(true === $memoized->callNTimes(3));
+        $memoized([1, 2, 3]); // Call memoized function with [1, 2, 3, 4]
+        $this->assertTrue(true === $memoized->callNTimes(3));
+    }
 }

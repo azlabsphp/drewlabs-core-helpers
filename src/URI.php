@@ -17,20 +17,19 @@ use Psr\Http\Message\UriInterface;
 
 class URI
 {
-
     /**
-     * Merge uri query string and parameters into a single array
-     * 
-     * @param string|UriInterface $query 
-     * @return array 
+     * Merge uri query string and parameters into a single array.
+     *
+     * @param string|UriInterface $query
      */
     public static function params($query): array
     {
-        $result = parse_url((string)$query);
+        $result = parse_url((string) $query);
         $path = $result['path'] ?? '';
         $query = str_replace('?', '&', $result['query'] ?? '');
         parse_str($path, $tmp1);
         parse_str($query, $tmp2);
+
         return Arr::filter(array_merge($tmp1, $tmp2), static function ($value) {
             return !empty($value);
         });
