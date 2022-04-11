@@ -13,8 +13,11 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests\Stubs;
 
-class Person
+#[NameAttribute]
+class Person implements PersonInterface
 {
+    use NameAware;
+
     public $login = 'Asmyns14';
     public $email = 'asmyns.platonnas29@gmail.com';
     private $secret = 'PassWord';
