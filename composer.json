@@ -11,9 +11,8 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.3|^7.4|^8.0|^8.1",
+        "php": "^7.2|^7.3|^7.4|^8.0|^8.1",
         "psr/http-message": "^1.0",
-        "drewlabs/contracts": "^2.0",
         "tuupola/base62": "^2.1",
         "ramsey/uuid": "^4.1",
         "psr/http-factory": "^1.0"
@@ -49,10 +48,5 @@
             "Drewlabs\\Core\\Helpers\\Tests\\": "tests/"
         }
     },
-    "repositories":[
-        {
-            "type": "vcs",
-            "url": "git@github.com:liksoft/drewlabs-php-contracts.git"
-        }
-    ]
+    "repositories":[]
 }

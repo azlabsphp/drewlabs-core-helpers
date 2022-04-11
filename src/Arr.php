@@ -14,9 +14,7 @@ declare(strict_types=1);
 namespace Drewlabs\Core\Helpers;
 
 use Closure;
-use Drewlabs\Contracts\Support\ArrayableInterface;
 use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
-use InvalidArgumentException;
 use Traversable;
 
 class Arr
@@ -378,10 +376,8 @@ class Arr
 
     /**
      * Checks if a source array contains all the elements of another array.
-     * 
-     * @param array $array 
-     * @param array $sub 
-     * @return bool 
+     *
+     * @return bool
      */
     public static function containsAll(array $source, array $innerArray)
     {
@@ -390,9 +386,8 @@ class Arr
 
     /**
      * Checks if an array is an associative array.
-     * 
-     * @param array $value 
-     * @return bool 
+     *
+     * @return bool
      */
     public static function isassoc(array $value)
     {
@@ -412,9 +407,8 @@ class Arr
      *
      * Use it instead of {drewlabs_core_array_is_assoc} to increase
      * error checking on full associative arrays
-     * 
-     * @param array $value 
-     * @return bool 
+     *
+     * @return bool
      */
     public static function isallassoc(array $value)
     {
@@ -433,9 +427,8 @@ class Arr
 
     /**
      * Group array values by the number of their occurence in the array.
-     * 
-     * @param array $array 
-     * @return array 
+     *
+     * @return array
      */
     public static function groupCount(array $array)
     {
@@ -455,10 +448,10 @@ class Arr
 
     /**
      * Return all items in an array execpt the specified keys.
-     * 
-     * @param array $array 
-     * @param mixed $keys 
-     * @return array 
+     *
+     * @param mixed $keys
+     *
+     * @return array
      */
     public static function except(array $array, $keys)
     {
@@ -538,7 +531,7 @@ class Arr
             }
         }
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of' . \Traversable::class . ', ' . \JsonSerializable::class);
+            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of'.\Traversable::class.', '.\JsonSerializable::class);
         }
 
         return $preserve_keys ? $value : array_values($value);
@@ -708,28 +701,26 @@ class Arr
      *
      * Note: The predicate function should return BinarySearchResult::FOUND, BinarySearchResult::LEFT or BinarySearchResult::RIGHT to indicate
      * whether to search in in the lower or upper bound
-     * 
-     * @param array $haystack 
-     * @param mixed $value 
-     * @param null|Closure $predicate 
-     * @param null|int $start 
-     * @param null|int $end 
-     * @return int 
+     *
+     * @param mixed $value
+     *
+     * @return int
      */
     public static function bsearch(array $haystack, $value = null, ?\Closure $predicate = null, ?int $start = null, ?int $end = null)
     {
         $start = $start ?? 0;
-        $end = $end ?? (count($haystack) - 1);
-        $predicate = $predicate ?? function($source, $match) {
+        $end = $end ?? (\count($haystack) - 1);
+        $predicate = $predicate ?? static function ($source, $match) {
             if ($source === $match) {
                 return 0;
             }
             if ($source > $match) {
                 return -1;
             }
+
             return 1;
         };
-        while($start <= $end) {
+        while ($start <= $end) {
             $mid = (int) (ceil($start + ($end - $start) / 2));
             $result = $predicate($haystack[$mid], $value);
             if (BinarySearchResult::FOUND === $result) {
@@ -741,6 +732,7 @@ class Arr
                 $start = $mid + 1;
             }
         }
+
         return -1;
     }
 
@@ -891,10 +883,11 @@ class Arr
     }
 
     /**
-     * Create a PHP Array from  user provided value
-     * 
-     * @param ArrayableInterface|Traversable|array|mixed|null $values 
-     * @return array 
+     * Create a PHP Array from  user provided value.
+     *
+     * @param \Traversable|array|mixed|null $values
+     *
+     * @return array
      */
     public static function create($values = null)
     {
@@ -902,48 +895,91 @@ class Arr
             return [];
         }
 
-        if ($values instanceof Traversable) {
+        if ($values instanceof \Traversable) {
             return iterator_to_array($values);
         }
 
-        if ($values instanceof ArrayableInterface) {
-            return $values->toArray();
-        }
-
-        if (is_object($values) && method_exists($values, 'all')) {
+        if (\is_object($values) && method_exists($values, 'all')) {
             return $values->all();
         }
 
-        if (is_object($values) && method_exists($values, 'toArray')) {
+        if (\is_object($values) && method_exists($values, 'toArray')) {
             return $values->toArray();
         }
-        return (array)$values;
+
+        return (array) $values;
     }
 
     /**
-     * Get the values from a list data structure
-     * 
-     * @param ArrayableInterface|Traversable|array|mixed $values 
-     * @return array 
+     * Get the values from a list data structure.
+     *
+     * @param \Traversable|array|mixed $values
+     *
+     * @return array
      */
     public static function values($values)
     {
-
-        if ($values instanceof Traversable) {
+        if ($values instanceof \Traversable) {
             return iterator_to_array($values, false);
         }
 
-        if ($values instanceof ArrayableInterface) {
-            return array_values($values->toArray());
-        }
-
-        if (is_object($values) && method_exists($values, 'all')) {
+        if (\is_object($values) && method_exists($values, 'all')) {
             return array_values($values->all());
         }
 
-        if (is_object($values) && method_exists($values, 'toArray')) {
+        if (\is_object($values) && method_exists($values, 'toArray')) {
             return array_values($values->toArray());
         }
-        throw new InvalidArgumentException('Unsupported type provided as parameter!');
+        throw new \InvalidArgumentException('Unsupported type provided as parameter!');
+    }
+
+    /**
+     *
+     * @param int|string $index
+     * @param bool       $preserverKeys
+     *
+     * @return array
+     */
+    public static function removeAt(array $array, $index, $preserverKeys = false)
+    {
+        if ($preserverKeys) {
+            unset($array[$index]);
+
+            return $array;
+        }
+        // Creates a new 0 based array removing item at a given index
+        return array_merge(
+            \array_slice($array, 0, $index),
+            \array_slice($array, $index + 1)
+        );
+    }
+
+    /**
+     * Remove item from array item matched a specified predicate.
+     *
+     * ```php
+     * <?php
+     *
+     * $array = [1, 2, 3, 4];
+     *
+     * $array = Arr::removeWhere($array, function() {
+     * });
+     * ```
+     *
+     * @param bool $preserverKeys
+     *
+     * @return array
+     */
+    public static function removeWhere(array $array, callable $predicate, $preserverKeys = false)
+    {
+        $index = -1;
+        foreach ($array ?? [] as $key => $current) {
+            ++$index;
+            if ($predicate($current, $key)) {
+                return self::removeAt($array, $preserverKeys ? $key : $index, $preserverKeys);
+            }
+        }
+
+        return $array;
     }
 }

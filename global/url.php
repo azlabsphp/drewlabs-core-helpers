@@ -34,11 +34,10 @@ if (!function_exists('drewlabs_core_url_has_valid_signature')) {
 if (!function_exists('drewlabs_core_url_has_correct_signature')) {
     /**
      * Verify if request URI is correct.
-     * 
-     * @param ServerRequestInterface $request 
-     * @param Closure $key_resolver 
-     * @param bool $absolute 
-     * @return bool 
+     *
+     * @param bool $absolute
+     *
+     * @return bool
      */
     function drewlabs_core_url_has_correct_signature(ServerRequestInterface $request, Closure $key_resolver, $absolute = true)
     {
@@ -67,8 +66,6 @@ if (!function_exists('drewlabs_core_url_array_to_query_string')) {
 
     /**
      * Convert the array into a query string.
-     *
-     * @param array|object $array
      *
      * @return string
      */
@@ -108,7 +105,7 @@ if (!function_exists('drewlabs_core_url_get_request_path')) {
 
     /**
      * @deprecated v2.0.x
-     * 
+     *
      * Normalize the request path.
      *
      * @return string
@@ -125,7 +122,7 @@ if (!function_exists('drewlabs_core_url_get_normalize_request_path')) {
 
     /**
      * @deprecated v2.0.x
-     * 
+     *
      * Normalize the request path.
      *
      * @return string
@@ -198,11 +195,10 @@ if (!function_exists('drewlabs_core_url_signature_from_url')) {
 
     /**
      * Creates a signature from a given URI scheme.
-     * 
-     * @param string $url 
-     * @param mixed $key_resolver 
-     * @param bool $absolute 
-     * @return string|false 
+     *
+     * @param mixed $key_resolver
+     *
+     * @return string|false
      */
     function drewlabs_core_url_signature_from_url(string $url, $key_resolver, bool $absolute = true)
     {

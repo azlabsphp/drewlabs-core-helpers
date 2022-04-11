@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the Drewlabs package.
+ *
+ * (c) Sidoine Azandrew <azandrewdevelopper@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use Drewlabs\Core\Helpers\Str;
 
 /*
@@ -16,9 +25,9 @@ use Drewlabs\Core\Helpers\Str;
 if (!function_exists('drewlabs_core_hashing_base62encode')) {
 
     /**
-     * 
-     * @param string $value 
-     * @return string 
+     * @param string $value
+     *
+     * @return string
      */
     function drewlabs_core_hashing_base62encode($value)
     {
@@ -29,9 +38,9 @@ if (!function_exists('drewlabs_core_hashing_base62encode')) {
 if (!function_exists('drewlabs_core_hashing_base62decode')) {
 
     /**
-     * 
-     * @param string $value 
-     * @return string 
+     * @param string $value
+     *
+     * @return string
      */
     function drewlabs_core_hashing_base62decode($value)
     {

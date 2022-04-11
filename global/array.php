@@ -58,8 +58,6 @@ if (!function_exists('drewlabs_core_array_find_index_by')) {
      * Find index of an array element.
      *
      * @param string $by
-     *
-     * @return int|null
      */
     function drewlabs_core_array_find_index_by(array $items, $by, $search, $start = null, $end = null): ?int
     {
@@ -137,7 +135,7 @@ if (!function_exists('drewlabs_core_array_key_exists')) {
      */
     function drewlabs_core_array_key_exists($array, $key)
     {
-        return  Arr::keyExists($array, $key);
+        return Arr::keyExists($array, $key);
     }
 }
 
@@ -251,10 +249,8 @@ if (!function_exists('drewlabs_core_array_contains_all')) {
 
     /**
      * Checks if a source array contains all the elements of another array.
-     * 
-     * @param array $array 
-     * @param array $sub 
-     * @return bool 
+     *
+     * @return bool
      */
     function drewlabs_core_array_contains_all(array $array, array $sub)
     {
@@ -266,10 +262,10 @@ if (!function_exists('is_assoc')) {
 
     /**
      * Checks if an array is an associative array.
-     * 
+     *
      * @deprecated 1.0.0
-     * @param array $value 
-     * @return bool 
+     *
+     * @return bool
      */
     function is_assoc(array $value)
     {
@@ -280,9 +276,8 @@ if (!function_exists('is_assoc')) {
 if (!function_exists('drewlabs_core_array_is_assoc')) {
     /**
      * Checks if an array is an associative array.
-     * 
-     * @param array $value 
-     * @return bool 
+     *
+     * @return bool
      */
     function drewlabs_core_array_is_assoc(array $value)
     {
@@ -300,9 +295,8 @@ if (!function_exists('drewlabs_core_array_is_full_assoc')) {
      *
      * Use it instead of {drewlabs_core_array_is_assoc} to increase
      * error checking on full associative arrays
-     * 
-     * @param array $value 
-     * @return bool 
+     *
+     * @return bool
      */
     function drewlabs_core_array_is_full_assoc(array $value)
     {
@@ -314,9 +308,8 @@ if (!function_exists('drewlabs_core_array_group_count')) {
 
     /**
      * Group array values by the number of their occurence in the array.
-     * 
-     * @param array $array 
-     * @return array 
+     *
+     * @return array
      */
     function drewlabs_core_array_group_count(array $array)
     {
@@ -327,10 +320,10 @@ if (!function_exists('drewlabs_core_array_group_count')) {
 if (!function_exists('drewlabs_core_array_except')) {
     /**
      * Return all items in an array execpt the specified keys.
-     * 
-     * @param array $array 
-     * @param mixed $keys 
-     * @return array 
+     *
+     * @param mixed $keys
+     *
+     * @return array
      */
     function drewlabs_core_array_except(array $array, $keys)
     {
@@ -431,7 +424,7 @@ if (!function_exists('drewlabs_core_array_value_retriever_func')) {
 
 if (!function_exists('drewlabs_core_array_unique')) {
     /**
-     * Returns the unique values in the list
+     * Returns the unique values in the list.
      *
      * @param array  $haystack
      * @param string $key
@@ -501,8 +494,8 @@ if (!function_exists('drewlabs_core_array_bsearch')) {
      * whether to search in in the lower or upper bound
      *
      * @param mixed    $value
-     * @param int|null $start      First item key
-     * @param int|null $end      Last item key
+     * @param int|null $start First item key
+     * @param int|null $end   Last item key
      *
      * @return int
      */
@@ -592,7 +585,6 @@ if (!function_exists('drewlabs_core_array_shuffle')) {
      */
     function drewlabs_core_array_shuffle(array $list, ?int $seed = null)
     {
-
         return Arr::shuffle($list, $seed);
     }
 }

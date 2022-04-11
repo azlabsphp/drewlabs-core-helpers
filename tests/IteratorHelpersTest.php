@@ -88,17 +88,17 @@ class IteratorHelpersTest extends TestCase
         $list1 = iterator_to_array(
             Iter::filter(
                 Iter::range(0, 10),
-                function ($value) {
-                    return $value % 2 === 0;
+                static function ($value) {
+                    return 0 === $value % 2;
                 }
             ),
             false
         );
         $list2 = array_values(
-            array_filter(range(0, 10), function ($value) {
-                return $value % 2 === 0;
+            array_filter(range(0, 10), static function ($value) {
+                return 0 === $value % 2;
             })
         );
-        $this->assertEquals($list1, $list2);
+        $this->assertSame($list1, $list2);
     }
 }
