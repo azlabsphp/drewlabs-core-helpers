@@ -692,7 +692,7 @@ class Arr
      */
     public static function first(array $list)
     {
-        return !empty($list) ? \array_slice($list, 0, 1, false)[0] : null;
+        return !empty($list) ? (\array_slice($list, 0, 1, false)[0] ?? null) : null;
     }
 
     /**
