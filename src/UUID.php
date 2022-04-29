@@ -13,15 +13,20 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
-class UUID
+use ReflectionException;
+use Exception;
+
+final class UUID
 {
+
     /**
-     * @throws \ReflectionException
-     * @throws \Exception
-     *
-     * @return string
+     * 
+     * @param null|callable $factory 
+     * @return string 
+     * @throws ReflectionException 
+     * @throws Exception 
      */
-    public static function guid(?callable $factory = null)
+    public static function create(?callable $factory = null)
     {
         if ($factory) {
             return (string) \call_user_func($factory);
@@ -47,13 +52,13 @@ class UUID
     }
 
     /**
-     * @param callable $factory
+     * @param callable|null $factory
      *
      * @throws \Exception
      *
-     * @return mixed
+     * @return string|mixed
      */
-    public static function orderedUUID(?callable $factory = null)
+    public static function ordered(?callable $factory = null)
     {
         if ($factory) {
             return \call_user_func($factory);
@@ -83,16 +88,58 @@ class UUID
         return (string) $factory->uuid4();
     }
 
+
     /**
+     * 
+     * @param null|callable $factory 
+     * @return string|mixed 
+     * @throws ReflectionException 
+     * @throws Exception 
+     */
+    public static function createUsing(?callable $factory = null)
+    {
+        return (static function () use ($factory) {
+            return (string) static::create($factory);
+        })();
+    }
+
+    /**
+     * @deprecated 2.2.x Use UUID::ordered() method instead
+     * 
+     * @param callable|null $factory
+     *
+     * @throws \Exception
+     *
+     * @return string|mixed
+     */
+    public static function orderedUUID(?callable $factory = null)
+    {
+        return static::ordered($factory);
+    }
+
+    /**
+     * @deprecated v2.2.x Use UUID::create() method instead
+     * 
      * @throws \ReflectionException
      * @throws \Exception
      *
-     * @return mixed
+     * @return string
+     */
+    public static function guid(?callable $factory = null)
+    {
+        return static::create($factory);
+    }
+
+    /**
+     * @deprecated 2.2.x Use createUsing() method instead
+     * 
+     * @throws \ReflectionException
+     * @throws \Exception
+     *
+     * @return string|mixed
      */
     public static function createUUIDUsing(?callable $factory = null)
     {
-        return (static function () use ($factory) {
-            return (string) static::guid($factory);
-        })();
+        return static::createUsing($factory);
     }
 }
