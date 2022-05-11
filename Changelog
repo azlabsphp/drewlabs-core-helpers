@@ -20,3 +20,10 @@
 ## [2.2.11] 20220320
 
 - Add function memoization implementation in PHP Language for fast fast call of long running pure function
+
+## [2.3.2] 2022-05-11
+
+- Apply bug fix to Arr::isnotassoclist
+- Added Arr::isassoclist function
+- Added Arr::isArray() method
+- Added Arr::groupBy()
