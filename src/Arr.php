@@ -191,6 +191,17 @@ class Arr
     }
 
     /**
+     * Checks if the provided parameter is a PHP array variable
+     * 
+     * @param mixed $value 
+     * @return bool 
+     */
+    public static function isArray($value)
+    {
+        return is_array($value);
+    }
+
+    /**
      * Convert a given object to array.
      *
      * @param mixed $value
@@ -394,7 +405,6 @@ class Arr
         if (null === $value) {
             return false;
         }
-
         return array_keys($value) !== range(0, \count($value) - 1);
     }
 
@@ -531,7 +541,7 @@ class Arr
             }
         }
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of'.\Traversable::class.', '.\JsonSerializable::class);
+            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of' . \Traversable::class . ', ' . \JsonSerializable::class);
         }
 
         return $preserve_keys ? $value : array_values($value);
@@ -596,12 +606,40 @@ class Arr
      */
     public static function isnotassoclist(array $items)
     {
-        // Check if the list is an associative list, and return false if it is
-        if (0 !== \count(array_filter(array_keys($items), 'is_string'))) {
+        return !Arr::isassoclist($items);
+    }
+
+    /**
+     * Checks if a given array is an associative array and each value of
+     * the primary array is an array itself
+     * 
+     * ```php
+     * <?php
+     * $result = Arr::isassoclist([
+     *  'h' => ['Hello'],
+     *  'g' => ['Good Morning']
+     * ]); // Returns true
+     * 
+     * // While
+     * $result  = Arr::isassoclist([
+     *  'h' => ['Hello'],
+     *  'g' => 'Good Moring'
+     * ]); // returns false
+     * 
+     * // And
+     * $result = Arr::isassoclist([]); // Returns false
+     * ```
+     * 
+     * @param array $items 
+     * @return bool 
+     */
+    public static function isassoclist(array $items)
+    {
+        if (empty($items)) {
             return false;
         }
-
-        return !empty($items) && array_filter($items, 'is_array') === $items;
+        $isAssociative = 0 !== \count(array_filter(array_keys($items), 'is_string'));
+        return $isAssociative && Arr::isList($items);
     }
 
     /**
@@ -981,5 +1019,40 @@ class Arr
         }
 
         return $array;
+    }
+
+    /**
+     * Groups list by a given value
+     *
+     * @param \Iterator|array $values 
+     * @param string|int $key 
+     * @return array 
+     */
+    public static function groupBy(array $values, $key)
+    {
+        $key =  (!is_string($key) && is_callable($key)) ? $key : function ($value) use ($key) {
+            if (is_array($value)) {
+                return $value[$key] ?? null;
+            }
+            if (is_object($key)) {
+                return $value->{$key};
+            }
+            return $value;
+        };
+        $results = [];
+        foreach ($values as $key => $value) {
+            $groupKeys = $key($value, $key);
+
+            if (!is_array($groupKeys)) {
+                $groupKeys = [$groupKeys];
+            }
+            foreach ($groupKeys as $groupKey) {
+                if (!array_key_exists($groupKey, $results)) {
+                    $results[$groupKey] = [];
+                }
+                $results[$groupKey][] = $value;
+            }
+        }
+        return $results;
     }
 }
