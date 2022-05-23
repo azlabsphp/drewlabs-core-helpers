@@ -27,3 +27,7 @@
 - Added Arr::isassoclist function
 - Added Arr::isArray() method
 - Added Arr::groupBy()
+
+## [2.3.3] 2022-05-23
+
+- Bug fix related to Arr::isnotassoclist intent implementation
