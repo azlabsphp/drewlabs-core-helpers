@@ -404,4 +404,31 @@ class ArrayHelpersTest extends TestCase
         $this->assertSame([3], Arr::create($val));
         $this->assertSame(['Hello World!'], Arr::create($strval));
     }
+
+
+    public function  test_array_isassoclist()
+    {
+        $this->assertTrue(Arr::isassoclist([
+            'basic' =>  ['Hello', 'World'],
+            'greetings' =>  ['Good', 'Morning']
+        ]));
+        $this->assertFalse(Arr::isassoclist([
+            ['Hello', 'World']
+        ]));
+        $this->assertFalse(Arr::isassoclist(['Hello', 'World']));
+        $this->assertFalse(Arr::isassoclist([]));
+    }
+
+    public function test_array_isnotassoclist()
+    {
+        $this->assertFalse(Arr::isnotassoclist([
+            'basic' =>  ['Hello', 'World'],
+            'greetings' =>  ['Good', 'Morning']
+        ]));
+        $this->assertTrue(Arr::isnotassoclist([
+            ['Hello', 'World']
+        ]));
+        $this->assertFalse(Arr::isnotassoclist(['Hello', 'World']));
+        $this->assertFalse(Arr::isnotassoclist([]));
+    }
 }

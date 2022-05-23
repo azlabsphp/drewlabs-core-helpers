@@ -600,13 +600,37 @@ class Arr
     }
 
     /**
-     * Process entries in the provided list and return true if the list is a list of list.
-     *
-     * @return bool
+     * Returns true if the provided $items is a numerical indexed array
+     * and each index value is an array
+     * 
+     * ```php
+     * $result = Arr::isnotassoclist([
+     *      [
+     *          'hello', 'world'
+     *      ],
+     *      [
+     *          'good', 'morning'
+     *      ]
+     * ]); // True
+     * $result = Arr::isnotassoclist([
+     *      'basic' => [
+     *          'hello', 'world'
+     *      ],
+     *      'greetings' => [
+     *          'good', 'morning'
+     *      ]
+     * ]); // False
+     * ```
+     * 
+     * @param array $items 
+     * @return bool 
      */
     public static function isnotassoclist(array $items)
     {
-        return !Arr::isassoclist($items);
+        if (empty($items)) {
+            return false;
+        }
+        return Arr::isList($items) && !Arr::isassoc($items);
     }
 
     /**
@@ -638,8 +662,7 @@ class Arr
         if (empty($items)) {
             return false;
         }
-        $isAssociative = 0 !== \count(array_filter(array_keys($items), 'is_string'));
-        return $isAssociative && Arr::isList($items);
+        return (0 !== \count(array_filter(array_keys($items), 'is_string'))) && Arr::isList($items);
     }
 
     /**
