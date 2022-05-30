@@ -47,6 +47,9 @@ class Str
      */
     public static function startsWith(string $haystack, string $needle)
     {
+        if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
+            return str_starts_with($haystack, $needle);
+        }
         return ('' === $needle) || (mb_substr($haystack, 0, mb_strlen($needle)) === $needle);
     }
 
@@ -57,6 +60,9 @@ class Str
      */
     public static function endsWith(string $haystack, string $needle)
     {
+        if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
+            return str_ends_with($haystack, $needle);
+        }
         return ('' === $needle) || (mb_substr($haystack, -(int) (mb_strlen($needle))) === $needle);
     }
 

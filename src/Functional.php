@@ -140,17 +140,18 @@ class Functional
      * It does not guaranty a deep copy as the developper must make sure clone object
      * is purely immutable.
      *
-     * @param mixed             $source
+     * @param mixed             $value
      * @param \Closure|callable $callback
      *
      * @return mixed
      */
-    public static function tap($source, $callback)
+    public static function tap($value, $callback)
     {
         $callback(
-            \is_object($state = (\is_callable($source) && !\is_string($source) ?
-                \call_user_func($source) : $source)) ? clone $state : $state
+            \is_object($state = (\is_callable($value) && !\is_string($value) ?
+                \call_user_func($value) : $value)) ? clone $state : $state
         );
+        return $value;
     }
 
     /**
