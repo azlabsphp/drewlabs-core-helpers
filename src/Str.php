@@ -308,7 +308,6 @@ class Str
         if ($pos) {
             return mb_substr($haystack, 0, $pos);
         }
-
         return '';
     }
 
