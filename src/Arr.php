@@ -743,7 +743,7 @@ class Arr
      */
     public static function last(array $list)
     {
-        return !empty($list) ? \array_slice($list, -1, 1, false)[0] : null;
+        return !empty($list) ? ($list[static::keyLast($list)] ?? null) : null;
     }
 
     /**
@@ -753,7 +753,7 @@ class Arr
      */
     public static function first(array $list)
     {
-        return !empty($list) ? (\array_slice($list, 0, 1, false)[0] ?? null) : null;
+        return !empty($list) ? ($list[static::keyFirst($list)] ?? null) : null;
     }
 
     /**
@@ -1077,5 +1077,53 @@ class Arr
             }
         }
         return $results;
+    }
+
+    /**
+     * 
+     * @param array $value 
+     * @return array 
+     */
+    public static function recursiveksort(array $value)
+    {
+        return static::_recursiveksort_($value, 'ksort');
+    }
+
+    /**
+     * 
+     * @param array $value 
+     * @return array 
+     */
+    public static function recursivekrsort(array $value)
+    {
+        return static::_recursiveksort_($value, 'krsort');
+    }
+
+    /**
+     * 
+     * @param array $value 
+     * @param callable|\Closure $sortFunc 
+     * @return array 
+     */
+    private static function _recursiveksort_(array $value, $sortFunc)
+    {
+        if (null === $sortFunc) {
+            $sortFunc = 'ksort';
+        }
+        #region Internal sort function
+        $func = function (array &$list) use ($sortFunc, &$func) {
+            foreach ($list as $key => $value) {
+                $is_object = is_object($value);
+                if ($is_object || is_array($value)) {
+                    $current = $is_object ? get_object_vars($value) : $value;
+                    $func($current);
+                    $list[$key] = $current;
+                }
+            }
+            call_user_func_array($sortFunc, [&$list]);
+        };
+        $func($value);
+        #endregion Internal function
+        return $value;
     }
 }

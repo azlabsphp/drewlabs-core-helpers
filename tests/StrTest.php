@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests;
 
+use Drewlabs\Core\Helpers\Str;
 use PHPUnit\Framework\TestCase;
 
-class StringsHelperTest extends TestCase
+class StrTest extends TestCase
 {
     public function testStringAfterFunction()
     {
@@ -36,5 +37,45 @@ class StringsHelperTest extends TestCase
         $source = 'TestChar_Variable ';
 
         $this->assertSame(drewlabs_core_strings_as_snake_case($source), 'test_char_variable', 'Expect the transformed string to equals test_char_variable');
+    }
+
+    public function test_str_hash()
+    {
+        $hash = Str::hash('Hello World!', 'secretkey');
+        $this->assertTrue(Str::hequals($hash, Str::hash('Hello World!', 'secretkey')));
+    }
+
+    public function test_str_json()
+    {
+        $json = Str::stringify([
+            [
+                'weight' => '30pd',
+                'name' => 'Banana'
+            ],
+            [
+                'name' => 'Orange',
+                'weight' => '10pd',
+            ],
+            [
+                'name' => 'Apple',
+                'weight' => '20pd',
+            ]
+        ]);
+        $json2 = Str::stringify([
+            [
+                'weight' => '30pd',
+                'name' => 'Banana'
+            ],
+            [
+                'weight' => '10pd',
+                'name' => 'Orange',
+            ],
+            [
+                'name' => 'Apple',
+                'weight' => '20pd',
+            ]
+        ]);
+        $this->assertIsString($json);
+        $this->assertEquals($json, $json2);
     }
 }

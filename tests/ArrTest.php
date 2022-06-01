@@ -17,7 +17,7 @@ use Drewlabs\Core\Helpers\Arr;
 use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
 use PHPUnit\Framework\TestCase;
 
-class ArrayHelpersTest extends TestCase
+class ArrTest extends TestCase
 {
     public function testArraySortMethod()
     {
@@ -377,7 +377,8 @@ class ArrayHelpersTest extends TestCase
 
     public function testCreate_Array_From_Object_With_ToArray()
     {
-        $object = new class() {
+        $object = new class()
+        {
             public function toArray()
             {
                 return range(0, 10);
@@ -388,7 +389,8 @@ class ArrayHelpersTest extends TestCase
 
     public function testCreate_Array_From_IteratorAggregate()
     {
-        $object = new class() implements \IteratorAggregate {
+        $object = new class() implements \IteratorAggregate
+        {
             public function getIterator(): \Traversable
             {
                 return new \ArrayIterator(range(0, 10));
@@ -430,5 +432,42 @@ class ArrayHelpersTest extends TestCase
         ]));
         $this->assertFalse(Arr::isnotassoclist(['Hello', 'World']));
         $this->assertFalse(Arr::isnotassoclist([]));
+    }
+
+    public function test_array_recursive_ksort()
+    {
+        $arr = [
+            'fruits' => [
+                [
+                    'weight' => '30pd',
+                    'name' => 'Banana'
+                ],
+                [
+                    'name' => 'Orange',
+                    'weight' => '10pd',
+                ],
+                [
+                    'name' => 'Apple',
+                    'weight' => '20pd',
+                ]
+            ],
+            'articles' => [
+                [
+                    'price' => 120,
+                    'name' => 'HTC',
+                ],
+                [
+                    'price' => 500,
+                    'name' => 'LG SMART 100 TV',
+                ],
+                [
+                    'price' => 10,
+                    'name' => 'HUAWEI LED CONTROLLER',
+                ]
+            ]
+        ];
+        $sorted = Arr::recursiveksort($arr);
+        $this->assertEquals(Arr::first($sorted), Arr::recursiveksort($arr['articles']));
+        $this->assertEquals('articles', Arr::keyFirst($sorted));
     }
 }
