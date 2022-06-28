@@ -924,6 +924,9 @@ class Arr
      */
     public static function filter(array $array, ?callable $predicate = null, ?int $flag = 0)
     {
+        if (null === $predicate) {
+            return static::filterNull($array);
+        }
         return array_filter($array, $predicate, $flag);
     }
 
