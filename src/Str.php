@@ -416,12 +416,11 @@ class Str
      */
     public static function camelize(string $haystack, $firstcapital = true, $delimiter = '_')
     {
-        return drewlabs_core_fn_compose_array(
-            static function ($params) {
+        return Functional::vcompose(
+            static function (...$params) {
                 if (\count($params) < 2) {
                     throw new \RuntimeException();
                 }
-
                 return str_replace($params[1], '', ucwords($params[0], $params[1]));
             },
             static function ($param) use ($firstcapital) {
@@ -442,12 +441,11 @@ class Str
      */
     public static function regexCamelize(string $haystack, $firstcapital = true, $delimiter = '{[_]+}')
     {
-        return drewlabs_core_fn_compose_array(
-            static function ($params) {
+        return Functional::vcompose(
+            static function (...$params) {
                 if (\count($params) < 2) {
                     throw new \RuntimeException();
                 }
-
                 return preg_replace($params[1], '', ucwords($params[0], $params[1]));
             },
             static function ($param) use ($firstcapital) {

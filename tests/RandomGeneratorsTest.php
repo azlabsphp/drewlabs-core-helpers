@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests;
 
+use Drewlabs\Core\Helpers\UUID;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidFactory;
 
@@ -20,19 +21,19 @@ class RandomGeneratorsTest extends TestCase
 {
     public function testGenerateUuid()
     {
-        $uuid = drewlabs_core_random_guid();
+        $uuid = UUID::create();
         $this->assertTrue((new UuidFactory())->getValidator()->validate($uuid));
     }
 
     public function testGenerateOrderedUuid()
     {
-        $uuid = drewlabs_core_random_ordered_uuid();
+        $uuid = UUID::ordered();
         $this->assertTrue((new UuidFactory())->getValidator()->validate($uuid));
     }
 
     public function testGenerateUuidUsinfFactory()
     {
-        $uuid = drewlabs_core_random_create_uuids_using(static function () {
+        $uuid = UUID::createUsing(static function () {
             return (new UuidFactory())->uuid4();
         });
         $this->assertTrue((new UuidFactory())->getValidator()->validate($uuid));

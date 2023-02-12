@@ -22,7 +22,7 @@ class IteratorHelpersTest extends TestCase
     {
         $iterator = new \ArrayIterator([1, 2, 3, 4, 5, 6, 7, 8]);
 
-        $filteredValue = drewlabs_core_iter_filter(
+        $filteredValue = Iter::filter(
             $iterator,
             static function ($value, $key) {
                 return 0 === $value % 2;
@@ -39,19 +39,19 @@ class IteratorHelpersTest extends TestCase
             'host' => '127.0.0.1',
             'port' => 22,
         ];
-        $result = iterator_to_array(drewlabs_core_iter_only(new \ArrayIterator($test_array), ['password']));
+        $result = iterator_to_array(Iter::only(new \ArrayIterator($test_array), ['password']));
         $this->assertTrue(4 !== \count($result), 'Expect test to fail');
         $this->assertCount(1, $result, 'Assert only on item in array');
         $this->assertTrue(\in_array('password', array_keys($result), true), 'Assert password key is in result array');
 
         // Test filtering on value
 
-        $result = iterator_to_array(drewlabs_core_iter_only(
+        $result = iterator_to_array(Iter::only(
             new \ArrayIterator($test_array),
             ['127.0.0.1', 'user'],
             false
         ));
-        $result = drewlabs_core_array_only($test_array, ['127.0.0.1', 'admin'], false);
+        $result = iterator_to_array(Iter::only(new \ArrayIterator($test_array), ['127.0.0.1', 'admin'], false));
         $this->assertTrue(4 !== \count($result), 'Expect test to fail');
         $this->assertCount(2, $result, 'Assert only on item in array');
         $this->assertTrue(\in_array('host', array_keys($result), true), 'Assert password key is in result array');

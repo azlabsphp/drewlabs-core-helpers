@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests;
 
+use Drewlabs\Core\Helpers\Str;
 use PHPUnit\Framework\TestCase;
 
 class HashingTest extends TestCase
@@ -25,11 +26,7 @@ class HashingTest extends TestCase
             return 'APP_KEY';
         };
         $this->assertTrue(
-            drewlabs_core_hashing_hash_str_compare(
-                $other,
-                drewlabs_core_hashing_hash_str($source, $resolver),
-                $resolver
-            ),
+            Str::hequals($other, Str::hash($source, $resolver), $resolver),
             'Expects the hash result of both source_string and other_string to be equals'
         );
     }

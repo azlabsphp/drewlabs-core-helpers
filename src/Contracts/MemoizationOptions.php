@@ -41,7 +41,7 @@ interface MemoizationOptions
     public function useCache();
 
     /**
-     * Cache size to be used. Default for the default LRU Cache is 16.
+     * Cache size to be used. Default for LRU Cache is 16.
      */
     public function cacheSize(): int;
 }

@@ -102,44 +102,4 @@ final class UUID
             return (string) static::create($factory);
         })();
     }
-
-    /**
-     * @deprecated 2.2.x Use UUID::ordered() method instead
-     * 
-     * @param callable|null $factory
-     *
-     * @throws \Exception
-     *
-     * @return string|mixed
-     */
-    public static function orderedUUID(?callable $factory = null)
-    {
-        return static::ordered($factory);
-    }
-
-    /**
-     * @deprecated v2.2.x Use UUID::create() method instead
-     * 
-     * @throws \ReflectionException
-     * @throws \Exception
-     *
-     * @return string
-     */
-    public static function guid(?callable $factory = null)
-    {
-        return static::create($factory);
-    }
-
-    /**
-     * @deprecated 2.2.x Use createUsing() method instead
-     * 
-     * @throws \ReflectionException
-     * @throws \Exception
-     *
-     * @return string|mixed
-     */
-    public static function createUUIDUsing(?callable $factory = null)
-    {
-        return static::createUsing($factory);
-    }
 }

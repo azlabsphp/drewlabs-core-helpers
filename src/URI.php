@@ -37,8 +37,9 @@ class URI
 
     /**
      * Returns the request URI without any query string.
-     *
-     * @return string
+     * 
+     * @param mixed $url 
+     * @return string 
      */
     public static function trimQueryStrings($url)
     {
@@ -124,7 +125,7 @@ class URI
             return false;
         }
 
-        return drewlabs_core_datetime_now()->getTimestamp() > (int) ($query_params['expires']);
+        return ImmutableDateTime::now()->getTimestamp() > (int) ($query_params['expires']);
     }
 
     /**

@@ -382,7 +382,6 @@ class Functional
             $size = $options->cacheSize() ?? 16;
             $memoize = $memoize->setCacheSize($size);
         }
-
         return $memoize;
     }
 }

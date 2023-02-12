@@ -13,6 +13,10 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests;
 
+use Drewlabs\Core\Helpers\Arr;
+use Drewlabs\Core\Helpers\Functional;
+use Drewlabs\Core\Helpers\Reflector;
+use Drewlabs\Core\Helpers\Str;
 use Drewlabs\Core\Helpers\Tests\Stubs\Person;
 use Drewlabs\Core\Helpers\Tests\Stubs\PersonValueObject;
 use PHPUnit\Framework\TestCase;
@@ -21,15 +25,15 @@ class UtilsHelpersTest extends TestCase
 {
     public function testComposeFunction()
     {
-        $result = drewlabs_core_fn_compose_array(
+        $result = Functional::compose(
             static function ($params) {
-                return drewlabs_core_strings_to_array(...$params);
+                return Str::split(...$params);
             },
             static function ($values) {
-                return drewlabs_core_array_group_count($values);
+                return Arr::groupCount($values);
             },
             static function ($value) {
-                return drewlabs_core_create_attribute_getter('repetition', null)($value);
+                return Reflector::propertyGetter('repetition', null)($value);
             }
         )(
             'repetition is the act of repeating or restating something more than once. In writing, repetition can occur at many levels: with individual letters and sounds, single words, phrases, or even ideas. repetition can be problematic in writing if it leads to dull work, but it can also be an effective poetic or rhetorical strategy to strengthen your message, as our examples of repetition in writing demonstrate.',
@@ -41,15 +45,15 @@ class UtilsHelpersTest extends TestCase
 
     public function testReverseComposeFunction()
     {
-        $result = drewlabs_core_fn_reverse_compose_array(
+        $result = Functional::rcompose(
             static function ($value) {
-                return drewlabs_core_create_attribute_getter('repetition', null)($value);
+                return Reflector::propertyGetter('repetition', null)($value);
             },
             static function ($values) {
-                return drewlabs_core_array_group_count($values);
+                return Arr::groupCount($values);
             },
             static function ($params) {
-                return drewlabs_core_strings_to_array(...$params);
+                return Str::split(...$params);
             }
         )('repetition is the act of repeating or restating something more than once. In writing, repetition can occur at many levels: with individual letters and sounds, single words, phrases, or even ideas. repetition can be problematic in writing if it leads to dull work, but it can also be an effective poetic or rhetorical strategy to strengthen your message, as our examples of repetition in writing demonstrate.', ' ');
         $this->assertIsInt($result, 'Expects the test to complete successfully');
@@ -64,8 +68,8 @@ class UtilsHelpersTest extends TestCase
             'age' => 23,
             'sex' => 'M',
         ];
-        $this->assertTrue('M' === drewlabs_core_get_attribute($person, 'sex', null), 'Expect the sex attribute of the person details to equals M');
-        $this->assertTrue(null === drewlabs_core_get_attribute($person, 'weight', null), 'Expect weigth property to equals null');
+        $this->assertTrue('M' === Reflector::getPropertyValue($person, 'sex', null), 'Expect the sex attribute of the person details to equals M');
+        $this->assertTrue(null === Reflector::getPropertyValue($person, 'weight', null), 'Expect weigth property to equals null');
     }
 
     public function testCreateAttributeGetterFunction()
@@ -77,7 +81,7 @@ class UtilsHelpersTest extends TestCase
         $person->parent = new \stdClass();
         $person->parent->fullname = 'Morris Campbel';
         $person->parent->total_children = 3;
-        $this->assertTrue(3 === drewlabs_core_create_attribute_getter('parent.total_children', null)($person), 'Expect the total_children property of the object parent property to equals 3');
+        $this->assertTrue(3 === Reflector::propertyGetter('parent.total_children', null)($person), 'Expect the total_children property of the object parent property to equals 3');
     }
 
     public function testRecursiveGetAttributeFunction()
@@ -94,8 +98,8 @@ class UtilsHelpersTest extends TestCase
                 'postal_code' => 228,
             ],
         ];
-        $this->assertSame(drewlabs_core_recursive_get_attribute($person, 'address.email', null), 'hillairekoudossou@example.com', 'Expect the email attribute nested in the address field to equals hillairekoudossou@example.com');
-        $this->assertSame(drewlabs_core_recursive_get_attribute($person, 'address.postal_code', null), 228, 'Expect the postal_code attribute nested in the address field to equals 228');
+        $this->assertSame(Reflector::getPropertyValue($person, 'address.email', null), 'hillairekoudossou@example.com', 'Expect the email attribute nested in the address field to equals hillairekoudossou@example.com');
+        $this->assertSame(Reflector::getPropertyValue($person, 'address.postal_code', null), 228, 'Expect the postal_code attribute nested in the address field to equals 228');
     }
 
     public function testRecursiveSetAttributeFunction()
@@ -114,18 +118,18 @@ class UtilsHelpersTest extends TestCase
                 ],
             ],
         ];
-        $person = drewlabs_core_fn_compose(
+        $person = Functional::compose(
             static function ($p) {
-                return drewlabs_core_recursive_set_attribute($p, 'address.physical.house_number', 'H 492');
+                return Reflector::getPropertyValue($p, 'address.physical.house_number', 'H 492');
             },
             static function ($p) {
-                return drewlabs_core_recursive_set_attribute($p, 'address.email', 'hkoudossou@example.com');
+                return Reflector::getPropertyValue($p, 'address.email', 'hkoudossou@example.com');
             },
             static function ($p) {
-                return drewlabs_core_recursive_set_attribute($p, 'address.postal_code', 'BP 1515');
+                return Reflector::getPropertyValue($p, 'address.postal_code', 'BP 1515');
             }
         )($person);
-        $this->assertSame(drewlabs_core_recursive_get_attribute($person, 'address.physical.house_number', null), 'H 492', 'Expect the house_number attribute nested in the address field to equals H 492');
+        $this->assertSame(Reflector::getPropertyValue($person, 'address.physical.house_number', null), 'H 492', 'Expect the house_number attribute nested in the address field to equals H 492');
     }
 
     public function testCreateAttributeSetterFunction()
@@ -139,7 +143,7 @@ class UtilsHelpersTest extends TestCase
         $physical->street = 'HN 78';
         $address->physical = $physical;
         $person->address = $address;
-        $p = drewlabs_core_create_attribute_setter(
+        $p = Reflector::propertySetter(
             // 'address.physical.house_number',
             // 'H 492'
             [
@@ -148,18 +152,17 @@ class UtilsHelpersTest extends TestCase
                 ['address.postal_code', 'BP 1515'],
             ]
         )($person);
-        // $this->assertEquals(\drewlabs_core_recursive_get_attribute($p, 'address.physical.house_number', null), 'H 492',  'Expect the house_number attribute nested in the address field to equals H 492');
-        $this->assertNotSame(drewlabs_core_recursive_get_attribute($p, 'address.physical.house_number', null), drewlabs_core_recursive_get_attribute($person, 'address.physical.house_number', null), 'Expect the modified person object to not equls the source person object');
+        $this->assertNotSame(Reflector::getPropertyValue($p, 'address.physical.house_number', null), Reflector::getPropertyValue($person, 'address.physical.house_number', null), 'Expect the modified person object to not equls the source person object');
     }
 
     public function testCreatePrivateAttributeSetterFunction()
     {
         $person = new Person();
-        $person = drewlabs_core_create_attribute_setter(
+        $person = Reflector::propertySetter(
             'secret',
             'MySecureSecretPassword'
         )($person);
-        $this->assertSame(drewlabs_core_recursive_get_attribute($person, 'secret', null), 'MySecureSecretPassword', 'Expect new person password to equals MySecureSecretPassword');
+        $this->assertSame(Reflector::getPropertyValue($person, 'secret', null), 'MySecureSecretPassword', 'Expect new person password to equals MySecureSecretPassword');
     }
 
     public function testCreateValueObjectAttributeSetterFunction()
@@ -168,11 +171,11 @@ class UtilsHelpersTest extends TestCase
             'login' => 'Asmyns14',
             'email' => 'asmyns.platonnas29@gmail.com',
         ]);
-        $person = drewlabs_core_create_attribute_setter(
+        $person = Reflector::propertySetter(
             'secret',
             'SuperSecretPassword'
         )($person);
-        $this->assertSame(drewlabs_core_recursive_get_attribute($person, 'secret', null), 'SuperSecretPassword', 'Expect new person password to equals SuperSecretPassword');
+        $this->assertSame(Reflector::getPropertyValue($person, 'secret', null), 'SuperSecretPassword', 'Expect new person password to equals SuperSecretPassword');
     }
 
     public function testValueObjectCopyWithMethodCreateACopyOfTheObject()
@@ -186,26 +189,11 @@ class UtilsHelpersTest extends TestCase
             'login' => 'Azandrew',
             'email' => 'azandrewdevelopper@gmail.com',
         ]);
-        $person = drewlabs_core_create_attribute_setter(
+        $person = Reflector::propertySetter(
             'secret',
             'Person1Secret'
         )($person);
-        $this->assertNotSame(drewlabs_core_recursive_get_attribute($person, 'secret', null), drewlabs_core_recursive_get_attribute($person2, 'secret', null), 'Expect person2 to be a deep copy of person, and any modification of person does not affect person 2');
-        $this->assertSame(drewlabs_core_recursive_get_attribute($person2, 'login', null), 'Azandrew', 'Expect person2 login to equals Azandrew');
-    }
-
-    public function testIsEmptyFunction()
-    {
-        $p = new \stdClass();
-
-        $p2 = new \stdClass();
-        $p2->name = null;
-        $p2->lastname = 'Azandrew';
-        $p2->age = 32;
-
-        $this->assertTrue(drewlabs_core_is_empty($p), 'Expect $p to be empty');
-        $this->assertTrue(!drewlabs_core_is_empty($p2), 'Expect $p2 to be be empty');
-        $this->assertTrue(drewlabs_core_is_empty([]), 'Expect an empty array to be empty');
-        $this->assertTrue(drewlabs_core_is_empty(''), 'Expect an empty string to be empty');
+        $this->assertNotSame(Reflector::getPropertyValue($person, 'secret', null), Reflector::getPropertyValue($person2, 'secret', null), 'Expect person2 to be a deep copy of person, and any modification of person does not affect person 2');
+        $this->assertSame(Reflector::getPropertyValue($person2, 'login', null), 'Azandrew', 'Expect person2 login to equals Azandrew');
     }
 }

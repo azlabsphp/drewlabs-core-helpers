@@ -22,21 +22,21 @@ class StrTest extends TestCase
     {
         $haystack = 'DonalTrumpVsJoeBaiden';
 
-        $this->assertSame(drewlabs_core_strings_after('Vs', $haystack), 'JoeBaiden', 'Expect strings afert Vs to be JoeBaiden');
+        $this->assertSame(Str::after('Vs', $haystack), 'JoeBaiden', 'Expect strings afert Vs to be JoeBaiden');
     }
 
     public function testStringsToCamelCaseFunction()
     {
         $source = 'test_char_variable';
 
-        $this->assertSame(drewlabs_core_strings_as_camel_case($source, true), 'TestCharVariable', 'Expect the transformed string to equals TestCharVariable');
+        $this->assertSame(Str::camelize($source, true), 'TestCharVariable', 'Expect the transformed string to equals TestCharVariable');
     }
 
     public function testStringsToSnakeCaseFunction()
     {
         $source = 'TestChar_Variable ';
 
-        $this->assertSame(drewlabs_core_strings_as_snake_case($source), 'test_char_variable', 'Expect the transformed string to equals test_char_variable');
+        $this->assertSame(Str::snakeCase($source), 'test_char_variable', 'Expect the transformed string to equals test_char_variable');
     }
 
     public function test_str_hash()

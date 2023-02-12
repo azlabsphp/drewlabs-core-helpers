@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Drewlabs\Core\Helpers;
 
 use Closure;
-use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
 use Traversable;
 
 class Arr
@@ -49,15 +48,23 @@ class Arr
      * @param string $by
      * @param string $order
      */
-    public static function sortBy(array &$items, $by, $order = DREWLABS_CORE_ORD_ASC)
+    public static function sortBy(array &$items, $by, $order = 'asc')
     {
-        $compare = static function ($a, $b) use ($order, $by) {
+        $desc = 'desc' === strtolower($order) || intval($order) < 0;
+        $str_compare = function ($a, $b) use ($desc) {
+            $result = strcmp($a, $b);
+            return $desc ? $result >= 0  : $result < 0;
+        };
+        $num_compare = function ($a, $b) use ($desc) {
+            return $desc ? ($a - $b >= 0 ? 1 : -1) : ($a - $b >= 0 ? -1 : 1);
+        };
+        $compare = static function ($a, $b) use ($order, $by, $desc, &$str_compare, &$num_compare) {
             // Check first if is standard type in order to avoid error
-            if (drewlabs_core_strings_is_str($a) || drewlabs_core_strings_is_str($b)) {
-                return drewlabs_core_compare_str($a, $b, $order, $order);
+            if (is_string($a) || is_string($b)) {
+                return $str_compare($a, $b, $order);
             }
             if (is_numeric($a) || is_numeric($b)) {
-                return drewlabs_core_compare_numeric($a, $b, $order);
+                return $num_compare($a, $b);
             }
             // Check if is arrayable
             if (($a instanceof \ArrayAccess || \is_array($a)) && ($b instanceof \ArrayAccess || \is_array($b))) {
@@ -69,14 +76,13 @@ class Arr
                 $a = $a->{$by};
                 $b = $b->{$by};
             }
-            if (drewlabs_core_strings_is_str($a) || drewlabs_core_strings_is_str($b)) {
-                return drewlabs_core_compare_str($a, $b, $order);
+            if (is_string($a) || is_string($b)) {
+                return $str_compare($a, $b);
             }
             if (is_numeric($a) || is_numeric($b)) {
-                return drewlabs_core_compare_numeric($a, $b, $order);
+                return $num_compare($a, $b);
             }
-
-            return DREWLABS_CORE_ORD_DESC === $order ? -1 : 1;
+            return $desc ? -1 : 1;
         };
         usort($items, $compare);
 
@@ -97,11 +103,11 @@ class Arr
 
         while ($low <= $high) {
             $mid = floor(($low + $high) / 2);
-            $searched_item = \is_object($items[$mid]) ? $items[$mid]->{$by} : $items[$mid][$by];
-            if (drewlabs_core_is_same($searched_item, $search)) {
+            $item = \is_object($items[$mid]) ? $items[$mid]->{$by} : $items[$mid][$by];
+            if ($item === $search) {
                 return $mid;
             }
-            if ($search < $searched_item) {
+            if ($search < $item) {
                 $high = $mid - 1;
             } else {
                 $low = $mid + 1;
@@ -414,9 +420,6 @@ class Arr
      * This checks if all array keys are string values
      *
      * Performs a O(n) comparison in a worst case scenario
-     *
-     * Use it instead of {drewlabs_core_array_is_assoc} to increase
-     * error checking on full associative arrays
      *
      * @return bool
      */
@@ -760,9 +763,6 @@ class Arr
      * Perform a binary search while providing a closure as predicate that provide the compison expression
      * If no closure is provided it use === sign to compare values.
      *
-     * Note: The predicate function should return BinarySearchResult::FOUND, BinarySearchResult::LEFT or BinarySearchResult::RIGHT to indicate
-     * whether to search in in the lower or upper bound
-     *
      * @param mixed $value
      *
      * @return int
@@ -784,10 +784,10 @@ class Arr
         while ($start <= $end) {
             $mid = (int) (ceil($start + ($end - $start) / 2));
             $result = $predicate($haystack[$mid], $value);
-            if (BinarySearchResult::FOUND === $result) {
+            if (0 === $result) {
                 return $mid;
             }
-            if (BinarySearchResult::LEFT === $result) {
+            if (-1 === $result) {
                 $end = $mid - 1;
             } else {
                 $start = $mid + 1;
