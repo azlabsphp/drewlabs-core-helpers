@@ -26,7 +26,7 @@ class HashingTest extends TestCase
             return 'APP_KEY';
         };
         $this->assertTrue(
-            Str::hequals($other, Str::hash($source, $resolver), $resolver),
+            Str::hequals(Str::hash($source, $resolver), $other),
             'Expects the hash result of both source_string and other_string to be equals'
         );
     }

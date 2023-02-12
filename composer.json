@@ -28,19 +28,7 @@
             "Drewlabs\\Core\\Helpers\\": "src/"
         },
         "files": [
-            "global/array.php",
-            "global/datetime.php",
-            "global/strings.php",
-            "global/utils.php",
-            "global/random.php",
-            "global/compose.php",
-            "global/immutable.php",
-            "global/format.php",
-            "global/url.php",
-            "global/hashing.php",
-            "global/callables.php",
-            "global/reflector.php",
-            "global/iterators.php"
+            "helpers.php"
         ],
         "optimize-autoloader": true
     },
