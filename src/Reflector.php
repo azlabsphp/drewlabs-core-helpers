@@ -297,7 +297,7 @@ class Reflector
     public static function getPropertyValue($object, string $key, $default = null)
     {
         if (is_string($key)  && (false !== strpos($key, '.'))) {
-            $keys = explode($key, '.');
+            $keys = explode('.', $key);
             return array_reduce($keys, static function ($carry, $current) use ($default) {
                 if ($carry === $default) {
                     return $carry;
@@ -321,7 +321,7 @@ class Reflector
     {
         if (is_string($key) && (false !== strpos($key, '.'))) {
             $cache = [];
-            $keys = explode($key, '.');
+            $keys = explode('.', $key);
             $last = count($keys) - 1;
             $top = self::_getPropertyValue($object, $keys[0], null);
             if (null === $top) {

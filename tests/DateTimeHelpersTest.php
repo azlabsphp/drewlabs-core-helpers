@@ -61,29 +61,30 @@ class DateTimeHelpersTest extends TestCase
     {
         $date = ImmutableDateTime::nowTz();
         $minutes = (int) $date->format('i');
-        $this->assertSame((int) (ImmutableDateTime::addMins($date, 5)->format('i')), ($minutes + 5 > 60 ? ($minutes + 5) % 60 : $minutes + 5), 'Expect the returned number of minutes to be equals to the initial date number of minutes + 5');
+        $next = ImmutableDateTime::addMinutes($date, 5);
+        $this->assertSame((int) ($next->format('i')), ($minutes + 5 > 60 ? ($minutes + 5) % 60 : $minutes + 5), 'Expect the returned number of minutes to be equals to the initial date number of minutes + 5');
     }
 
     public function testDateTimeMaxFunction()
     {
-        $first_date = ImmutableDateTime::nowTz()();
-        $second_date = ImmutableDateTime::addMins(ImmutableDateTime::nowTz()(), 10);
+        $first_date = ImmutableDateTime::nowTz();
+        $second_date = ImmutableDateTime::addMinutes(ImmutableDateTime::nowTz(), 10);
         $this->assertTrue(ImmutableDateTime::same(ImmutableDateTime::max($first_date, $second_date), $second_date), 'Expects second date to be the result of the max function');
     }
 
     public function testDateTimeDiffInHoursFunction()
     {
-        $first_date = ImmutableDateTime::nowTz()();
-        $second_date = ImmutableDateTime::addMins(ImmutableDateTime::nowTz()(), 120);
-        $hrs_diff = ImmutableDateTime::hrsDiff($first_date, $second_date);
+        $first_date = ImmutableDateTime::nowTz();
+        $second_date = ImmutableDateTime::addHrs(ImmutableDateTime::nowTz(), 2);
+        $hrs_diff = intval(round(ImmutableDateTime::hrsDiff($first_date, $second_date)));
         $this->assertSame($hrs_diff, 2, 'Expect the difference in hours to equals 0');
     }
 
     public function testDateTimeDiffInMinutesFunction()
     {
-        $first_date = ImmutableDateTime::nowTz()();
-        $second_date = ImmutableDateTime::addMins(ImmutableDateTime::nowTz()(), 10);
-        $min_diff = ImmutableDateTime::minDiff($first_date, $second_date);
+        $first_date = ImmutableDateTime::nowTz();
+        $second_date = ImmutableDateTime::addMinutes(ImmutableDateTime::nowTz(), 10);
+        $min_diff = intval(round(ImmutableDateTime::minDiff($first_date, $second_date)));
         $this->assertSame($min_diff, 10, 'Expect the difference in hours to equals 0');
     }
 }

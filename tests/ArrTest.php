@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Drewlabs\Core\Helpers\Tests;
 
 use Drewlabs\Core\Helpers\Arr;
-use Drewlabs\Core\Helpers\Arrays\BinarySearchResult;
 use Drewlabs\Core\Helpers\Iter;
 use PHPUnit\Framework\TestCase;
 
@@ -307,9 +306,8 @@ class ArrTest extends TestCase
         $this->assertSame(
             Arr::bsearch($array, 'JAVA', static function ($curr, $item) {
                 if (0 === strcmp($curr['lang'], $item)) {
-                    return BinarySearchResult::FOUND;
+                    return 0;
                 }
-
                 return strcmp($curr['lang'], $item) > 0 ? -1 : 1;
             }),
             0,

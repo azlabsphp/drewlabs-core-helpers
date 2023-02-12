@@ -21,13 +21,10 @@ class HashingTest extends TestCase
     public function testHashStringFunction()
     {
         $source = 'Hello Test';
-        $other = 'Hello Test';
+        $match = 'Hello Test';
         $resolver = static function () {
             return 'APP_KEY';
         };
-        $this->assertTrue(
-            Str::hequals(Str::hash($source, $resolver), $other),
-            'Expects the hash result of both source_string and other_string to be equals'
-        );
+        $this->assertTrue(Str::hequals(Str::hash($source, $resolver), Str::hash($match, $resolver)), 'Expects the hash result of both source_string and other_string to be equals');
     }
 }

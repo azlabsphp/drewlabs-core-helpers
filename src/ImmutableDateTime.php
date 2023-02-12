@@ -175,9 +175,9 @@ class ImmutableDateTime
      *
      * @return \DateTimeInterface
      */
-    public static function addMins($date, $minutes = 0)
+    public static function addMinutes($date, $minutes = 0)
     {
-        return self::addSecs($date, $minutes);
+        return self::addSecs($date, $minutes * self::_SECONDS_PER_MINUTE);
     }
 
     /**
@@ -240,9 +240,9 @@ class ImmutableDateTime
      *
      * @return \DateTimeInterface
      */
-    public static function subMins($date, $minutes = 0)
+    public static function subMinutes($date, $minutes = 0)
     {
-        return self::subSecs($date, $minutes);
+        return self::subSecs($date, $minutes * self::_SECONDS_PER_MINUTE);
     }
 
     /**
@@ -369,11 +369,11 @@ class ImmutableDateTime
      * @param \DateTimeInterface|string|null $other
      * @param bool                           $exact       Get the exact of the difference
      *
-     * @return int
+     * @return float
      */
     public static function yrsDiff(\DateTimeInterface $date, $other = null, $exact = true)
     {
-        return (int) (self::weeksDiff($date, $other, $exact) / self::_WEEKS_PER_YEAR);
+        return self::weeksDiff($date, $other, $exact) / self::_WEEKS_PER_YEAR;
     }
 
     /**
@@ -383,11 +383,11 @@ class ImmutableDateTime
      * @param \DateTimeInterface|string|null $other
      * @param bool                           $exact       Get the exact of the difference
      *
-     * @return int
+     * @return float
      */
     public static function weeksDiff(\DateTimeInterface $date, $other = null, $exact = true)
     {
-        return (int) (self::daysDiff($date, $other, $exact) / self::_DAYS_PER_WEEK);
+        return self::daysDiff($date, $other, $exact) / self::_DAYS_PER_WEEK;
     }
 
     /**
@@ -397,11 +397,11 @@ class ImmutableDateTime
      * @param \DateTimeInterface|string|null $other
      * @param bool                           $exact       Get the exact of the difference
      *
-     * @return int
+     * @return float
      */
     public static function daysDiff(\DateTimeInterface $date, $other = null, $exact = true)
     {
-        return (int) (self::hrsDiff($date, $other, $exact) / self::_HOURS_PER_DAY);
+        return self::hrsDiff($date, $other, $exact) / self::_HOURS_PER_DAY;
     }
 
     /**
@@ -411,11 +411,11 @@ class ImmutableDateTime
      * @param \DateTimeInterface|string|null $other
      * @param bool                           $exact       Get the exact of the difference
      *
-     * @return int
+     * @return float
      */
     public static function hrsDiff(\DateTimeInterface $date, $other = null, $exact = true)
     {
-        return (int) (self::secsDiff($date, $other, $exact) / self::_SECONDS_PER_MINUTE / self::_MINUTES_PER_HOUR);
+        return self::secsDiff($date, $other, $exact) / self::_SECONDS_PER_MINUTE / self::_MINUTES_PER_HOUR;
     }
 
     /**
@@ -425,11 +425,11 @@ class ImmutableDateTime
      * @param \DateTimeInterface|string|null $date
      * @param bool                    $exact       Get the exact of the difference
      *
-     * @return int
+     * @return float
      */
     public static function minDiff(\DateTimeInterface $source, $date = null, $exact = true)
     {
-        return (int) (self::secsDiff($source, $date, $exact) / self::_SECONDS_PER_MINUTE);
+        return self::secsDiff($source, $date, $exact) / self::_SECONDS_PER_MINUTE;
     }
 
     /**

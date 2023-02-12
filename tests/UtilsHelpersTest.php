@@ -25,8 +25,8 @@ class UtilsHelpersTest extends TestCase
 {
     public function testComposeFunction()
     {
-        $result = Functional::compose(
-            static function ($params) {
+        $result = Functional::vcompose(
+            static function (...$params) {
                 return Str::split(...$params);
             },
             static function ($values) {
@@ -35,24 +35,21 @@ class UtilsHelpersTest extends TestCase
             static function ($value) {
                 return Reflector::propertyGetter('repetition', null)($value);
             }
-        )(
-            'repetition is the act of repeating or restating something more than once. In writing, repetition can occur at many levels: with individual letters and sounds, single words, phrases, or even ideas. repetition can be problematic in writing if it leads to dull work, but it can also be an effective poetic or rhetorical strategy to strengthen your message, as our examples of repetition in writing demonstrate.',
-            ' '
-        );
+        )('repetition is the act of repeating or restating something more than once. In writing, repetition can occur at many levels: with individual letters and sounds, single words, phrases, or even ideas. repetition can be problematic in writing if it leads to dull work, but it can also be an effective poetic or rhetorical strategy to strengthen your message, as our examples of repetition in writing demonstrate.', ' ');
         $this->assertIsInt($result, 'Expects the test to complete successfully');
         $this->assertSame($result, 4, 'Expect the word repetition to appear 4 times in the source array');
     }
 
     public function testReverseComposeFunction()
     {
-        $result = Functional::rcompose(
+        $result = Functional::rvcompose(
             static function ($value) {
                 return Reflector::propertyGetter('repetition', null)($value);
             },
             static function ($values) {
                 return Arr::groupCount($values);
             },
-            static function ($params) {
+            static function (...$params) {
                 return Str::split(...$params);
             }
         )('repetition is the act of repeating or restating something more than once. In writing, repetition can occur at many levels: with individual letters and sounds, single words, phrases, or even ideas. repetition can be problematic in writing if it leads to dull work, but it can also be an effective poetic or rhetorical strategy to strengthen your message, as our examples of repetition in writing demonstrate.', ' ');
@@ -120,13 +117,13 @@ class UtilsHelpersTest extends TestCase
         ];
         $person = Functional::compose(
             static function ($p) {
-                return Reflector::getPropertyValue($p, 'address.physical.house_number', 'H 492');
+                return Reflector::setPropertyValue($p, 'address.physical.house_number', 'H 492');
             },
             static function ($p) {
-                return Reflector::getPropertyValue($p, 'address.email', 'hkoudossou@example.com');
+                return Reflector::setPropertyValue($p, 'address.email', 'hkoudossou@example.com');
             },
             static function ($p) {
-                return Reflector::getPropertyValue($p, 'address.postal_code', 'BP 1515');
+                return Reflector::setPropertyValue($p, 'address.postal_code', 'BP 1515');
             }
         )($person);
         $this->assertSame(Reflector::getPropertyValue($person, 'address.physical.house_number', null), 'H 492', 'Expect the house_number attribute nested in the address field to equals H 492');
