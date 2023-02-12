@@ -12,10 +12,8 @@ declare(strict_types=1);
  */
 
 use Drewlabs\Core\Helpers\Arr;
-use Drewlabs\Core\Helpers\Reflector;
 use Drewlabs\Core\Helpers\Iter;
-
-
+use Drewlabs\Core\Helpers\Reflector;
 
 if (!function_exists('drewlabs_core_get')) {
 
@@ -47,10 +45,12 @@ if (!function_exists('drewlabs_core_get')) {
                 foreach ($target as $item) {
                     $result[] = drewlabs_core_get($item, $keys);
                 }
+
                 return in_array('*', $keys, true) ? Iter::collapse($result) : $result;
             }
             $target = (Arr::isArrayable($target)) ? Arr::get($target, $segment) : ((is_object($target) && (null !== ($target_ = Reflector::getPropertyValue($target, $segment)))) ? $target_ : ($default instanceof \Closure ? $default() : $default));
         }
+
         return $target;
     }
 }

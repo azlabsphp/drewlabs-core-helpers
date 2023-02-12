@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
-use InvalidArgumentException;
-use RuntimeException;
-
 class Str
 {
     /**
@@ -50,9 +47,10 @@ class Str
      */
     public static function startsWith(string $haystack, string $needle)
     {
-        if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
+        if (version_compare(\PHP_VERSION, '8.0.0') >= 0) {
             return str_starts_with($haystack, $needle);
         }
+
         return ('' === $needle) || (mb_substr($haystack, 0, mb_strlen($needle)) === $needle);
     }
 
@@ -63,9 +61,10 @@ class Str
      */
     public static function endsWith(string $haystack, string $needle)
     {
-        if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
+        if (version_compare(\PHP_VERSION, '8.0.0') >= 0) {
             return str_ends_with($haystack, $needle);
         }
+
         return ('' === $needle) || (mb_substr($haystack, -(int) (mb_strlen($needle))) === $needle);
     }
 
@@ -253,7 +252,7 @@ class Str
      */
     public static function md5()
     {
-        return md5(uniqid() . microtime());
+        return md5(uniqid().microtime());
     }
 
     /**
@@ -266,7 +265,7 @@ class Str
      *
      * @return string|string[]
      */
-    public static function replace($search, $replacement, $subject, ?int &$count = null)
+    public static function replace($search, $replacement, $subject, int &$count = null)
     {
         return str_replace($search, $replacement, $subject, $count);
     }
@@ -308,6 +307,7 @@ class Str
         if ($pos) {
             return mb_substr($haystack, 0, $pos);
         }
+
         return '';
     }
 
@@ -383,7 +383,7 @@ class Str
         // Foreach values in the data attributes
         foreach ($data as $key => $value) {
             // code...
-            $patterns[] = '/(\{){2}[ ]?\$' . $key . '[ ]?(\}){2}/i';
+            $patterns[] = '/(\{){2}[ ]?\$'.$key.'[ ]?(\}){2}/i';
             $replacements[] = $value;
         }
 
@@ -421,6 +421,7 @@ class Str
                 if (\count($params) < 2) {
                     throw new \RuntimeException();
                 }
+
                 return str_replace($params[1], '', ucwords($params[0], $params[1]));
             },
             static function ($param) use ($firstcapital) {
@@ -446,6 +447,7 @@ class Str
                 if (\count($params) < 2) {
                     throw new \RuntimeException();
                 }
+
                 return preg_replace($params[1], '', ucwords($params[0], $params[1]));
             },
             static function ($param) use ($firstcapital) {
@@ -477,7 +479,7 @@ class Str
                     self::lower(
                         preg_replace(
                             '/([A-Z])([a-z\d])/',
-                            $delimiter . '$0',
+                            $delimiter.'$0',
                             preg_replace("/[$delimiter]/", $delimiter_escape_char, $haystack)
                         )
                     ),
@@ -499,7 +501,7 @@ class Str
         // Convert all capital letters to $delimiter + lowercaseLetter
         $haystack = preg_replace([' ', $delimiter], '', lcfirst($haystack));
 
-        return mb_strtolower(preg_replace('/([A-Z])([a-z\d])/', $delimiter . '\\0', $haystack));
+        return mb_strtolower(preg_replace('/([A-Z])([a-z\d])/', $delimiter.'\\0', $haystack));
     }
 
     /**
@@ -535,11 +537,11 @@ class Str
                 $k2 = \ord(mb_substr($k, 1, 1));
                 $ord = $k2 * 256 + $k1;
                 if ($ord > 255) {
-                    $result .= '\uc1\u' . $ord . '*';
+                    $result .= '\uc1\u'.$ord.'*';
                 } elseif ($ord > 32768) {
-                    $result .= '\uc1\u' . ($ord - 65535) . '*';
+                    $result .= '\uc1\u'.($ord - 65535).'*';
                 } else {
-                    $result .= "\\'" . dechex($ord);
+                    $result .= "\\'".dechex($ord);
                 }
             } else {
                 $result .= $char;
@@ -596,7 +598,7 @@ class Str
     /**
      * Convert a base62 encoded value to a normal string.
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      *
      * @return string
      */
@@ -607,13 +609,15 @@ class Str
 
     /**
      * Creates a hash value from the provided string.
-     * 
-     * @param string|object|array $value 
-     * @param callable|string|\Closure $key 
-     * @param string $algo 
-     * @return string|false 
-     * @throws RuntimeException 
-     * @throws InvalidArgumentException 
+     *
+     * @param string|object|array      $value
+     * @param callable|string|\Closure $key
+     * @param string                   $algo
+     *
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     *
+     * @return string|false
      */
     public static function hash($value, $key, $algo = 'sha256')
     {
@@ -625,18 +629,19 @@ class Str
             throw new \RuntimeException(sprintf('%s : requires either a Closure<void,string> or a string as second parameter', __FUNCTION__));
         }
         // For base64 string, we decode the string key before using it as key
-        if (static::startsWith((string)$key, 'base64:')) {
-            $key = base64_decode(substr($key, strlen('base64:')));
+        if (static::startsWith((string) $key, 'base64:')) {
+            $key = base64_decode(substr($key, \strlen('base64:')), true);
         }
+
         return hash_hmac($algo, static::base62encode(static::stringify($value)), $key);
     }
 
     /**
      * Time attacking safe strings comparison.
-     * 
-     * @param string $hash 
-     * @param string|array|object $match 
-     * @return bool 
+     *
+     * @param string|array|object $match
+     *
+     * @return bool
      */
     public static function hequals(string $hash, string $match)
     {
@@ -653,21 +658,22 @@ class Str
         return 0 === strcmp($string1, $string1);
     }
 
-
     /**
-     * Compute string representation of object|array|string variables
-     * 
-     * @param string|object|array $value 
-     * @return string 
-     * @throws InvalidArgumentException 
+     * Compute string representation of object|array|string variables.
+     *
+     * @param string|object|array $value
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public static function stringify($value)
     {
-        $is_object = is_object($value);
-        $is_array = is_array($value);
+        $is_object = \is_object($value);
+        $is_array = \is_array($value);
         $is_string = static::isStr($value);
         if (!($is_object || $is_string || $is_array)) {
-            throw new InvalidArgumentException("Expected string, array or object types, got " . (!is_null($value) && is_object($value) ? get_class($value) : gettype($value)));
+            throw new \InvalidArgumentException('Expected string, array or object types, got '.(null !== $value && \is_object($value) ? \get_class($value) : \gettype($value)));
         }
         if ($is_string) {
             return $value;
@@ -678,7 +684,7 @@ class Str
              * @var array
              */
             $arr = $value->toArray();
-        } else if ($is_object && !method_exists($value, 'toArray')) {
+        } elseif ($is_object && !method_exists($value, 'toArray')) {
             $arr = get_object_vars($value);
         } else {
             // Here we assume $value is an array as it does not under
@@ -688,6 +694,7 @@ class Str
              */
             $arr = array_merge($value);
         }
+
         return json_encode(Arr::recursiveksort($arr));
     }
 }

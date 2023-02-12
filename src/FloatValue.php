@@ -1,36 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the Drewlabs package.
+ *
+ * (c) Sidoine Azandrew <azandrewdevelopper@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Drewlabs\Core\Helpers;
 
 /**
- * Class provides a string representation of a floating point value
- * 
- * @package Drewlabs\Core\Helpers
+ * Class provides a string representation of a floating point value.
  */
 class FloatValue
 {
     /**
-     * 
      * @var float
      */
     private $value;
 
     /**
-     * 
      * @var string
      */
     private $delimiter;
 
     /**
-     * 
      * @var int
      */
     private $decimal;
 
     /**
-     * Creates a new float value instance
-     * 
-     * @param float $value 
+     * Creates a new float value instance.
      */
     public function __construct(float $value, int $decimal, string $delimiter)
     {
@@ -40,9 +44,17 @@ class FloatValue
     }
 
     /**
-     * Creates a new float value instance
-     * 
-     * @param float $value 
+     * Returns the string representation of the current instance.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->format($this->decimal, $this->delimiter);
+    }
+
+    /**
+     * Creates a new float value instance.
      */
     public static function new(float $value)
     {
@@ -50,11 +62,11 @@ class FloatValue
     }
 
     /**
-     * Format the value with provided delimiter
-     * 
-     * @param int $decimal 
-     * @param string $delimiter 
-     * @return string 
+     * Format the value with provided delimiter.
+     *
+     * @param string $delimiter
+     *
+     * @return string
      */
     public function format(int $decimal = 0, $delimiter = ' ')
     {
@@ -68,7 +80,7 @@ class FloatValue
             $inDecimal = 0;
         }
         $output = sprintf('%d', $input);
-        $nb = strlen($output);
+        $nb = \strlen($output);
         for ($i = 1; $i < 4; ++$i) {
             if ($input >= 10 ** (3 * $i)) {
                 $output = sprintf('%s%s%s', substr($output, 0, ($nb - (3 * $i))), $delimiter, substr($output, $nb - 3 * $i, $nb));
@@ -76,7 +88,7 @@ class FloatValue
         }
         if ($decimal > 0) {
             $decim = '';
-            for ($j = 0; $j < $decimal - strlen((string) $inDecimal); ++$j) {
+            for ($j = 0; $j < $decimal - \strlen((string) $inDecimal); ++$j) {
                 $decim .= '0';
             }
             $inDecimal = sprintf('%s%s', $decim, (string) $inDecimal);
@@ -85,18 +97,7 @@ class FloatValue
         if (((float) $this->value) < 0) {
             $output = sprintf('%s%s', '-', $output);
         }
-        return $output;
-    }
 
-    /**
-     * Returns the string representation of the current instance
-     * 
-     * @param int $decimal 
-     * @param string $delimiter 
-     * @return string 
-     */
-    public function __toString()
-    {
-        return $this->format($this->decimal, $this->delimiter);
+        return $output;
     }
 }

@@ -1,42 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the Drewlabs package.
+ *
+ * (c) Sidoine Azandrew <azandrewdevelopper@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Drewlabs\Core\Helpers;
 
-use BadMethodCallException;
 use Closure;
-use InvalidArgumentException;
-use ReflectionClass;
-use ReflectionException;
-use ReflectionFunction;
-use ReflectionNamedType;
-use ReflectionParameter;
 
 class Reflector
 {
-
     /**
-     * Checks if a class or it instance implements a given interface
-     * 
-     * @param string|object $class 
-     * @param string $abstract 
-     * @return bool 
+     * Checks if a class or it instance implements a given interface.
+     *
+     * @param string|object $class
+     *
+     * @return bool
      */
     public static function implements($class, string $abstract)
     {
-        return in_array($abstract, class_implements($class));
+        return \in_array($abstract, class_implements($class), true);
     }
 
     /**
      * Get the class name of the given parameter's type, if possible.
      *
-     * @param \ReflectionParameter $parameter
-     *
      * @return string|null
      */
-    public static function getParameterClass(ReflectionParameter $parameter)
+    public static function getParameterClass(\ReflectionParameter $parameter)
     {
         $type = $parameter->getType();
-        if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
+        if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
             return;
         }
         $name = $type->getName();
@@ -65,51 +66,54 @@ class Reflector
         $name = static::getParameterClass($parameter);
 
         return ($name && class_exists($name))
-            ? (new ReflectionClass($name))->isSubclassOf($className)
+            ? (new \ReflectionClass($name))->isSubclassOf($className)
             : false;
     }
 
     /**
-     * Return the list of attributes bound to a given PHP variable, method/function or class
-     * 
-     * @param mixed $source 
-     * @return ReflectionAttribute[] 
+     * Return the list of attributes bound to a given PHP variable, method/function or class.
+     *
+     * @param mixed $source
+     *
+     * @return ReflectionAttribute[]
      */
     public static function getAttributes($source)
     {
         if (\PHP_VERSION_ID < 80000) {
-            throw new BadMethodCallException(__METHOD__ . ' requires a PHP version 8 or later.');
+            throw new \BadMethodCallException(__METHOD__.' requires a PHP version 8 or later.');
         }
-        if (is_string($source) && class_exists($source)) {
-            $reflector = new ReflectionClass($source);
-        } elseif (is_callable($source) || ($source instanceof \Closure) || is_string($source)) {
-            $reflector = new ReflectionFunction($source);
-        } elseif (is_object($source)) {
-            $reflector = new ReflectionClass($source);
+        if (\is_string($source) && class_exists($source)) {
+            $reflector = new \ReflectionClass($source);
+        } elseif (\is_callable($source) || ($source instanceof \Closure) || \is_string($source)) {
+            $reflector = new \ReflectionFunction($source);
+        } elseif (\is_object($source)) {
+            $reflector = new \ReflectionClass($source);
         } else {
             $reflector = $source;
         }
+
         return $reflector->getAttributes();
     }
 
     /**
      * Check if the parameter has a given attribute.
-     * 
-     * @param mixed $param 
-     * @param string|string[] $attribute 
-     * @return bool 
+     *
+     * @param mixed           $param
+     * @param string|string[] $attribute
+     *
+     * @return bool
      */
     public static function hasAttribute($param, $attribute)
     {
         if (\PHP_VERSION_ID < 80000) {
-            throw new BadMethodCallException(__METHOD__ . ' requires a PHP version 8 or later.');
+            throw new \BadMethodCallException(__METHOD__.' requires a PHP version 8 or later.');
         }
         // We make sure the provided list of attribute argument is a list
         // of attribute name a.k.a PHP strings
         $attribute = Arr::filter(
             Arr::wrap($attribute),
-            function ($current) {
-                return is_string($current);
+            static function ($current) {
+                return \is_string($current);
             }
         );
         if (empty($attribute)) {
@@ -119,6 +123,7 @@ class Reflector
         if (empty($attributes)) {
             return false;
         }
+
         return Arr::containsAll(
             array_map(static function (\ReflectionAttribute $item) {
                 return $item->getName();
@@ -129,21 +134,23 @@ class Reflector
 
     /**
      * Get a given reflection attribute from a parameter list of attributes.
-     * 
-     * @param mixed $type 
-     * @param string $name 
+     *
+     * @param mixed $type
+     *
+     * @throws \BadMethodCallException
+     *
      * @return ReflectionAttribute|null
-     * @throws BadMethodCallException 
      */
     public static function getAttribute($type, string $name)
     {
         if (\PHP_VERSION_ID < 80000) {
-            throw new BadMethodCallException(__METHOD__ . ' requires a PHP version 8 or later.');
+            throw new \BadMethodCallException(__METHOD__.' requires a PHP version 8 or later.');
         }
         $attributes = static::getAttributes($type);
         if (empty($attributes)) {
             return null;
         }
+
         return Arr::get($attributes, static function ($values) use ($name) {
             $matches = array_filter(
                 $values,
@@ -151,16 +158,18 @@ class Reflector
                     return $item->getName() === $name;
                 }
             );
+
             return Arr::first($matches);
         }, null);
     }
 
     /**
-     * Recursively get all traits of the user provided classes
-     * 
-     * @param object|string $blueprint 
-     * @param bool $autoload 
-     * @return string[]|false 
+     * Recursively get all traits of the user provided classes.
+     *
+     * @param object|string $blueprint
+     * @param bool          $autoload
+     *
+     * @return string[]|false
      */
     public static function usesRecursive($blueprint, $autoload = true)
     {
@@ -174,54 +183,58 @@ class Reflector
         foreach ($traits as $trait => $same) {
             $traits = array_merge(class_uses($trait, $autoload), $traits);
         }
+
         return array_unique($traits);
     }
 
     /**
-     * Check if class has a list of PHP traits
-     * 
-     * @param string|object $blueprint 
-     * @param string|string[] $mixins 
-     * @param bool $autoload 
-     * @return void 
+     * Check if class has a list of PHP traits.
+     *
+     * @param string|object   $blueprint
+     * @param string|string[] $mixins
+     * @param bool            $autoload
+     *
+     * @return void
      */
     public static function hasMixins($blueprint, $mixins, $autoload = true)
     {
         $mixins = Arr::wrap($mixins);
         // We make sure the provided list of mixins argument is a list
         // of mixins name a.k.a PHP strings
-        $mixins = Arr::filter(Arr::wrap($mixins), function ($current) {
-            return is_string($current);
+        $mixins = Arr::filter(Arr::wrap($mixins), static function ($current) {
+            return \is_string($current);
         });
         if (empty($mixins)) {
             return false;
         }
+
         return \count(array_intersect(static::usesRecursive($blueprint, $autoload), $mixins)) === \count($mixins);
     }
 
-    //#region Callable reflexion helpers
+    // #region Callable reflexion helpers
     /**
      * This is a PHP 7.4 compatible implementation of is_callable.
-     * 
-     * @param mixed $object 
-     * @param bool $syntax_only 
-     * @return bool 
+     *
+     * @param mixed $object
+     * @param bool  $syntax_only
+     *
+     * @return bool
      */
     public static function isCallable($object, $syntax_only = false)
     {
-        if (!is_array($object)) {
-            return is_callable($object, $syntax_only);
+        if (!\is_array($object)) {
+            return \is_callable($object, $syntax_only);
         }
 
-        if ((!isset($object[0]) || !isset($object[1])) || !is_string($object[1] ?? null)) {
+        if ((!isset($object[0]) || !isset($object[1])) || !\is_string($object[1] ?? null)) {
             return false;
         }
 
-        if ($syntax_only && (is_string($object[0]) || is_object($object[0])) && is_string($object[1])) {
+        if ($syntax_only && (\is_string($object[0]) || \is_object($object[0])) && \is_string($object[1])) {
             return true;
         }
 
-        list($class, $method) = [is_object($object[0]) ? get_class($object[0]) : $object[0], $object[1]];
+        [$class, $method] = [\is_object($object[0]) ? \get_class($object[0]) : $object[0], $object[1]];
 
         if (!class_exists($class)) {
             return false;
@@ -231,11 +244,11 @@ class Reflector
             return (new \ReflectionMethod($class, $method))->isPublic();
         }
 
-        if (is_object($object[0]) && method_exists($class, '__call')) {
+        if (\is_object($object[0]) && method_exists($class, '__call')) {
             return (new \ReflectionMethod($class, '__call'))->isPublic();
         }
 
-        if (!is_object($object[0]) && method_exists($class, '__callStatic')) {
+        if (!\is_object($object[0]) && method_exists($class, '__callStatic')) {
             return (new \ReflectionMethod($class, '__callStatic'))->isPublic();
         }
 
@@ -244,67 +257,70 @@ class Reflector
 
     /**
      * Checks if the given $object is callable, but not a string.
-     * 
-     * @param mixed $object 
-     * @return bool 
+     *
+     * @param mixed $object
+     *
+     * @return bool
      */
     public static function isClosure($object)
     {
-        return !is_string($object) && is_callable($object);
+        return !\is_string($object) && \is_callable($object);
     }
-    //#endregion Callable reflexion helpers
+    // #endregion Callable reflexion helpers
 
-    //#region Class instanciation
+    // #region Class instanciation
     /**
-     * Instanciate class without invoking class constructor
-     * 
-     * @param string $blueprint 
-     * @return object 
-     * @throws ReflectionException 
+     * Instanciate class without invoking class constructor.
+     *
+     * @throws \ReflectionException
+     *
+     * @return object
      */
     public static function newInstanceWithoutConstructor(string $blueprint)
     {
-        return (new ReflectionClass($blueprint))->newInstanceWithoutConstructor();
+        return (new \ReflectionClass($blueprint))->newInstanceWithoutConstructor();
     }
 
     /**
-     * Create class instance with provided parameters
-     * 
-     * @param string $blueprint 
-     * @param mixed $args 
-     * @return object|T 
-     * @throws ReflectionException 
+     * Create class instance with provided parameters.
+     *
+     * @param mixed $args
+     *
+     * @throws \ReflectionException
+     *
+     * @return object|T
      */
     public static function newInstance(string $blueprint, ...$args)
     {
-        return (new ReflectionClass($blueprint))->newInstance(...$args);
+        return (new \ReflectionClass($blueprint))->newInstance(...$args);
     }
-    //#endregion Class instanciation
+    // #endregion Class instanciation
 
     // #region Instance properties
-
 
     /**
      * Recursively get the value of an attribute in the provided object
      * Nested attributes must be separated with the '.' ponctuation.
      *
      * @param object|array $object
-     * @param string       $key
      * @param mixed        $default
      *
      * @return void
      */
     public static function getPropertyValue($object, string $key, $default = null)
     {
-        if (is_string($key)  && (false !== strpos($key, '.'))) {
+        if (\is_string($key) && (false !== strpos($key, '.'))) {
             $keys = explode('.', $key);
+
             return array_reduce($keys, static function ($carry, $current) use ($default) {
                 if ($carry === $default) {
                     return $carry;
                 }
+
                 return self::_getPropertyValue($carry, $current, $default);
             }, $object);
         }
+
         return self::_getPropertyValue($object, $key, $default);
     }
 
@@ -312,17 +328,16 @@ class Reflector
      * Try recursively to find the atribute of the object that need to be setted.
      *
      * @param object|array $object
-     * @param string       $key
      * @param mixed        $value
      *
      * @return mixed
      */
     public static function setPropertyValue($object, string $key, $value = null)
     {
-        if (is_string($key) && (false !== strpos($key, '.'))) {
+        if (\is_string($key) && (false !== strpos($key, '.'))) {
             $cache = [];
             $keys = explode('.', $key);
-            $last = count($keys) - 1;
+            $last = \count($keys) - 1;
             $top = self::_getPropertyValue($object, $keys[0], null);
             if (null === $top) {
                 return $object;
@@ -349,14 +364,15 @@ class Reflector
             $rkey = $cache[0]['key'];
             $rvalue = $cache[0]['value'];
             // Loop through the cache items in the reverse order and rebuild the object tree
-            for ($index = 0; $index < count($cache); ++$index) {
+            for ($index = 0; $index < \count($cache); ++$index) {
                 // code...
-                if (($index + 1) === count($cache)) {
+                if (($index + 1) === \count($cache)) {
                     break;
                 }
                 $rvalue = self::_setPropertyValue($cache[$index + 1]['value'], $cache[$index]['key'], $rvalue);
                 $rkey = $cache[$index + 1]['key'];
             }
+
             return self::_setPropertyValue($object, $keys[0], self::_setPropertyValue($top, $rkey, $rvalue));
         }
 
@@ -368,17 +384,16 @@ class Reflector
      * name or returns the {$default} value if provided or {NULL}.
      *
      * @param \stdClass|array|object $object
-     * @param string          $key
-     * @param mixed|null      $default
+     * @param mixed|null             $default
      *
      * @return mixed
      */
     public static function _getPropertyValue($object, string $key, $default = null)
     {
-        if (is_array($object) || ($object instanceof \ArrayAccess)) {
-            return array_key_exists($key, $object) ? $object[$key] : $default;
+        if (\is_array($object) || ($object instanceof \ArrayAccess)) {
+            return \array_key_exists($key, $object) ? $object[$key] : $default;
         }
-        if (!is_object($object)) {
+        if (!\is_object($object)) {
             // Throws an execption
             throw new \InvalidArgumentException('Reflector::getPropertyValue requires a parameter of type array or object');
         }
@@ -399,6 +414,7 @@ class Reflector
         } else {
             $value = $object->{$key} ?? $default;
         }
+
         return $value;
     }
 
@@ -406,8 +422,7 @@ class Reflector
      * Set the value of a given array or object and return the updated object.
      *
      * @param \stdClass|array|object $object
-     * @param string          $key
-     * @param mixed           $value
+     * @param mixed                  $value
      *
      * @throws \InvalidArgumentException
      *
@@ -415,10 +430,10 @@ class Reflector
      */
     public static function _setPropertyValue($object, string $key, $value)
     {
-        if (is_array($object) || ($object instanceof \ArrayAccess)) {
+        if (\is_array($object) || ($object instanceof \ArrayAccess)) {
             return array_merge($object, [$key => $value]);
         }
-        if (!is_object($object)) {
+        if (!\is_object($object)) {
             // Throws an execption
             throw new \InvalidArgumentException('Reflector::setPropertyValue method requires parameter 1 to be of type array or object');
         }
@@ -447,37 +462,16 @@ class Reflector
         } else {
             $clone->{$key} = $value;
         }
+
         return $clone;
     }
 
     /**
-     * Validate the first argument [key] of the [createPropertyGetter] function.
-     *
-     * @param \Closure $callback
-     *
-     * @return \Closure|callable
-     */
-    private static function assertArgsDecorator(\Closure $callback)
-    {
-        return static function (...$args) use ($callback) {
-            if (0 === count($args)) {
-                return $callback(...$args);
-            }
-            $key = $args[0];
-            if (!is_string($key) && !is_int($key)) {
-                throw new \InvalidArgumentException('$key paramater must be a string or an array numeric index');
-            }
-            return $callback(...$args);
-        };
-    }
-
-
-    /**
      * Create an operator function that will be use to get attribute on a given array or object.
-     * 
-     * @param string $key 
-     * @param mixed $default 
-     * @return Closure(mixed $obj): mixed 
+     *
+     * @param mixed $default
+     *
+     * @return Closure(mixed $obj): mixed
      */
     public static function propertyGetter(string $key, $default = null)
     {
@@ -490,22 +484,24 @@ class Reflector
 
     /**
      * Create an operator function that will be use to set attribute on a given array or object.
-     * 
-     * @param string $key 
-     * @param mixed $value 
-     * @return Closure(mixed $obj): mixed 
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return Closure(mixed $obj): mixed
      */
     public static function propertySetter($key, $value = null)
     {
         return static function ($obj) use ($key, $value) {
             // If the provided key is an array, apply a reducer for each key in the array
-            if (is_array($key)) {
+            if (\is_array($key)) {
                 return array_reduce($key, static function ($carry, $current) {
                     return self::assertArgsDecorator(static function () use ($carry, $current) {
                         return self::setPropertyValue($carry, ...$current);
                     })(...$current);
                 }, $obj);
             }
+
             return self::assertArgsDecorator(static function () use ($obj, $key, $value) {
                 return self::setPropertyValue($obj, $key, $value);
             })($key, $value);
@@ -513,16 +509,37 @@ class Reflector
     }
     // #endregion Instance properties
 
-    //#region Miscellanous
+    // #region Miscellanous
     /**
-     * Creates a copy or a clone of php data structure
-     * 
-     * @param mixed $object 
-     * @return mixed 
+     * Creates a copy or a clone of php data structure.
+     *
+     * @param mixed $object
+     *
+     * @return mixed
      */
     public static function clone($object)
     {
-        return is_object($object) ? clone $object : (is_array($object) ? array_merge([], $object) : $object);
+        return \is_object($object) ? clone $object : (\is_array($object) ? array_merge([], $object) : $object);
+    }
+
+    /**
+     * Validate the first argument [key] of the [createPropertyGetter] function.
+     *
+     * @return \Closure|callable
+     */
+    private static function assertArgsDecorator(\Closure $callback)
+    {
+        return static function (...$args) use ($callback) {
+            if (0 === \count($args)) {
+                return $callback(...$args);
+            }
+            $key = $args[0];
+            if (!\is_string($key) && !\is_int($key)) {
+                throw new \InvalidArgumentException('$key paramater must be a string or an array numeric index');
+            }
+
+            return $callback(...$args);
+        };
     }
     // #endregion Miscellanous
 }

@@ -50,7 +50,7 @@ class StrTest extends TestCase
         $json = Str::stringify([
             [
                 'weight' => '30pd',
-                'name' => 'Banana'
+                'name' => 'Banana',
             ],
             [
                 'name' => 'Orange',
@@ -59,12 +59,12 @@ class StrTest extends TestCase
             [
                 'name' => 'Apple',
                 'weight' => '20pd',
-            ]
+            ],
         ]);
         $json2 = Str::stringify([
             [
                 'weight' => '30pd',
-                'name' => 'Banana'
+                'name' => 'Banana',
             ],
             [
                 'weight' => '10pd',
@@ -73,9 +73,9 @@ class StrTest extends TestCase
             [
                 'name' => 'Apple',
                 'weight' => '20pd',
-            ]
+            ],
         ]);
         $this->assertIsString($json);
-        $this->assertEquals($json, $json2);
+        $this->assertSame($json, $json2);
     }
 }

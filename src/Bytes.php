@@ -1,26 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the Drewlabs package.
+ *
+ * (c) Sidoine Azandrew <azandrewdevelopper@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Drewlabs\Core\Helpers;
 
 class Bytes
 {
     /**
-     * 
      * @var float
      */
     private $bytes;
 
     /**
-     * 
      * @var mixed
      */
     private $delimiter;
 
     /**
-     * Creates class instance
-     * 
-     * @param float $bytes 
-     * @param mixed $delimiter 
+     * Creates class instance.
+     *
+     * @param mixed $delimiter
      */
     public function __construct(float $bytes, $delimiter)
     {
@@ -29,20 +37,9 @@ class Bytes
     }
 
     /**
-     * Creates a new bytes instance
-     * 
-     * @param float $bytes 
-     * @return self 
-     */
-    public static function new(float $bytes)
-    {
-        return new self($bytes, ',');
-    }
-
-    /**
-     * Human readable string representation of the bytes instance
-     * 
-     * @return string 
+     * Human readable string representation of the bytes instance.
+     *
+     * @return string
      */
     public function __toString()
     {
@@ -73,10 +70,21 @@ class Bytes
         foreach ($bytes as $item) {
             if ($this->bytes >= $item['value']) {
                 $result = $this->bytes / $item['value'];
-                $result = str_replace('.', $this->delimiter, (string) (round($result, 2))) . ' ' . $item['unit'];
+                $result = str_replace('.', $this->delimiter, (string) (round($result, 2))).' '.$item['unit'];
                 break;
             }
         }
-        return (string)$result;
+
+        return (string) $result;
+    }
+
+    /**
+     * Creates a new bytes instance.
+     *
+     * @return self
+     */
+    public static function new(float $bytes)
+    {
+        return new self($bytes, ',');
     }
 }

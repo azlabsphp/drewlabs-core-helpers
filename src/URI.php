@@ -37,9 +37,10 @@ class URI
 
     /**
      * Returns the request URI without any query string.
-     * 
-     * @param mixed $url 
-     * @return string 
+     *
+     * @param mixed $url
+     *
+     * @return string
      */
     public static function trimQueryStrings($url)
     {

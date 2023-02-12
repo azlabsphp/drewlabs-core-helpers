@@ -76,7 +76,7 @@ class DateTimeHelpersTest extends TestCase
     {
         $first_date = ImmutableDateTime::nowTz();
         $second_date = ImmutableDateTime::addHrs(ImmutableDateTime::nowTz(), 2);
-        $hrs_diff = intval(round(ImmutableDateTime::hrsDiff($first_date, $second_date)));
+        $hrs_diff = (int) (round(ImmutableDateTime::hrsDiff($first_date, $second_date)));
         $this->assertSame($hrs_diff, 2, 'Expect the difference in hours to equals 0');
     }
 
@@ -84,7 +84,7 @@ class DateTimeHelpersTest extends TestCase
     {
         $first_date = ImmutableDateTime::nowTz();
         $second_date = ImmutableDateTime::addMinutes(ImmutableDateTime::nowTz(), 10);
-        $min_diff = intval(round(ImmutableDateTime::minDiff($first_date, $second_date)));
+        $min_diff = (int) (round(ImmutableDateTime::minDiff($first_date, $second_date)));
         $this->assertSame($min_diff, 10, 'Expect the difference in hours to equals 0');
     }
 }

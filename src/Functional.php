@@ -151,11 +151,12 @@ class Functional
             \is_object($state = (\is_callable($value) && !\is_string($value) ?
                 \call_user_func($value) : $value)) ? clone $state : $state
         );
+
         return $value;
     }
 
     /**
-     * Function memoization memoization implementation in PHP Language for fast call 
+     * Function memoization memoization implementation in PHP Language for fast call
      * of long running pure functions or methods
      * It uses an internal LRU Caching system for algorithm optimization.
      *
@@ -184,8 +185,7 @@ class Functional
      */
     public static function memoize($function, $options = null)
     {
-        $memoize = new class()
-        {
+        $memoize = new class() {
             /**
              * @var object
              */
@@ -206,6 +206,7 @@ class Functional
             public function setCacheSize(int $size)
             {
                 $this->cache->size = $size;
+
                 return $this;
             }
 
@@ -248,8 +249,7 @@ class Functional
                 // list is subject to be the next to be called by the caller.
                 // Therefore we keep the recent callee arguments at the top of
                 // the list so that the searching algorithm will perform better
-                $this->cache = new class()
-                {
+                $this->cache = new class() {
                     public $internal = [];
 
                     /**
@@ -291,6 +291,7 @@ class Functional
                                 \array_slice($this->internal, $index_ + 1)
                             );
                         }
+
                         return $current_ ? $current_->value : __MEMOIZED__NOT_FOUND__;
                     }
 
@@ -341,6 +342,7 @@ class Functional
                 };
                 // Use deep equality comparison by default
                 $this->cache->equals = [Comparator::class, 'shallowEqual'];
+
                 return $this;
             }
 
@@ -376,12 +378,13 @@ class Functional
         }
         if ($options instanceof MemoizationOptions) {
             if (null === ($cache = $options->useCache())) {
-                throw new \InvalidArgumentException('Expected $option->useCache() to returns a cache instance, ' . \is_object($cache) ? \get_class($cache) : \gettype($cache) . ' given');
+                throw new \InvalidArgumentException('Expected $option->useCache() to returns a cache instance, '.\is_object($cache) ? \get_class($cache) : \gettype($cache).' given');
             }
             $memoize = $memoize->setCache($cache);
             $size = $options->cacheSize() ?? 16;
             $memoize = $memoize->setCacheSize($size);
         }
+
         return $memoize;
     }
 }

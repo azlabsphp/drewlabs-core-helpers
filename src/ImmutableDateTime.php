@@ -1,42 +1,48 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the Drewlabs package.
+ *
+ * (c) Sidoine Azandrew <azandrewdevelopper@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Drewlabs\Core\Helpers;
 
-use DateInterval;
-use DateTimeImmutable;
 use DateTimeInterface;
-use DateTimeZone;
-use InvalidArgumentException;
 
 class ImmutableDateTime
 {
-    const _YEARS_PER_CENTURY = 100;
+    public const _YEARS_PER_CENTURY = 100;
 
-    const _YEARS_PER_DECADE = 10;
+    public const _YEARS_PER_DECADE = 10;
 
-    const _MONTHS_PER_YEAR = 12;
+    public const _MONTHS_PER_YEAR = 12;
 
-    const _MONTHS_PER_QUARTER = 3;
+    public const _MONTHS_PER_QUARTER = 3;
 
-    const _WEEKS_PER_YEAR = 52;
+    public const _WEEKS_PER_YEAR = 52;
 
-    const _WEEKS_PER_MONTH = 4;
+    public const _WEEKS_PER_MONTH = 4;
 
-    const _DAYS_PER_WEEK = 7;
+    public const _DAYS_PER_WEEK = 7;
 
-    const _HOURS_PER_DAY = 24;
+    public const _HOURS_PER_DAY = 24;
 
-    const _MINUTES_PER_HOUR = 60;
+    public const _MINUTES_PER_HOUR = 60;
 
-    const _SECONDS_PER_MINUTE = 60;
+    public const _SECONDS_PER_MINUTE = 60;
 
     /**
-     * Creates a new Date time immutable instance
-     * 
-     * @param string $datetime 
-     * @param DateTimeZone|null $tz 
-     * @param mixed ...$args            List of optional argument to support future changes of the immatable class
-     * @return DateTimeImmutable 
+     * Creates a new Date time immutable instance.
+     *
+     * @param mixed ...$args List of optional argument to support future changes of the immatable class
+     *
+     * @return \DateTimeImmutable
      */
     public static function create(string $datetime = 'now', \DateTimeZone $tz = null, ...$args)
     {
@@ -44,16 +50,15 @@ class ImmutableDateTime
     }
 
     /**
-     * Creates date time immutable from provided timestamp
-     * 
-     * @param int $timestamp
+     * Creates date time immutable from provided timestamp.
+     *
      * @param \DateTimeZone $tz
-     * 
-     * @return DateTimeImmutable 
+     *
+     * @return \DateTimeImmutable
      */
     public static function timestamp(int $timestamp, \DateTimeZone $tz = null)
     {
-        return new \DateTimeImmutable('@' . $timestamp, $tz);
+        return new \DateTimeImmutable('@'.$timestamp, $tz);
     }
 
     /**
@@ -65,37 +70,31 @@ class ImmutableDateTime
      */
     public static function now($tz = null)
     {
-        return new \DateTimeImmutable('now', is_string($tz) ? new \DateTimeZone($tz) : $tz);
+        return new \DateTimeImmutable('now', \is_string($tz) ? new \DateTimeZone($tz) : $tz);
     }
 
     /**
      * Checks if a given date time is a future date time.
-     * 
-     * @param DateTimeInterface $now 
-     * @return bool 
+     *
+     * @return bool
      */
     public static function isfuture(\DateTimeInterface $now)
     {
         return self::gt($now, self::nowTz());
     }
 
-
     /**
      * Check if the instance is in the past, ie. less (before) than now.
-     * 
-     * @param DateTimeInterface $current_date 
-     * @return bool 
+     *
+     * @return bool
      */
     public static function ispast(\DateTimeInterface $current_date)
     {
         return self::lt($current_date, self::nowTz());
     }
 
-
     /**
      * Get the timezone of a dateTime instance.
-     *
-     * @param \DateTimeInterface $value
      *
      * @return \DateTimeZone
      */
@@ -115,7 +114,7 @@ class ImmutableDateTime
     }
 
     /**
-     * Check if fisrt date is greater than other date
+     * Check if fisrt date is greater than other date.
      *
      * @param \DateTimeInterface $date
      * @param \DateTimeInterface $other
@@ -128,7 +127,7 @@ class ImmutableDateTime
     }
 
     /**
-     * Check if fisrt date is greater than other date
+     * Check if fisrt date is greater than other date.
      *
      * @param \DateTimeInterface $date
      * @param \DateTimeInterface $other
@@ -142,10 +141,10 @@ class ImmutableDateTime
 
     // #region Arithmetic operation on Date Time Immutable instance
     /**
-     * Add time in days to date instance
+     * Add time in days to date instance.
      *
      * @param \DateTimeInterface|string|int|null $date
-     * @param int $days
+     * @param int                                $days
      *
      * @return \DateTimeInterface
      */
@@ -155,10 +154,9 @@ class ImmutableDateTime
     }
 
     /**
-     * Add time in hours to date instance
+     * Add time in hours to date instance.
      *
      * @param \DateTimeInterface|string|int|null $date
-     * @param int                          $minutes
      *
      * @return \DateTimeInterface
      */
@@ -168,10 +166,10 @@ class ImmutableDateTime
     }
 
     /**
-     * Add time in minutes to date instance
+     * Add time in minutes to date instance.
      *
      * @param \DateTimeInterface|string|int|null $date
-     * @param int                          $minutes
+     * @param int                                $minutes
      *
      * @return \DateTimeInterface
      */
@@ -181,25 +179,23 @@ class ImmutableDateTime
     }
 
     /**
-     * Add time in seconds to date instance
+     * Add time in seconds to date instance.
      *
      * @param \DateTimeInterface|string|int|null $date
-     * @param int $minutes
      *
      * @return \DateTimeInterface
      */
     public static function addSecs($date = 'now', $seconds = 0)
     {
-        return self::make($date)->modify((int) $seconds . ' second');
+        return self::make($date)->modify((int) $seconds.' second');
     }
 
     /**
-     * Add date interval to provided date instance
-     * 
-     * @param \DateTimeInterface|string|int|null $date 
-     * @param DateInterval $interval
-     * 
-     * @return DateTimeImmutable 
+     * Add date interval to provided date instance.
+     *
+     * @param \DateTimeInterface|string|int|null $date
+     *
+     * @return \DateTimeImmutable
      */
     public static function add($date, \DateInterval $interval)
     {
@@ -207,10 +203,10 @@ class ImmutableDateTime
     }
 
     /**
-     * Substract time in days from date instance
+     * Substract time in days from date instance.
      *
      * @param \DateTimeInterface|string|int|null $date
-     * @param int $days
+     * @param int                                $days
      *
      * @return \DateTimeInterface
      */
@@ -220,10 +216,10 @@ class ImmutableDateTime
     }
 
     /**
-     * Substract time in hours from date instance
+     * Substract time in hours from date instance.
      *
      * @param \DateTimeInterface|string|int|null $date
-     * @param int $hours
+     * @param int                                $hours
      *
      * @return \DateTimeInterface
      */
@@ -233,10 +229,10 @@ class ImmutableDateTime
     }
 
     /**
-     * Substract time in minutes from date instance
+     * Substract time in minutes from date instance.
      *
      * @param \DateTimeInterface|string|int|null $date
-     * @param int $minutes
+     * @param int                                $minutes
      *
      * @return \DateTimeInterface
      */
@@ -246,25 +242,24 @@ class ImmutableDateTime
     }
 
     /**
-     * Substract time in seconds from date instance
+     * Substract time in seconds from date instance.
      *
      * @param \DateTimeInterface|string|int|null $date
-     * @param int $seconds
+     * @param int                                $seconds
      *
      * @return \DateTimeInterface
      */
     public static function subSecs($date = 'now', $seconds = 0)
     {
-        return self::make($date)->modify(sprintf("-%d second", (int) $seconds));
+        return self::make($date)->modify(sprintf('-%d second', (int) $seconds));
     }
 
     /**
-     * Substract date interval from provided date instance
-     * 
-     * @param \DateTimeInterface|string|int|null $date 
-     * @param DateInterval $interval
-     * 
-     * @return DateTimeImmutable 
+     * Substract date interval from provided date instance.
+     *
+     * @param \DateTimeInterface|string|int|null $date
+     *
+     * @return \DateTimeImmutable
      */
     public static function sub(\DateTimeInterface $date, \DateInterval $interval)
     {
@@ -273,14 +268,13 @@ class ImmutableDateTime
     // #region Arithmetic operations on date time immutable instances
 
     /**
-     * Returns the min of 2 date instances
-     * 
-     * @param \DateTimeInterface $date 
-     * @param \DateTimeInterface|string|null $other 
-     * 
-     * @return \DateTimeInterface 
-     * 
-     * @throws InvalidArgumentException 
+     * Returns the min of 2 date instances.
+     *
+     * @param \DateTimeInterface|string|null $other
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return \DateTimeInterface
      */
     public static function min(\DateTimeInterface $date, $other = null)
     {
@@ -288,14 +282,13 @@ class ImmutableDateTime
     }
 
     /**
-     * Returns the max of 2 date instances
-     * 
-     * @param \DateTimeInterface $date 
-     * @param \DateTimeInterface|string|null $other 
-     * 
-     * @return \DateTimeInterface 
-     * 
-     * @throws InvalidArgumentException 
+     * Returns the max of 2 date instances.
+     *
+     * @param \DateTimeInterface|string|null $other
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return \DateTimeInterface
      */
     public static function max(\DateTimeInterface $date, $other = null)
     {
@@ -306,8 +299,8 @@ class ImmutableDateTime
      * Compares the formatted values of the two dates.
      *
      * @param \DateTimeInterface      $date
-     * @param \DateTimeInterface|null $other the instance to compare with or null to use current day
-     * @param string                  $format    the date formats to compare
+     * @param \DateTimeInterface|null $other  the instance to compare with or null to use current day
+     * @param string                  $format the date formats to compare
      *
      * @throws \InvalidArgumentException
      *
@@ -318,7 +311,8 @@ class ImmutableDateTime
         if (!isset($other)) {
             $other = self::nowTz();
         }
-        self::assert($other, gettype(null));
+        self::assert($other, \gettype(null));
+
         return $date->format($format) === $other->format($format);
     }
 
@@ -326,7 +320,6 @@ class ImmutableDateTime
      * Return the DateTime instance passed through, a now instance in the same timezone
      * if null given or parse the input if string given.
      *
-     * @param \DateTimeInterface $from
      * @param \DateTimeInterface|string|null $date
      *
      * @return \DateTimeInterface
@@ -336,38 +329,40 @@ class ImmutableDateTime
         if (null === $date) {
             return self::nowTz();
         }
-        if (is_string($date)) {
+        if (\is_string($date)) {
             return self::create($date, $from->getTimezone());
         }
+
         return self::make($date, $from->getTimezone());
     }
 
     /**
      * Create a date time immutable from a date time like instance.
-     * 
-     * @param \DateTimeInterface|string|int|null $date 
-     * @param null|DateTimeZone $tz 
-     * @return \DateTimeImmutable 
-     * @throws InvalidArgumentException 
+     *
+     * @param \DateTimeInterface|string|int|null $date
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return \DateTimeImmutable
      */
-    public static function make($date = 'now', DateTimeZone $tz = null)
+    public static function make($date = 'now', \DateTimeZone $tz = null)
     {
         if ($date instanceof \DateTimeInterface) {
             return self::timestamp($date->getTimestamp(), $tz ?? ($tz = $date->getTimezone() ? $tz : null));
         }
-        if (is_int($date)) {
+        if (\is_int($date)) {
             return self::timestamp($date, $tz);
         }
-        self::assert($date, ['string', gettype(null)]);
+        self::assert($date, ['string', \gettype(null)]);
+
         return self::create($date ?? 'now', $tz);
     }
 
     /**
-     * Compute years difference btween 2 date
+     * Compute years difference btween 2 date.
      *
-     * @param \DateTimeInterface $date
      * @param \DateTimeInterface|string|null $other
-     * @param bool                           $exact       Get the exact of the difference
+     * @param bool                           $exact Get the exact of the difference
      *
      * @return float
      */
@@ -377,11 +372,10 @@ class ImmutableDateTime
     }
 
     /**
-     * Compute weeks difference btween 2 date
+     * Compute weeks difference btween 2 date.
      *
-     * @param \DateTimeInterface $date
      * @param \DateTimeInterface|string|null $other
-     * @param bool                           $exact       Get the exact of the difference
+     * @param bool                           $exact Get the exact of the difference
      *
      * @return float
      */
@@ -391,11 +385,10 @@ class ImmutableDateTime
     }
 
     /**
-     * Compute days difference btween 2 date
+     * Compute days difference btween 2 date.
      *
-     * @param \DateTimeInterface $date
      * @param \DateTimeInterface|string|null $other
-     * @param bool                           $exact       Get the exact of the difference
+     * @param bool                           $exact Get the exact of the difference
      *
      * @return float
      */
@@ -405,11 +398,10 @@ class ImmutableDateTime
     }
 
     /**
-     * Compute hours difference btween 2 date
+     * Compute hours difference btween 2 date.
      *
-     * @param \DateTimeInterface $date
      * @param \DateTimeInterface|string|null $other
-     * @param bool                           $exact       Get the exact of the difference
+     * @param bool                           $exact Get the exact of the difference
      *
      * @return float
      */
@@ -421,9 +413,8 @@ class ImmutableDateTime
     /**
      * Get the difference in minutes.
      *
-     * @param \DateTimeInterface      $source
      * @param \DateTimeInterface|string|null $date
-     * @param bool                    $exact       Get the exact of the difference
+     * @param bool                           $exact Get the exact of the difference
      *
      * @return float
      */
@@ -433,11 +424,10 @@ class ImmutableDateTime
     }
 
     /**
-     * Compute the difference in seconds between 2 dates
+     * Compute the difference in seconds between 2 dates.
      *
-     * @param \DateTimeInterface      $source
      * @param \DateTimeInterface|string|null $date
-     * @param bool                    $exact  Get the exact of the difference
+     * @param bool                           $exact Get the exact of the difference
      *
      * @return int
      */
@@ -445,30 +435,33 @@ class ImmutableDateTime
     {
         $diff = $source->diff(self::resolve($source, $date));
         $value = $diff->days * self::_HOURS_PER_DAY * self::_MINUTES_PER_HOUR * self::_SECONDS_PER_MINUTE + $diff->h * self::_MINUTES_PER_HOUR * self::_SECONDS_PER_MINUTE + $diff->i * self::_SECONDS_PER_MINUTE + $diff->s;
+
         return $exact || !$diff->invert ? $value : -$value;
     }
 
     /**
      * Throws an exception if the given object is not a DateTime and does not implement DateTimeInterface
      * and not in $other.
-     * 
-     * @param mixed $date 
-     * @param array $types 
-     * @return void 
-     * @throws InvalidArgumentException 
+     *
+     * @param mixed $date
+     * @param array $types
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     public static function assert($date, $types = [])
     {
         if (($date instanceof \DateTimeInterface)) {
             return;
         }
-        if (in_array(gettype($date), $types)) {
+        if (\in_array(\gettype($date), $types, true)) {
             return;
         }
         $message = 'Expected type : ';
         foreach ((array) $types as $expect) {
             $message .= "{$expect}, ";
         }
-        throw new \InvalidArgumentException($message . '\DateTimeImmutable, DateTime, DateTimeInterface, ' . (is_object($date) ? get_class($date) : gettype($date)) . ' given');
+        throw new \InvalidArgumentException($message.'\DateTimeImmutable, DateTime, DateTimeInterface, '.(\is_object($date) ? \get_class($date) : \gettype($date)).' given');
     }
 }

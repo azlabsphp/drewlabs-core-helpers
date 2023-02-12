@@ -308,6 +308,7 @@ class ArrTest extends TestCase
                 if (0 === strcmp($curr['lang'], $item)) {
                     return 0;
                 }
+
                 return strcmp($curr['lang'], $item) > 0 ? -1 : 1;
             }),
             0,
@@ -376,8 +377,7 @@ class ArrTest extends TestCase
 
     public function testCreate_Array_From_Object_With_ToArray()
     {
-        $object = new class()
-        {
+        $object = new class() {
             public function toArray()
             {
                 return range(0, 10);
@@ -388,8 +388,7 @@ class ArrTest extends TestCase
 
     public function testCreate_Array_From_IteratorAggregate()
     {
-        $object = new class() implements \IteratorAggregate
-        {
+        $object = new class() implements \IteratorAggregate {
             public function getIterator(): \Traversable
             {
                 return new \ArrayIterator(range(0, 10));
@@ -406,15 +405,14 @@ class ArrTest extends TestCase
         $this->assertSame(['Hello World!'], Arr::create($strval));
     }
 
-
-    public function  test_array_isassoclist()
+    public function test_array_isassoclist()
     {
         $this->assertTrue(Arr::isassoclist([
-            'basic' =>  ['Hello', 'World'],
-            'greetings' =>  ['Good', 'Morning']
+            'basic' => ['Hello', 'World'],
+            'greetings' => ['Good', 'Morning'],
         ]));
         $this->assertFalse(Arr::isassoclist([
-            ['Hello', 'World']
+            ['Hello', 'World'],
         ]));
         $this->assertFalse(Arr::isassoclist(['Hello', 'World']));
         $this->assertFalse(Arr::isassoclist([]));
@@ -423,11 +421,11 @@ class ArrTest extends TestCase
     public function test_array_isnotassoclist()
     {
         $this->assertFalse(Arr::isnotassoclist([
-            'basic' =>  ['Hello', 'World'],
-            'greetings' =>  ['Good', 'Morning']
+            'basic' => ['Hello', 'World'],
+            'greetings' => ['Good', 'Morning'],
         ]));
         $this->assertTrue(Arr::isnotassoclist([
-            ['Hello', 'World']
+            ['Hello', 'World'],
         ]));
         $this->assertFalse(Arr::isnotassoclist(['Hello', 'World']));
         $this->assertFalse(Arr::isnotassoclist([]));
@@ -439,7 +437,7 @@ class ArrTest extends TestCase
             'fruits' => [
                 [
                     'weight' => '30pd',
-                    'name' => 'Banana'
+                    'name' => 'Banana',
                 ],
                 [
                     'name' => 'Orange',
@@ -448,7 +446,7 @@ class ArrTest extends TestCase
                 [
                     'name' => 'Apple',
                     'weight' => '20pd',
-                ]
+                ],
             ],
             'articles' => [
                 [
@@ -462,11 +460,11 @@ class ArrTest extends TestCase
                 [
                     'price' => 10,
                     'name' => 'HUAWEI LED CONTROLLER',
-                ]
-            ]
+                ],
+            ],
         ];
         $sorted = Arr::recursiveksort($arr);
-        $this->assertEquals(Arr::first($sorted), Arr::recursiveksort($arr['articles']));
-        $this->assertEquals('articles', Arr::keyFirst($sorted));
+        $this->assertSame(Arr::first($sorted), Arr::recursiveksort($arr['articles']));
+        $this->assertSame('articles', Arr::keyFirst($sorted));
     }
 }

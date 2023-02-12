@@ -13,20 +13,15 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
-use ReflectionException;
-use Exception;
-
 final class UUID
 {
-
     /**
-     * 
-     * @param null|callable $factory 
-     * @return string 
-     * @throws ReflectionException 
-     * @throws Exception 
+     * @throws \ReflectionException
+     * @throws \Exception
+     *
+     * @return string
      */
-    public static function create(?callable $factory = null)
+    public static function create(callable $factory = null)
     {
         if ($factory) {
             return (string) \call_user_func($factory);
@@ -52,13 +47,11 @@ final class UUID
     }
 
     /**
-     * @param callable|null $factory
-     *
      * @throws \Exception
      *
      * @return string|mixed
      */
-    public static function ordered(?callable $factory = null)
+    public static function ordered(callable $factory = null)
     {
         if ($factory) {
             return \call_user_func($factory);
@@ -88,15 +81,13 @@ final class UUID
         return (string) $factory->uuid4();
     }
 
-
     /**
-     * 
-     * @param null|callable $factory 
-     * @return string|mixed 
-     * @throws ReflectionException 
-     * @throws Exception 
+     * @throws \ReflectionException
+     * @throws \Exception
+     *
+     * @return string|mixed
      */
-    public static function createUsing(?callable $factory = null)
+    public static function createUsing(callable $factory = null)
     {
         return (static function () use ($factory) {
             return (string) static::create($factory);

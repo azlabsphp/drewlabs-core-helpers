@@ -50,17 +50,18 @@ class Arr
      */
     public static function sortBy(array &$items, $by, $order = 'asc')
     {
-        $desc = 'desc' === strtolower($order) || intval($order) < 0;
-        $str_compare = function ($a, $b) use ($desc) {
+        $desc = 'desc' === strtolower($order) || (int) $order < 0;
+        $str_compare = static function ($a, $b) use ($desc) {
             $result = strcmp($a, $b);
-            return $desc ? $result >= 0  : $result < 0;
+
+            return $desc ? $result >= 0 : $result < 0;
         };
-        $num_compare = function ($a, $b) use ($desc) {
+        $num_compare = static function ($a, $b) use ($desc) {
             return $desc ? ($a - $b >= 0 ? 1 : -1) : ($a - $b >= 0 ? -1 : 1);
         };
         $compare = static function ($a, $b) use ($order, $by, $desc, &$str_compare, &$num_compare) {
             // Check first if is standard type in order to avoid error
-            if (is_string($a) || is_string($b)) {
+            if (\is_string($a) || \is_string($b)) {
                 return $str_compare($a, $b, $order);
             }
             if (is_numeric($a) || is_numeric($b)) {
@@ -76,12 +77,13 @@ class Arr
                 $a = $a->{$by};
                 $b = $b->{$by};
             }
-            if (is_string($a) || is_string($b)) {
+            if (\is_string($a) || \is_string($b)) {
                 return $str_compare($a, $b);
             }
             if (is_numeric($a) || is_numeric($b)) {
                 return $num_compare($a, $b);
             }
+
             return $desc ? -1 : 1;
         };
         usort($items, $compare);
@@ -197,14 +199,15 @@ class Arr
     }
 
     /**
-     * Checks if the provided parameter is a PHP array variable
-     * 
-     * @param mixed $value 
-     * @return bool 
+     * Checks if the provided parameter is a PHP array variable.
+     *
+     * @param mixed $value
+     *
+     * @return bool
      */
     public static function isArray($value)
     {
-        return is_array($value);
+        return \is_array($value);
     }
 
     /**
@@ -411,6 +414,7 @@ class Arr
         if (null === $value) {
             return false;
         }
+
         return array_keys($value) !== range(0, \count($value) - 1);
     }
 
@@ -544,7 +548,7 @@ class Arr
             }
         }
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of' . \Traversable::class . ', ' . \JsonSerializable::class);
+            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of'.\Traversable::class.', '.\JsonSerializable::class);
         }
 
         return $preserve_keys ? $value : array_values($value);
@@ -604,8 +608,8 @@ class Arr
 
     /**
      * Returns true if the provided $items is a numerical indexed array
-     * and each index value is an array
-     * 
+     * and each index value is an array.
+     *
      * ```php
      * $result = Arr::isnotassoclist([
      *      [
@@ -624,48 +628,48 @@ class Arr
      *      ]
      * ]); // False
      * ```
-     * 
-     * @param array $items 
-     * @return bool 
+     *
+     * @return bool
      */
     public static function isnotassoclist(array $items)
     {
         if (empty($items)) {
             return false;
         }
-        return Arr::isList($items) && !Arr::isassoc($items);
+
+        return self::isList($items) && !self::isassoc($items);
     }
 
     /**
      * Checks if a given array is an associative array and each value of
-     * the primary array is an array itself
-     * 
+     * the primary array is an array itself.
+     *
      * ```php
      * <?php
      * $result = Arr::isassoclist([
      *  'h' => ['Hello'],
      *  'g' => ['Good Morning']
      * ]); // Returns true
-     * 
+     *
      * // While
      * $result  = Arr::isassoclist([
      *  'h' => ['Hello'],
      *  'g' => 'Good Moring'
      * ]); // returns false
-     * 
+     *
      * // And
      * $result = Arr::isassoclist([]); // Returns false
      * ```
-     * 
-     * @param array $items 
-     * @return bool 
+     *
+     * @return bool
      */
     public static function isassoclist(array $items)
     {
         if (empty($items)) {
             return false;
         }
-        return (0 !== \count(array_filter(array_keys($items), 'is_string'))) && Arr::isList($items);
+
+        return (0 !== \count(array_filter(array_keys($items), 'is_string'))) && self::isList($items);
     }
 
     /**
@@ -695,7 +699,7 @@ class Arr
      *
      * @return array
      */
-    public static function unique($haystack, ?string $key = null, $strict = false)
+    public static function unique($haystack, string $key = null, $strict = false)
     {
         $callback = self::valueRetriever($key);
         $exists = [];
@@ -767,7 +771,7 @@ class Arr
      *
      * @return int
      */
-    public static function bsearch(array $haystack, $value = null, ?\Closure $predicate = null, ?int $start = null, ?int $end = null)
+    public static function bsearch(array $haystack, $value = null, \Closure $predicate = null, int $start = null, int $end = null)
     {
         $start = $start ?? 0;
         $end = $end ?? (\count($haystack) - 1);
@@ -805,7 +809,7 @@ class Arr
      *
      * @return int
      */
-    public static function ssearch(array $list, $x = null, ?\Closure $fn = null)
+    public static function ssearch(array $list, $x = null, \Closure $fn = null)
     {
         $index = -1;
         if (empty($list)) {
@@ -890,7 +894,7 @@ class Arr
      *
      * @return array
      */
-    public static function shuffle(array $list, ?int $seed = null)
+    public static function shuffle(array $list, int $seed = null)
     {
         if (null === $seed) {
             shuffle($list);
@@ -922,11 +926,12 @@ class Arr
      *
      * @return array
      */
-    public static function filter(array $array, ?callable $predicate = null, ?int $flag = 0)
+    public static function filter(array $array, callable $predicate = null, ?int $flag = 0)
     {
         if (null === $predicate) {
             return static::filterNull($array);
         }
+
         return array_filter($array, $predicate, $flag);
     }
 
@@ -938,7 +943,7 @@ class Arr
     public static function filterMap(
         array $values,
         callable $transform,
-        ?callable $predicate = null
+        callable $predicate = null
     ) {
         return self::map(
             self::filter($values, $predicate),
@@ -998,7 +1003,6 @@ class Arr
     }
 
     /**
-     *
      * @param int|string $index
      * @param bool       $preserverKeys
      *
@@ -1048,44 +1052,45 @@ class Arr
     }
 
     /**
-     * Groups list by a given value
+     * Groups list by a given value.
      *
-     * @param \Iterator|array $values 
-     * @param string|int $key 
-     * @return array 
+     * @param \Iterator|array $values
+     * @param string|int      $key
+     *
+     * @return array
      */
     public static function groupBy(array $values, $key)
     {
-        $key =  (!is_string($key) && is_callable($key)) ? $key : function ($value) use ($key) {
-            if (is_array($value)) {
+        $key = (!\is_string($key) && \is_callable($key)) ? $key : static function ($value) use ($key) {
+            if (\is_array($value)) {
                 return $value[$key] ?? null;
             }
-            if (is_object($key)) {
+            if (\is_object($key)) {
                 return $value->{$key};
             }
+
             return $value;
         };
         $results = [];
         foreach ($values as $key => $value) {
             $groupKeys = $key($value, $key);
 
-            if (!is_array($groupKeys)) {
+            if (!\is_array($groupKeys)) {
                 $groupKeys = [$groupKeys];
             }
             foreach ($groupKeys as $groupKey) {
-                if (!array_key_exists($groupKey, $results)) {
+                if (!\array_key_exists($groupKey, $results)) {
                     $results[$groupKey] = [];
                 }
                 $results[$groupKey][] = $value;
             }
         }
+
         return $results;
     }
 
     /**
-     * 
-     * @param array $value 
-     * @return array 
+     * @return array
      */
     public static function recursiveksort(array $value)
     {
@@ -1093,9 +1098,7 @@ class Arr
     }
 
     /**
-     * 
-     * @param array $value 
-     * @return array 
+     * @return array
      */
     public static function recursivekrsort(array $value)
     {
@@ -1103,30 +1106,29 @@ class Arr
     }
 
     /**
-     * 
-     * @param array $value 
-     * @param callable|\Closure $sortFunc 
-     * @return array 
+     * @param callable|\Closure $sortFunc
+     *
+     * @return array
      */
     private static function _recursiveksort_(array $value, $sortFunc)
     {
         if (null === $sortFunc) {
             $sortFunc = 'ksort';
         }
-        #region Internal sort function
-        $func = function (array &$list) use ($sortFunc, &$func) {
+        // region Internal sort function
+        $func = static function (array &$list) use ($sortFunc, &$func) {
             foreach ($list as $key => $value) {
-                $is_object = is_object($value);
-                if ($is_object || is_array($value)) {
+                $is_object = \is_object($value);
+                if ($is_object || \is_array($value)) {
                     $current = $is_object ? get_object_vars($value) : $value;
                     $func($current);
                     $list[$key] = $current;
                 }
             }
-            call_user_func_array($sortFunc, [&$list]);
+            \call_user_func_array($sortFunc, [&$list]);
         };
         $func($value);
-        #endregion Internal function
+        // endregion Internal function
         return $value;
     }
 }

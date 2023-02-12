@@ -13,32 +13,21 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
-use Closure;
-use Exception;
-use InvalidArgumentException;
-
 class CSV
 {
     /**
-     * Read data from string using csv standard
-     * 
-     * @param string $content 
-     * @param bool $fistLineAsHeader 
-     * @param array $headers 
-     * @param bool $assoc 
-     * @param null|Closure $headerTransformer 
-     * @param string $separator 
-     * @param string $enclosure 
-     * @param string $escape 
-     * @return array 
-     * @throws InvalidArgumentException 
+     * Read data from string using csv standard.
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return array
      */
     public static function read(
         string $content,
         bool $fistLineAsHeader = true,
         array $headers = [],
         bool $assoc = true,
-        ?\Closure $headerTransformer = null,
+        \Closure $headerTransformer = null,
         string $separator = ',',
         string $enclosure = '"',
         string $escape = '\\'
@@ -84,32 +73,25 @@ class CSV
     }
 
     /**
-     * Read data from file base on csv standard
-     * 
-     * @param string $path 
-     * @param bool $firstLineAsHeader 
-     * @param array $headers 
-     * @param bool $assoc 
-     * @param null|Closure $headerTransformer 
-     * @param string $separator 
-     * @param string $enclosure 
-     * @param string $escape 
-     * @return array 
-     * @throws Exception 
-     * @throws InvalidArgumentException 
+     * Read data from file base on csv standard.
+     *
+     * @throws \Exception
+     * @throws \InvalidArgumentException
+     *
+     * @return array
      */
     public static function readFromFile(
         string $path,
         bool $firstLineAsHeader = true,
         array $headers = [],
         bool $assoc = true,
-        ?\Closure $headerTransformer = null,
+        \Closure $headerTransformer = null,
         string $separator = ',',
         string $enclosure = '"',
         string $escape = '\\'
     ) {
         if (!file_exists($path)) {
-            throw new Exception(sprintf('Specified file path %s could not be found', $path));
+            throw new \Exception(sprintf('Specified file path %s could not be found', $path));
         }
         $content = file_get_contents($path);
 
