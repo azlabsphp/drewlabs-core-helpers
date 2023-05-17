@@ -1,0 +1,7 @@
+/vendor/
+.DS_Store
+composer.lock
+
+fixer.sh
+Todos.md
+.vscode/

@@ -11,7 +11,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.2|^7.3|^7.4|^8.0|^8.1",
+        "php": ">=7.2",
         "ext-mbstring": "*",
         "psr/http-message": "^1.0",
         "tuupola/base62": "^2.1",
@@ -25,7 +25,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Drewlabs\\Core\\Helpers\\": "src/"
+            "Drewlabs\\Core\\Helpers\\": "src/",
+            "Drewlabs\\Caching\\": "caching/src"
         },
         "files": [
             "helpers.php"

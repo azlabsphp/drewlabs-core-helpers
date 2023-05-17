@@ -16,7 +16,7 @@ namespace Drewlabs\Core\Helpers;
 use Iterator;
 use Traversable;
 
-class Iter
+final class Iter
 {
     /**
      * Map through the values of a given iterator.

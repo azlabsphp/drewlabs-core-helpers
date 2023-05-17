@@ -15,27 +15,57 @@ namespace Drewlabs\Core\Helpers;
 
 use DateTimeInterface;
 
-class ImmutableDateTime
+final class ImmutableDateTime
 {
-    public const _YEARS_PER_CENTURY = 100;
+    /**
+     * @var int
+     */
+    const _YEARS_PER_CENTURY = 100;
 
-    public const _YEARS_PER_DECADE = 10;
+    /**
+     * @var int
+     */
+    const _YEARS_PER_DECADE = 10;
 
-    public const _MONTHS_PER_YEAR = 12;
+    /**
+     * @var int
+     */
+    const _MONTHS_PER_YEAR = 12;
 
-    public const _MONTHS_PER_QUARTER = 3;
+    /**
+     * @var int
+     */
+    const _MONTHS_PER_QUARTER = 3;
 
-    public const _WEEKS_PER_YEAR = 52;
+    /**
+     * @var int
+     */
+    const _WEEKS_PER_YEAR = 52;
 
-    public const _WEEKS_PER_MONTH = 4;
+    /**
+     * @var int
+     */
+    const _WEEKS_PER_MONTH = 4;
 
-    public const _DAYS_PER_WEEK = 7;
+    /**
+     * @var int
+     */
+    const _DAYS_PER_WEEK = 7;
 
-    public const _HOURS_PER_DAY = 24;
+    /**
+     * @var int
+     */
+    const _HOURS_PER_DAY = 24;
 
-    public const _MINUTES_PER_HOUR = 60;
+    /**
+     * @var int
+     */
+    const _MINUTES_PER_HOUR = 60;
 
-    public const _SECONDS_PER_MINUTE = 60;
+    /**
+     * @var int
+     */
+    const _SECONDS_PER_MINUTE = 60;
 
     /**
      * Creates a new Date time immutable instance.

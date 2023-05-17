@@ -14,14 +14,17 @@ declare(strict_types=1);
 namespace Drewlabs\Core\Helpers;
 
 use Closure;
+use Drewlabs\Caching\Contracts\CacheInterface;
+use Drewlabs\Caching\LRUCache;
+use Drewlabs\Caching\Tokens;
 use Drewlabs\Core\Helpers\Contracts\MemoizationOptions;
+use Drewlabs\Caching\Contracts\BufferedCacheInterface;
+use Drewlabs\Caching\Contracts\ProvidesPredicate;
 
-if (!\defined('__MEMOIZED__NOT_FOUND__')) {
-    \define('__MEMOIZED__NOT_FOUND__', '__NOT_FOUND__');
-}
 
 class Functional
 {
+
     /**
      * Function composition function that apply transformations to the source input in the top -> down
      * level that the functions appear.
@@ -185,37 +188,35 @@ class Functional
      */
     public static function memoize($function, $options = null)
     {
-        $memoize = new class() {
+        $memoize = new class()
+        {
             /**
-             * @var object
+             * @var BufferedCacheInterface&ProvidesPredicate
              */
             private $cache;
 
             /**
              * @var callable
              */
-            private $internal_;
+            private $callback;
 
-            public function setEquals($comparator)
+            public function setPredicate($comparator)
             {
-                $this->cache->equals = $comparator;
-
+                $this->cache->setPredicate($comparator);
                 return $this;
             }
 
             public function setCacheSize(int $size)
             {
-                $this->cache->size = $size;
-
+                $this->cache->setCapacity($size);
                 return $this;
             }
 
-            public function setCache(object $cache)
+            public function setCache(CacheInterface $cache)
             {
                 if ($cache) {
                     $this->cache = $cache;
                 }
-
                 return $this;
             }
 
@@ -229,17 +230,16 @@ class Functional
             public function remove(...$args)
             {
                 if ($this->cache) {
-                    return $this->cache->delete($args);
+                    return $this->cache->remove($args);
                 }
             }
 
-            public function internal($function = null)
+            public function setCallback($function = null)
             {
                 if (null !== $function) {
-                    $this->internal_ = $function;
+                    $this->callback = $function;
                 }
-
-                return $this->internal_;
+                return $this->callback;
             }
 
             public function useDefaults()
@@ -249,100 +249,11 @@ class Functional
                 // list is subject to be the next to be called by the caller.
                 // Therefore we keep the recent callee arguments at the top of
                 // the list so that the searching algorithm will perform better
-                $this->cache = new class() {
-                    public $internal = [];
-
-                    /**
-                     * Max size of the LRU cache.
-                     *
-                     * @var int
-                     */
-                    public $size = 10;
-
-                    /**
-                     * @var \Closure
-                     */
-                    public $equals;
-
-                    /**
-                     * Query for given argument list from cache.
-                     *
-                     * @param mixed $key
-                     *
-                     * @return mixed
-                     */
-                    public function get($key)
-                    {
-                        $current_ = null;
-                        $index_ = -1;
-                        foreach ($this->internal ?? [] as $index => $current) {
-                            if (($this->equals)($current->key, $key)) {
-                                $current_ = $current;
-                                $index_ = $index;
-                                break;
-                            }
-                        }
-                        if (-1 !== $index_ && ($index_ > 0)) {
-                            // Move the recent argument list search to the top of the
-                            // to optimize searching algorithm for subsequent searchs
-                            $this->internal = array_merge(
-                                [$current_],
-                                \array_slice($this->internal, 0, $index_),
-                                \array_slice($this->internal, $index_ + 1)
-                            );
-                        }
-
-                        return $current_ ? $current_->value : __MEMOIZED__NOT_FOUND__;
-                    }
-
-                    /**
-                     * Add argument list to cache with required computation value.
-                     *
-                     * @param mixed $key
-                     * @param mixed $value
-                     *
-                     * @return void
-                     */
-                    public function set($key, $value)
-                    {
-                        if (\count($this->internal) === $this->size) {
-                            // If storage size is equals to the max size
-                            // remove the last item from the storage
-                            array_pop($this->internal);
-                        }
-                        $object = new \stdClass();
-                        $object->key = $key;
-                        $object->value = $value;
-                        $this->internal[] = $object;
-                    }
-
-                    /**
-                     * Delete/Removes a given argument list from cache.
-                     *
-                     * @param mixed $key
-                     *
-                     * @return void
-                     */
-                    public function delete($key)
-                    {
-                        $this->internal = Arr::removeWhere($this->internal, function ($value) use ($key) {
-                            return ($this->equals)($value->key, $key);
-                        }, false);
-                    }
-
-                    /**
-                     * Clear arguments cache.
-                     *
-                     * @return array
-                     */
-                    public function clear()
-                    {
-                        return $this->internal = [];
-                    }
-                };
                 // Use deep equality comparison by default
-                $this->cache->equals = [Comparator::class, 'shallowEqual'];
-
+                /**
+                 * @var BufferedCacheInterface $cache
+                 */
+                $this->cache = new LRUCache([Comparator::class, 'shallowEqual']);
                 return $this;
             }
 
@@ -350,9 +261,8 @@ class Functional
             public function __invoke(...$args)
             {
                 $args = $args ?? \func_get_args();
-                if (__MEMOIZED__NOT_FOUND__ === ($value = $this->cache->get($args))) {
-                    $value = ($this->internal_)(...$args);
-                    $this->cache->set($args, $value);
+                if (Tokens::__MEMOIZED__NOT_FOUND__ === ($value = $this->cache->get($args))) {
+                    $this->cache->set($args, $value = ($this->callback)(...$args));
                 }
                 // Returns the computed value on function's call
                 return $value;
@@ -360,29 +270,33 @@ class Functional
 
             public function __call($name, $arguments)
             {
-                if (\is_object($this->internal_)) {
-                    return $this->internal_->{$name}(...$arguments);
+                if (\is_object($this->callback)) {
+                    return $this->callback->{$name}(...$arguments);
                 }
                 throw new \BadMethodCallException('Memoized function is not an object, therefore function indirection is not possible');
             }
         };
-        // Set the memoized function as internal function
-        $memoize->internal($function);
         // Set the default options by default
         $memoize = $memoize->useDefaults();
+        // Set the memoized function as internal function
+        $memoize->setCallback($function);
+
+        // Set the predicate function if the options is a callable instance
         if (\is_callable($options)) {
-            $memoize = $memoize->setEquals($options);
+            $memoize = $memoize->setPredicate($options);
         }
+
+        // Set the cache size if the options is an int
         if (\is_int($options)) {
             $memoize = $memoize->setCacheSize($options ?? 16);
         }
+
+        // Case the options parameter is a memoizationOptions instance, set the cache instance and the cache size
         if ($options instanceof MemoizationOptions) {
-            if (null === ($cache = $options->useCache())) {
-                throw new \InvalidArgumentException('Expected $option->useCache() to returns a cache instance, '.\is_object($cache) ? \get_class($cache) : \gettype($cache).' given');
+            if (null !== ($cache = $options->useCache())) {
+                $memoize = $memoize->setCache($cache);
             }
-            $memoize = $memoize->setCache($cache);
-            $size = $options->cacheSize() ?? 16;
-            $memoize = $memoize->setCacheSize($size);
+            $memoize = $memoize->setCacheSize($options->cacheSize() ?? 16);
         }
 
         return $memoize;
