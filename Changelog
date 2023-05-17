@@ -43,3 +43,8 @@
 ## [2.3.6] 2022-06-28
 
 - Bug fix related to recent version of PHP
+
+## [0.2.0] 2023-05-17
+
+- Review memoization implementation to use external library for caching
+- Remove `CSV` class implementation
