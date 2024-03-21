@@ -17,7 +17,6 @@ use Closure;
 use Drewlabs\Caching\Contracts\CacheInterface;
 use Drewlabs\Caching\LRUCache;
 use Drewlabs\Caching\Tokens;
-use Drewlabs\Core\Helpers\Contracts\MemoizationOptions;
 use Drewlabs\Caching\Contracts\BufferedCacheInterface;
 use Drewlabs\Caching\Contracts\ProvidesPredicate;
 
@@ -160,7 +159,8 @@ class Functional
 
     /**
      * Function memoization memoization implementation in PHP Language for fast call
-     * of long running pure functions or methods
+     * of long running pure functions or methods.
+     * 
      * It uses an internal LRU Caching system for algorithm optimization.
      *
      * ```php
@@ -182,7 +182,7 @@ class Functional
      *  $memo();
      *```
      *
-     * @param int|MemoizationOptions|callable|\Closure $options
+     * @param int|callable|\Closure $options
      *
      * @return #Class#1cda036d
      */
@@ -200,9 +200,9 @@ class Functional
              */
             private $callback;
 
-            public function setPredicate($comparator)
+            public function setPredicate($equality)
             {
-                $this->cache->setPredicate($comparator);
+                $this->cache->setPredicate($equality);
                 return $this;
             }
 
@@ -253,7 +253,7 @@ class Functional
                 /**
                  * @var BufferedCacheInterface $cache
                  */
-                $this->cache = new LRUCache([Comparator::class, 'shallowEqual']);
+                $this->cache = new LRUCache([Equals::class, 'shallow']);
                 return $this;
             }
 
@@ -289,14 +289,6 @@ class Functional
         // Set the cache size if the options is an int
         if (\is_int($options)) {
             $memoize = $memoize->setCacheSize($options ?? 16);
-        }
-
-        // Case the options parameter is a memoizationOptions instance, set the cache instance and the cache size
-        if ($options instanceof MemoizationOptions) {
-            if (null !== ($cache = $options->useCache())) {
-                $memoize = $memoize->setCache($cache);
-            }
-            $memoize = $memoize->setCacheSize($options->cacheSize() ?? 16);
         }
 
         return $memoize;

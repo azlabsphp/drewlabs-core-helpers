@@ -15,11 +15,57 @@ namespace Drewlabs\Core\Helpers;
 
 use DateTimeInterface;
 
-/**
- * @deprecated Use \Drewlabs\Core\Helpers\DateTime instead
- */
-final class ImmutableDateTime
+final class DateTime
 {
+    /**
+     * @var int
+     */
+    const _YEARS_PER_CENTURY = 100;
+
+    /**
+     * @var int
+     */
+    const _YEARS_PER_DECADE = 10;
+
+    /**
+     * @var int
+     */
+    const _MONTHS_PER_YEAR = 12;
+
+    /**
+     * @var int
+     */
+    const _MONTHS_PER_QUARTER = 3;
+
+    /**
+     * @var int
+     */
+    const _WEEKS_PER_YEAR = 52;
+
+    /**
+     * @var int
+     */
+    const _WEEKS_PER_MONTH = 4;
+
+    /**
+     * @var int
+     */
+    const _DAYS_PER_WEEK = 7;
+
+    /**
+     * @var int
+     */
+    const _HOURS_PER_DAY = 24;
+
+    /**
+     * @var int
+     */
+    const _MINUTES_PER_HOUR = 60;
+
+    /**
+     * @var int
+     */
+    const _SECONDS_PER_MINUTE = 60;
 
     /**
      * Creates a new Date time immutable instance.
@@ -42,7 +88,7 @@ final class ImmutableDateTime
      */
     public static function timestamp(int $timestamp, \DateTimeZone $tz = null)
     {
-        return new \DateTimeImmutable('@'.$timestamp, $tz);
+        return new \DateTimeImmutable('@' . $timestamp, $tz);
     }
 
     /**
@@ -64,7 +110,7 @@ final class ImmutableDateTime
      */
     public static function isfuture(\DateTimeInterface $now)
     {
-        return DateTime::gt($now, DateTime::nowTz());
+        return self::gt($now, self::nowTz());
     }
 
     /**
@@ -74,7 +120,7 @@ final class ImmutableDateTime
      */
     public static function ispast(\DateTimeInterface $current_date)
     {
-        return DateTime::lt($current_date, DateTime::nowTz());
+        return self::lt($current_date, self::nowTz());
     }
 
     /**
@@ -94,7 +140,7 @@ final class ImmutableDateTime
      */
     public static function nowTz()
     {
-        return DateTime::now(DateTime::getTz(new \DateTimeImmutable()));
+        return self::now(self::getTz(new \DateTimeImmutable()));
     }
 
     /**
@@ -134,7 +180,7 @@ final class ImmutableDateTime
      */
     public static function addDays($date, $days = 0)
     {
-        return DateTime::addSecs($date, $days * DateTime::_HOURS_PER_DAY * DateTime::_MINUTES_PER_HOUR * DateTime::_SECONDS_PER_MINUTE);
+        return self::addSecs($date, $days * self::_HOURS_PER_DAY * self::_MINUTES_PER_HOUR * self::_SECONDS_PER_MINUTE);
     }
 
     /**
@@ -146,7 +192,7 @@ final class ImmutableDateTime
      */
     public static function addHrs($date, $hours = 0)
     {
-        return DateTime::addSecs($date, $hours * DateTime::_MINUTES_PER_HOUR * DateTime::_SECONDS_PER_MINUTE);
+        return self::addSecs($date, $hours * self::_MINUTES_PER_HOUR * self::_SECONDS_PER_MINUTE);
     }
 
     /**
@@ -159,7 +205,7 @@ final class ImmutableDateTime
      */
     public static function addMinutes($date, $minutes = 0)
     {
-        return DateTime::addSecs($date, $minutes * DateTime::_SECONDS_PER_MINUTE);
+        return self::addSecs($date, $minutes * self::_SECONDS_PER_MINUTE);
     }
 
     /**
@@ -171,7 +217,7 @@ final class ImmutableDateTime
      */
     public static function addSecs($date = 'now', $seconds = 0)
     {
-        return DateTime::make($date)->modify((int) $seconds.' second');
+        return self::make($date)->modify((int) $seconds . ' second');
     }
 
     /**
@@ -183,7 +229,7 @@ final class ImmutableDateTime
      */
     public static function add($date, \DateInterval $interval)
     {
-        return DateTime::make($date)->add($interval);
+        return self::make($date)->add($interval);
     }
 
     /**
@@ -196,7 +242,7 @@ final class ImmutableDateTime
      */
     public static function subDays($date, $days = 0)
     {
-        return DateTime::subSecs($date, $days * DateTime::_HOURS_PER_DAY * DateTime::_MINUTES_PER_HOUR * DateTime::_SECONDS_PER_MINUTE);
+        return self::subSecs($date, $days * self::_HOURS_PER_DAY * self::_MINUTES_PER_HOUR * self::_SECONDS_PER_MINUTE);
     }
 
     /**
@@ -209,7 +255,7 @@ final class ImmutableDateTime
      */
     public static function subHrs($date, $hours = 0)
     {
-        return DateTime::subSecs($date, $hours * DateTime::_MINUTES_PER_HOUR * DateTime::_SECONDS_PER_MINUTE);
+        return self::subSecs($date, $hours * self::_MINUTES_PER_HOUR * self::_SECONDS_PER_MINUTE);
     }
 
     /**
@@ -222,7 +268,7 @@ final class ImmutableDateTime
      */
     public static function subMinutes($date, $minutes = 0)
     {
-        return DateTime::subSecs($date, $minutes * DateTime::_SECONDS_PER_MINUTE);
+        return self::subSecs($date, $minutes * self::_SECONDS_PER_MINUTE);
     }
 
     /**
@@ -235,7 +281,7 @@ final class ImmutableDateTime
      */
     public static function subSecs($date = 'now', $seconds = 0)
     {
-        return DateTime::make($date)->modify(sprintf('-%d second', (int) $seconds));
+        return self::make($date)->modify(sprintf('-%d second', (int) $seconds));
     }
 
     /**
@@ -247,7 +293,7 @@ final class ImmutableDateTime
      */
     public static function sub(\DateTimeInterface $date, \DateInterval $interval)
     {
-        return DateTime::make($date)->sub($interval);
+        return self::make($date)->sub($interval);
     }
     // #region Arithmetic operations on date time immutable instances
 
@@ -262,7 +308,7 @@ final class ImmutableDateTime
      */
     public static function min(\DateTimeInterface $date, $other = null)
     {
-        return DateTime::lt($date, $other = DateTime::resolve($date, $other)) ? $date : $other;
+        return self::lt($date, $other = self::resolve($date, $other)) ? $date : $other;
     }
 
     /**
@@ -276,7 +322,7 @@ final class ImmutableDateTime
      */
     public static function max(\DateTimeInterface $date, $other = null)
     {
-        return DateTime::gt($date, $other = DateTime::resolve($date, $other)) ? $date : $other;
+        return self::gt($date, $other = self::resolve($date, $other)) ? $date : $other;
     }
 
     /**
@@ -293,9 +339,9 @@ final class ImmutableDateTime
     public static function same($date, $other = null, $format = 'c')
     {
         if (!isset($other)) {
-            $other = DateTime::nowTz();
+            $other = self::nowTz();
         }
-        DateTime::assert($other, \gettype(null));
+        self::assert($other, \gettype(null));
 
         return $date->format($format) === $other->format($format);
     }
@@ -311,13 +357,13 @@ final class ImmutableDateTime
     public static function resolve(\DateTimeInterface $from, $date = null)
     {
         if (null === $date) {
-            return DateTime::nowTz();
+            return self::nowTz();
         }
         if (\is_string($date)) {
-            return DateTime::create($date, $from->getTimezone());
+            return self::create($date, $from->getTimezone());
         }
 
-        return DateTime::make($date, $from->getTimezone());
+        return self::make($date, $from->getTimezone());
     }
 
     /**
@@ -332,14 +378,14 @@ final class ImmutableDateTime
     public static function make($date = 'now', \DateTimeZone $tz = null)
     {
         if ($date instanceof \DateTimeInterface) {
-            return DateTime::timestamp($date->getTimestamp(), $tz ?? ($tz = $date->getTimezone() ? $tz : null));
+            return self::timestamp($date->getTimestamp(), $tz ?? ($tz = $date->getTimezone() ? $tz : null));
         }
         if (\is_int($date)) {
-            return DateTime::timestamp($date, $tz);
+            return self::timestamp($date, $tz);
         }
-        DateTime::assert($date, ['string', \gettype(null)]);
+        self::assert($date, ['string', \gettype(null)]);
 
-        return DateTime::create($date ?? 'now', $tz);
+        return self::create($date ?? 'now', $tz);
     }
 
     /**
@@ -352,7 +398,7 @@ final class ImmutableDateTime
      */
     public static function yrsDiff(\DateTimeInterface $date, $other = null, $exact = true)
     {
-        return DateTime::weeksDiff($date, $other, $exact) / DateTime::_WEEKS_PER_YEAR;
+        return self::weeksDiff($date, $other, $exact) / self::_WEEKS_PER_YEAR;
     }
 
     /**
@@ -365,7 +411,7 @@ final class ImmutableDateTime
      */
     public static function weeksDiff(\DateTimeInterface $date, $other = null, $exact = true)
     {
-        return DateTime::daysDiff($date, $other, $exact) / DateTime::_DAYS_PER_WEEK;
+        return self::daysDiff($date, $other, $exact) / self::_DAYS_PER_WEEK;
     }
 
     /**
@@ -378,7 +424,7 @@ final class ImmutableDateTime
      */
     public static function daysDiff(\DateTimeInterface $date, $other = null, $exact = true)
     {
-        return DateTime::hrsDiff($date, $other, $exact) / DateTime::_HOURS_PER_DAY;
+        return self::hrsDiff($date, $other, $exact) / self::_HOURS_PER_DAY;
     }
 
     /**
@@ -391,7 +437,7 @@ final class ImmutableDateTime
      */
     public static function hrsDiff(\DateTimeInterface $date, $other = null, $exact = true)
     {
-        return DateTime::secsDiff($date, $other, $exact) / DateTime::_SECONDS_PER_MINUTE / DateTime::_MINUTES_PER_HOUR;
+        return self::secsDiff($date, $other, $exact) / self::_SECONDS_PER_MINUTE / self::_MINUTES_PER_HOUR;
     }
 
     /**
@@ -404,7 +450,7 @@ final class ImmutableDateTime
      */
     public static function minDiff(\DateTimeInterface $source, $date = null, $exact = true)
     {
-        return DateTime::secsDiff($source, $date, $exact) / DateTime::_SECONDS_PER_MINUTE;
+        return self::secsDiff($source, $date, $exact) / self::_SECONDS_PER_MINUTE;
     }
 
     /**
@@ -417,8 +463,8 @@ final class ImmutableDateTime
      */
     public static function secsDiff(\DateTimeInterface $source, $date = null, $exact = true)
     {
-        $diff = $source->diff(DateTime::resolve($source, $date));
-        $value = $diff->days * DateTime::_HOURS_PER_DAY * DateTime::_MINUTES_PER_HOUR * DateTime::_SECONDS_PER_MINUTE + $diff->h * DateTime::_MINUTES_PER_HOUR * DateTime::_SECONDS_PER_MINUTE + $diff->i * DateTime::_SECONDS_PER_MINUTE + $diff->s;
+        $diff = $source->diff(self::resolve($source, $date));
+        $value = $diff->days * self::_HOURS_PER_DAY * self::_MINUTES_PER_HOUR * self::_SECONDS_PER_MINUTE + $diff->h * self::_MINUTES_PER_HOUR * self::_SECONDS_PER_MINUTE + $diff->i * self::_SECONDS_PER_MINUTE + $diff->s;
 
         return $exact || !$diff->invert ? $value : -$value;
     }
@@ -446,6 +492,6 @@ final class ImmutableDateTime
         foreach ((array) $types as $expect) {
             $message .= "{$expect}, ";
         }
-        throw new \InvalidArgumentException($message.'\DateTimeImmutable, DateTime, DateTimeInterface, '.(\is_object($date) ? \get_class($date) : \gettype($date)).' given');
+        throw new \InvalidArgumentException($message . '\DateTimeImmutable, DateTime, DateTimeInterface, ' . (\is_object($date) ? \get_class($date) : \gettype($date)) . ' given');
     }
 }

@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
-/**
- * @deprecated Implementation will be move to Equals class
- */
-class Comparator
+
+class Equals
 {
     /**
      * Compare two object using PHP === operator.
@@ -24,7 +22,7 @@ class Comparator
      * @param mixed $a
      * @param mixed $b
      */
-    public static function strictEqual($a, $b): bool
+    public static function strict($a, $b): bool
     {
         return $a === $b;
     }
@@ -35,13 +33,13 @@ class Comparator
      * ```php
      * <?php
      *
-     * const $bool = shallowEqual([], [1, 2, 3]); // false
+     * const $bool = shallow([], [1, 2, 3]); // false
      * ```
      *
      * @param mixed $a
      * @param mixed $b
      */
-    public static function shallowEqual($a, $b): bool
+    public static function shallow($a, $b): bool
     {
         $type1 = \gettype($a);
         $type2 = \gettype($b);
@@ -49,7 +47,7 @@ class Comparator
             case $type1 !== $type2:
                 return false;
             case 'boolean' === $type1 || 'integer' === $type1 || 'double' === $type1 || 'string' === $type1:
-                return self::strictEqual($a, $b);
+                return self::strict($a, $b);
             case 'array' === $type1:
                 return self::arrayEquals($a, $b);
             case 'object' === $type1:
@@ -85,7 +83,7 @@ class Comparator
      * @param mixed $a
      * @param mixed $b
      */
-    public static function deepEqual($a, $b): bool
+    public static function deep($a, $b): bool
     {
         $type1 = \gettype($a);
         $type2 = \gettype($b);
@@ -93,7 +91,7 @@ class Comparator
             case $type1 !== $type2:
                 return false;
             case 'boolean' === $type1 || 'integer' === $type1 || 'double' === $type1 || 'string' === $type1:
-                return self::strictEqual($a, $b);
+                return self::strict($a, $b);
             case 'array' === $type1:
                 return self::arrayDeepEqual($a, $b);
             case 'object' === $type1:
@@ -122,7 +120,7 @@ class Comparator
         $keysA = array_keys($a);
         $keysB = array_keys($b);
         foreach ($keysA as $k => $v) {
-            if (!self::strictEqual($keysA[$k], $keysB[$k]) || !self::strictEqual($a[$v], $b[$v])) {
+            if (!self::strict($keysA[$k], $keysB[$k]) || !self::strict($a[$v], $b[$v])) {
                 return false;
             }
         }
@@ -149,7 +147,7 @@ class Comparator
             return false;
         }
         foreach ($aProperties as $key => $prop) {
-            if (!self::strictEqual($a->$prop, $b->$prop)) {
+            if (!self::strict($a->$prop, $b->$prop)) {
                 return false;
             }
         }
@@ -180,7 +178,7 @@ class Comparator
             return false;
         }
         foreach ($aProperties as $key => $propName) {
-            if (!self::deepEqual($a->$propName, $b->$propName)) {
+            if (!self::deep($a->$propName, $b->$propName)) {
                 return false;
             }
         }
@@ -218,7 +216,7 @@ class Comparator
         }
         // They do have same keys and in same order.
         foreach ($a as $key => $val) {
-            $bool = self::deepEqual($a[$key], $b[$key]);
+            $bool = self::deep($a[$key], $b[$key]);
             if (false === $bool) {
                 return false;
             }
