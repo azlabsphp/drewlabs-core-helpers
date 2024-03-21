@@ -13,6 +13,10 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Contracts;
 
+/**
+ * @deprecated
+ * 
+ */
 interface MemoizationOptions
 {
     /**
