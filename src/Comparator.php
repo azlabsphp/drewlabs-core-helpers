@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
+/**
+ * @deprecated Implementation will be move to Equals class
+ */
 class Comparator
 {
     /**
@@ -155,10 +158,15 @@ class Comparator
     }
 
     /**
+     * Method performs a deep equality on PHP object instances.
+     * 
+     * It loops through all properties and deep properties of provided
+     * object and check if they are equals 
+     * 
      * @param mixed $a
      * @param mixed $b
      */
-    public static function objectDeepEqual($a, $b): bool
+    public static function objectDeepEqual(object $a, object $b): bool
     {
         if ($a !== $b) {
             return false;
@@ -181,7 +189,12 @@ class Comparator
     }
 
     /**
-     * Compute deep equality of 2 PHP objects.
+     * Compute deep equality of 2 PHP arrays/dictionaries.
+     * 
+     * @param array $a 
+     * @param array $b 
+     * 
+     * @return bool 
      */
     public static function arrayDeepEqual(array $a, array $b): bool
     {
