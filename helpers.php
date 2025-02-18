@@ -39,7 +39,7 @@ if (!function_exists('drewlabs_core_get')) {
             }
             if ('*' === $segment) {
                 if (!is_array($target)) {
-                    return $default instanceof \Closure ? $default() : $default;
+                    return $default instanceof Closure ? $default() : $default;
                 }
                 $result = [];
                 foreach ($target as $item) {
@@ -48,7 +48,7 @@ if (!function_exists('drewlabs_core_get')) {
 
                 return in_array('*', $keys, true) ? Iter::collapse($result) : $result;
             }
-            $target = (Arr::isArrayable($target)) ? Arr::get($target, $segment) : ((is_object($target) && (null !== ($target_ = Reflector::getPropertyValue($target, $segment)))) ? $target_ : ($default instanceof \Closure ? $default() : $default));
+            $target = (Arr::isArrayable($target)) ? Arr::get($target, $segment) : ((is_object($target) && (null !== ($target_ = Reflector::getPropertyValue($target, $segment)))) ? $target_ : ($default instanceof Closure ? $default() : $default));
         }
 
         return $target;

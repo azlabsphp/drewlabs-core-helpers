@@ -65,7 +65,7 @@ class Str
             return str_ends_with($haystack, $needle);
         }
 
-        return ('' === $needle) || (mb_substr($haystack, -(int) (mb_strlen($needle))) === $needle);
+        return ('' === $needle) || (mb_substr($haystack, -(int) mb_strlen($needle)) === $needle);
     }
 
     /**
@@ -135,7 +135,6 @@ class Str
     /**
      * Determine if a given string contains a given substring.
      *
-     * @param string          $haystack
      * @param string|string[] $needle
      *
      * @return bool
@@ -261,11 +260,10 @@ class Str
      * @param string|string[] $search
      * @param string|string[] $replacement
      * @param string|string[] $subject
-     * @param int             $count
      *
      * @return string|string[]
      */
-    public static function replace($search, $replacement, $subject, int &$count = null)
+    public static function replace($search, $replacement, $subject, ?int &$count = null)
     {
         return str_replace($search, $replacement, $subject, $count);
     }
@@ -397,7 +395,7 @@ class Str
      */
     public static function valueOrNull($value)
     {
-        if (!(self::isStr($value))) {
+        if (!self::isStr($value)) {
             throw new \InvalidArgumentException(sprintf('Helper %s requires a valid PHP string', __FUNCTION__));
         }
 
@@ -673,7 +671,7 @@ class Str
         $is_array = \is_array($value);
         $is_string = static::isStr($value);
         if (!($is_object || $is_string || $is_array)) {
-            throw new \InvalidArgumentException('Expected string, array or object types, got '.(null !== $value && \is_object($value) ? \get_class($value) : \gettype($value)));
+            throw new \InvalidArgumentException('Expected string, array or object types, got '.(null !== $value && \is_object($value) ? $value::class : \gettype($value)));
         }
         if ($is_string) {
             return $value;

@@ -20,8 +20,8 @@ use Drewlabs\Caching\Contracts\ProvidesPredicate;
 class LRUCache implements BufferedCacheInterface, ProvidesPredicate
 {
     /**
-     * Internal cache storage object
-     * 
+     * Internal cache storage object.
+     *
      * @var array<CachedItem>
      */
     private $storage = [];
@@ -39,16 +39,17 @@ class LRUCache implements BufferedCacheInterface, ProvidesPredicate
     private $predicate;
 
     /**
-     * Creates class instance
-     * 
-     * @param callable $predicate 
-     * @param int $size 
-     * 
+     * Creates class instance.
      */
-    public function __construct(callable $predicate = null, int $size = 16)
+    public function __construct(?callable $predicate = null, int $size = 16)
     {
         $this->predicate = $predicate;
         $this->size = $size ?? 16;
+    }
+
+    public function __destruct()
+    {
+        unset($this->storage);
     }
 
     public function setPredicate($predicate)
@@ -93,6 +94,7 @@ class LRUCache implements BufferedCacheInterface, ProvidesPredicate
                 \array_slice($this->storage, $index + 1)
             );
         }
+
         return $current ? $current->value() : Tokens::__MEMOIZED__NOT_FOUND__;
     }
 
@@ -118,18 +120,10 @@ class LRUCache implements BufferedCacheInterface, ProvidesPredicate
         return $this->storage = [];
     }
 
-
-    public function __destruct()
-    {
-        unset($this->storage);
-    }
-
     /**
-     * Remove from array where the `predicate` return `true`
-     * 
-     * @param array $array 
-     * @param callable $predicate 
-     * @return array 
+     * Remove from array where the `predicate` return `true`.
+     *
+     * @return array
      */
     private function arrayRemove(array $array, callable $predicate)
     {
@@ -143,6 +137,7 @@ class LRUCache implements BufferedCacheInterface, ProvidesPredicate
                 );
             }
         }
+
         return $array;
     }
 }

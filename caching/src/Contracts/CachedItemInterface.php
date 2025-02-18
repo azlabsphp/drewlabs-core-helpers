@@ -15,18 +15,17 @@ namespace Drewlabs\Caching\Contracts;
 
 interface CachedItemInterface
 {
-
     /**
-     * Returns the cached item key
-     * 
-     * @return string|int|mixed 
+     * Returns the cached item key.
+     *
+     * @return string|int|mixed
      */
     public function key();
 
     /**
-     * Returns the cached value
-     * 
-     * @return mixed 
+     * Returns the cached value.
+     *
+     * @return mixed
      */
     public function value();
 }

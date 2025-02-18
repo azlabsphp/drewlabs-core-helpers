@@ -11,22 +11,21 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
- namespace Drewlabs\Caching\Contracts;
-
+namespace Drewlabs\Caching\Contracts;
 
 interface BufferedCacheInterface extends CacheInterface
 {
     /**
-     * Set the `size` state of the cache instance
-     * 
-     * @return void 
+     * Set the `size` state of the cache instance.
+     *
+     * @return void
      */
     public function setCapacity(int $capacity);
 
     /**
-     * Returns the current state of the cache size
-     * 
-     * @return int 
+     * Returns the current state of the cache size.
+     *
+     * @return int
      */
     public function getCapacity();
 }

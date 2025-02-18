@@ -21,7 +21,7 @@ final class UUID
      *
      * @return string
      */
-    public static function create(callable $factory = null)
+    public static function create(?callable $factory = null)
     {
         if ($factory) {
             return (string) \call_user_func($factory);
@@ -51,7 +51,7 @@ final class UUID
      *
      * @return string|mixed
      */
-    public static function ordered(callable $factory = null)
+    public static function ordered(?callable $factory = null)
     {
         if ($factory) {
             return \call_user_func($factory);
@@ -87,7 +87,7 @@ final class UUID
      *
      * @return string|mixed
      */
-    public static function createUsing(callable $factory = null)
+    public static function createUsing(?callable $factory = null)
     {
         return (static function () use ($factory) {
             return (string) static::create($factory);

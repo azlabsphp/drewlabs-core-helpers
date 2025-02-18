@@ -20,7 +20,6 @@ use DateTimeInterface;
  */
 final class ImmutableDateTime
 {
-
     /**
      * Creates a new Date time immutable instance.
      *
@@ -28,7 +27,7 @@ final class ImmutableDateTime
      *
      * @return \DateTimeImmutable
      */
-    public static function create(string $datetime = 'now', \DateTimeZone $tz = null, ...$args)
+    public static function create(string $datetime = 'now', ?\DateTimeZone $tz = null, ...$args)
     {
         return new \DateTimeImmutable($datetime, $tz, ...$args);
     }
@@ -36,11 +35,9 @@ final class ImmutableDateTime
     /**
      * Creates date time immutable from provided timestamp.
      *
-     * @param \DateTimeZone $tz
-     *
      * @return \DateTimeImmutable
      */
-    public static function timestamp(int $timestamp, \DateTimeZone $tz = null)
+    public static function timestamp(int $timestamp, ?\DateTimeZone $tz = null)
     {
         return new \DateTimeImmutable('@'.$timestamp, $tz);
     }
@@ -329,7 +326,7 @@ final class ImmutableDateTime
      *
      * @return \DateTimeImmutable
      */
-    public static function make($date = 'now', \DateTimeZone $tz = null)
+    public static function make($date = 'now', ?\DateTimeZone $tz = null)
     {
         if ($date instanceof \DateTimeInterface) {
             return DateTime::timestamp($date->getTimestamp(), $tz ?? ($tz = $date->getTimezone() ? $tz : null));
@@ -436,7 +433,7 @@ final class ImmutableDateTime
      */
     public static function assert($date, $types = [])
     {
-        if (($date instanceof \DateTimeInterface)) {
+        if ($date instanceof \DateTimeInterface) {
             return;
         }
         if (\in_array(\gettype($date), $types, true)) {
@@ -446,6 +443,6 @@ final class ImmutableDateTime
         foreach ((array) $types as $expect) {
             $message .= "{$expect}, ";
         }
-        throw new \InvalidArgumentException($message.'\DateTimeImmutable, DateTime, DateTimeInterface, '.(\is_object($date) ? \get_class($date) : \gettype($date)).' given');
+        throw new \InvalidArgumentException($message.'\DateTimeImmutable, DateTime, DateTimeInterface, '.(\is_object($date) ? $date::class : \gettype($date)).' given');
     }
 }

@@ -18,5 +18,5 @@ class Tokens
     /**
      * @var string
      */
-    const __MEMOIZED__NOT_FOUND__ = '__NOT_FOUND__';
+    public const __MEMOIZED__NOT_FOUND__ = '__NOT_FOUND__';
 }

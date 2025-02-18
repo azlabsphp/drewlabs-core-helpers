@@ -307,13 +307,13 @@ class Arr
         }
 
         if (
-            self::keyExists($array, $key) ||
-            isset($array[$key])
+            self::keyExists($array, $key)
+            || isset($array[$key])
         ) {
             return $array[$key];
         }
 
-        if (false === strpos($key, '.')) {
+        if (!str_contains($key, '.')) {
             return $array[$key] ?? ($default instanceof \Closure ? $default() : $default);
         }
 
@@ -693,13 +693,12 @@ class Arr
     /**
      * Undocumented function.
      *
-     * @param array  $haystack
-     * @param string $key
-     * @param bool   $strict
+     * @param array $haystack
+     * @param bool  $strict
      *
      * @return array
      */
-    public static function unique($haystack, string $key = null, $strict = false)
+    public static function unique($haystack, ?string $key = null, $strict = false)
     {
         $callback = self::valueRetriever($key);
         $exists = [];
@@ -771,7 +770,7 @@ class Arr
      *
      * @return int
      */
-    public static function bsearch(array $haystack, $value = null, \Closure $predicate = null, int $start = null, int $end = null)
+    public static function bsearch(array $haystack, $value = null, ?\Closure $predicate = null, ?int $start = null, ?int $end = null)
     {
         $start = $start ?? 0;
         $end = $end ?? (\count($haystack) - 1);
@@ -786,7 +785,7 @@ class Arr
             return 1;
         };
         while ($start <= $end) {
-            $mid = (int) (ceil($start + ($end - $start) / 2));
+            $mid = (int) ceil($start + ($end - $start) / 2);
             $result = $predicate($haystack[$mid], $value);
             if (0 === $result) {
                 return $mid;
@@ -804,12 +803,11 @@ class Arr
     /**
      * Perform a sequential search on array and apply a predicate function to it if one is passed.
      *
-     * @param mixed    $x
-     * @param \Closure $fn
+     * @param mixed $x
      *
      * @return int
      */
-    public static function ssearch(array $list, $x = null, \Closure $fn = null)
+    public static function ssearch(array $list, $x = null, ?\Closure $fn = null)
     {
         $index = -1;
         if (empty($list)) {
@@ -890,11 +888,9 @@ class Arr
     /**
      * Shuffle the list of element in an array.
      *
-     * @param int $seed
-     *
      * @return array
      */
-    public static function shuffle(array $list, int $seed = null)
+    public static function shuffle(array $list, ?int $seed = null)
     {
         if (null === $seed) {
             shuffle($list);
@@ -926,7 +922,7 @@ class Arr
      *
      * @return array
      */
-    public static function filter(array $array, callable $predicate = null, ?int $flag = 0)
+    public static function filter(array $array, ?callable $predicate = null, ?int $flag = 0)
     {
         if (null === $predicate) {
             return static::filterNull($array);
@@ -943,7 +939,7 @@ class Arr
     public static function filterMap(
         array $values,
         callable $transform,
-        callable $predicate = null
+        ?callable $predicate = null
     ) {
         return self::map(
             self::filter($values, $predicate),
@@ -1015,6 +1011,7 @@ class Arr
 
             return $array;
         }
+
         // Creates a new 0 based array removing item at a given index
         return array_merge(
             \array_slice($array, 0, $index),
@@ -1128,6 +1125,7 @@ class Arr
             \call_user_func_array($sortFunc, [&$list]);
         };
         $func($value);
+
         // endregion Internal function
         return $value;
     }

@@ -17,55 +17,35 @@ use DateTimeInterface;
 
 final class DateTime
 {
-    /**
-     * @var int
-     */
-    const _YEARS_PER_CENTURY = 100;
+    /** @var int */
+    public const _YEARS_PER_CENTURY = 100;
 
-    /**
-     * @var int
-     */
-    const _YEARS_PER_DECADE = 10;
+    /** @var int */
+    public const _YEARS_PER_DECADE = 10;
 
-    /**
-     * @var int
-     */
-    const _MONTHS_PER_YEAR = 12;
+    /** @var int */
+    public const _MONTHS_PER_YEAR = 12;
 
-    /**
-     * @var int
-     */
-    const _MONTHS_PER_QUARTER = 3;
+    /** @var int */
+    public const _MONTHS_PER_QUARTER = 3;
 
-    /**
-     * @var int
-     */
-    const _WEEKS_PER_YEAR = 52;
+    /** @var int */
+    public const _WEEKS_PER_YEAR = 52;
 
-    /**
-     * @var int
-     */
-    const _WEEKS_PER_MONTH = 4;
+    /** @var int */
+    public const _WEEKS_PER_MONTH = 4;
 
-    /**
-     * @var int
-     */
-    const _DAYS_PER_WEEK = 7;
+    /** @var int */
+    public const _DAYS_PER_WEEK = 7;
 
-    /**
-     * @var int
-     */
-    const _HOURS_PER_DAY = 24;
+    /** @var int */
+    public const _HOURS_PER_DAY = 24;
 
-    /**
-     * @var int
-     */
-    const _MINUTES_PER_HOUR = 60;
+    /** @var int */
+    public const _MINUTES_PER_HOUR = 60;
 
-    /**
-     * @var int
-     */
-    const _SECONDS_PER_MINUTE = 60;
+    /** @var int */
+    public const _SECONDS_PER_MINUTE = 60;
 
     /**
      * Creates a new Date time immutable instance.
@@ -74,7 +54,7 @@ final class DateTime
      *
      * @return \DateTimeImmutable
      */
-    public static function create(string $datetime = 'now', \DateTimeZone $tz = null, ...$args)
+    public static function create(string $datetime = 'now', ?\DateTimeZone $tz = null, ...$args)
     {
         return new \DateTimeImmutable($datetime, $tz, ...$args);
     }
@@ -82,13 +62,11 @@ final class DateTime
     /**
      * Creates date time immutable from provided timestamp.
      *
-     * @param \DateTimeZone $tz
-     *
      * @return \DateTimeImmutable
      */
-    public static function timestamp(int $timestamp, \DateTimeZone $tz = null)
+    public static function timestamp(int $timestamp, ?\DateTimeZone $tz = null)
     {
-        return new \DateTimeImmutable('@' . $timestamp, $tz);
+        return new \DateTimeImmutable('@'.$timestamp, $tz);
     }
 
     /**
@@ -217,7 +195,7 @@ final class DateTime
      */
     public static function addSecs($date = 'now', $seconds = 0)
     {
-        return self::make($date)->modify((int) $seconds . ' second');
+        return self::make($date)->modify((int) $seconds.' second');
     }
 
     /**
@@ -375,7 +353,7 @@ final class DateTime
      *
      * @return \DateTimeImmutable
      */
-    public static function make($date = 'now', \DateTimeZone $tz = null)
+    public static function make($date = 'now', ?\DateTimeZone $tz = null)
     {
         if ($date instanceof \DateTimeInterface) {
             return self::timestamp($date->getTimestamp(), $tz ?? ($tz = $date->getTimezone() ? $tz : null));
@@ -482,7 +460,7 @@ final class DateTime
      */
     public static function assert($date, $types = [])
     {
-        if (($date instanceof \DateTimeInterface)) {
+        if ($date instanceof \DateTimeInterface) {
             return;
         }
         if (\in_array(\gettype($date), $types, true)) {
@@ -492,6 +470,6 @@ final class DateTime
         foreach ((array) $types as $expect) {
             $message .= "{$expect}, ";
         }
-        throw new \InvalidArgumentException($message . '\DateTimeImmutable, DateTime, DateTimeInterface, ' . (\is_object($date) ? \get_class($date) : \gettype($date)) . ' given');
+        throw new \InvalidArgumentException($message.'\DateTimeImmutable, DateTime, DateTimeInterface, '.(\is_object($date) ? $date::class : \gettype($date)).' given');
     }
 }

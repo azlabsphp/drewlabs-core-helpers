@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
-use Closure;
-
 class Reflector
 {
     /**
@@ -309,7 +307,7 @@ class Reflector
      */
     public static function getPropertyValue($object, string $key, $default = null)
     {
-        if (\is_string($key) && (false !== strpos($key, '.'))) {
+        if (\is_string($key) && str_contains($key, '.')) {
             $keys = explode('.', $key);
 
             return array_reduce($keys, static function ($carry, $current) use ($default) {
@@ -334,7 +332,7 @@ class Reflector
      */
     public static function setPropertyValue($object, string $key, $value = null)
     {
-        if (\is_string($key) && (false !== strpos($key, '.'))) {
+        if (\is_string($key) && str_contains($key, '.')) {
             $cache = [];
             $keys = explode('.', $key);
             $last = \count($keys) - 1;
@@ -471,7 +469,7 @@ class Reflector
      *
      * @param mixed $default
      *
-     * @return Closure(mixed $obj): mixed
+     * @return \Closure(mixed $obj): mixed
      */
     public static function propertyGetter(string $key, $default = null)
     {
@@ -488,7 +486,7 @@ class Reflector
      * @param string $key
      * @param mixed  $value
      *
-     * @return Closure(mixed $obj): mixed
+     * @return \Closure(mixed $obj): mixed
      */
     public static function propertySetter($key, $value = null)
     {

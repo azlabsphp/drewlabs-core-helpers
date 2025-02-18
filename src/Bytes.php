@@ -15,14 +15,10 @@ namespace Drewlabs\Core\Helpers;
 
 class Bytes
 {
-    /**
-     * @var float
-     */
+    /** @var float */
     private $bytes;
 
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     private $delimiter;
 
     /**
@@ -70,7 +66,7 @@ class Bytes
         foreach ($bytes as $item) {
             if ($this->bytes >= $item['value']) {
                 $result = $this->bytes / $item['value'];
-                $result = str_replace('.', $this->delimiter, (string) (round($result, 2))).' '.$item['unit'];
+                $result = str_replace('.', $this->delimiter, (string) round($result, 2)).' '.$item['unit'];
                 break;
             }
         }

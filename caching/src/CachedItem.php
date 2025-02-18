@@ -18,23 +18,22 @@ use Drewlabs\Caching\Contracts\CachedItemInterface;
 class CachedItem implements CachedItemInterface
 {
     /**
-     * 
      * @var string|int|mixed
      */
     private $key;
 
     /**
-     * 
      * @var mixed
      */
     private $value;
 
     /**
-     * Creates a new cache item
-     * 
-     * @param string|int|mixed $key 
-     * @param mixed $value 
-     * @return void 
+     * Creates a new cache item.
+     *
+     * @param string|int|mixed $key
+     * @param mixed            $value
+     *
+     * @return void
      */
     public function __construct($key, $value)
     {
@@ -43,9 +42,9 @@ class CachedItem implements CachedItemInterface
     }
 
     /**
-     * Returns the cached item key
-     * 
-     * @return string|int|mixed 
+     * Returns the cached item key.
+     *
+     * @return string|int|mixed
      */
     public function key()
     {
@@ -53,9 +52,9 @@ class CachedItem implements CachedItemInterface
     }
 
     /**
-     * Returns the cached value
-     * 
-     * @return mixed 
+     * Returns the cached value.
+     *
+     * @return mixed
      */
     public function value()
     {

@@ -15,19 +15,13 @@ namespace Drewlabs\Core\Helpers;
 
 class Decimal
 {
-    /**
-     * @var float
-     */
+    /** @var float */
     private $value;
 
-    /**
-     * @var string
-     */
+    /**  @var string */
     private $delimiter;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $decimal;
 
     /**
@@ -52,11 +46,11 @@ class Decimal
 
     /**
      * @param string|float $value
-     * Creates a new float value instance.
+     *                            Creates a new float value instance
      */
     public static function new($value)
     {
-        return new self(floatval($value), 0, ' ');
+        return new self((float) $value, 0, ' ');
     }
 
     /**
@@ -81,7 +75,7 @@ class Decimal
         $nb = \strlen($output);
         for ($i = 1; $i < 4; ++$i) {
             if ($input >= 10 ** (3 * $i)) {
-                $output = sprintf('%s%s%s', substr($output, 0, ($nb - (3 * $i))), $delimiter, substr($output, $nb - 3 * $i, $nb));
+                $output = sprintf('%s%s%s', substr($output, 0, $nb - (3 * $i)), $delimiter, substr($output, $nb - 3 * $i, $nb));
             }
         }
         if ($decimal > 0) {

@@ -123,9 +123,9 @@ final class Iter
         bool $useKeys = true
     ) {
         if (
-            !\is_string($keys) &&
-            !\is_array($keys) &&
-            !($keys instanceof \Iterator)
+            !\is_string($keys)
+            && !\is_array($keys)
+            && !($keys instanceof \Iterator)
         ) {
             throw new \InvalidArgumentException('$keys parameter must be a PHP string|array or a validate iterator');
         }
@@ -159,9 +159,9 @@ final class Iter
         bool $useKeys = true
     ) {
         if (
-            !\is_string($values) &&
-            !\is_array($values) &&
-            !($values instanceof \Iterator)
+            !\is_string($values)
+            && !\is_array($values)
+            && !($values instanceof \Iterator)
         ) {
             throw new \InvalidArgumentException('$keys parameter must be a PHP string|array or a validate iterator');
         }

@@ -13,15 +13,14 @@ declare(strict_types=1);
 
 namespace Drewlabs\Caching\Contracts;
 
-
 interface ProvidesPredicate
 {
     /**
-     * Set the predicate function used when comparing cached values
-     * 
+     * Set the predicate function used when comparing cached values.
+     *
      * @param callable|\Closure($a, $b):bool $predicate
-     * 
-     * @return void 
+     *
+     * @return void
      */
     public function setPredicate($predicate);
 }

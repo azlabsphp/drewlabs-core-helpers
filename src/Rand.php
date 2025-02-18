@@ -196,7 +196,6 @@ class Rand
              * @ref https://gist.github.com/CodesInChaos/03f9ea0b58e8b2b8d435
              *
              * We use ~0 as a mask in this case because it generates all 1s
-             *
              * @ref https://eval.in/400356 (32-bit)
              * @ref http://3v4l.org/XX9r5  (64-bit)
              */
@@ -289,10 +288,8 @@ class Rand
         /** @var int|float $number */
         if (
             \is_float($number)
-            &&
-            $number > ~\PHP_INT_MAX
-            &&
-            $number < \PHP_INT_MAX
+            && $number > ~\PHP_INT_MAX
+            && $number < \PHP_INT_MAX
         ) {
             $number = (int) $number;
         }

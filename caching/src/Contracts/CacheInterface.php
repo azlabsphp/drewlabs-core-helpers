@@ -16,36 +16,37 @@ namespace Drewlabs\Caching\Contracts;
 interface CacheInterface
 {
     /**
-     * Returns a cached item from cache if it exists
-     * 
+     * Returns a cached item from cache if it exists.
+     *
      * @param mixed $key
-     * 
-     * @return mixed 
+     *
+     * @return mixed
      */
     public function get($key);
 
     /**
-     * Set new cache value
-     * 
-     * @param mixed $key 
-     * @param mixed $value 
-     * @return void 
+     * Set new cache value.
+     *
+     * @param mixed $key
+     * @param mixed $value
+     *
+     * @return void
      */
     public function set($key, $value);
 
-
     /**
-     * Removes the matching cached value from cache
-     * 
-     * @param mixed $key 
-     * @return void 
+     * Removes the matching cached value from cache.
+     *
+     * @param mixed $key
+     *
+     * @return void
      */
     public function remove($key);
 
     /**
-     * Clears the cache by removing cached values
-     * 
-     * @return void 
+     * Clears the cache by removing cached values.
+     *
+     * @return void
      */
     public function clear();
 }

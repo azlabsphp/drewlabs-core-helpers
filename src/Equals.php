@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
-
 class Equals
 {
     /**
@@ -157,10 +156,10 @@ class Equals
 
     /**
      * Method performs a deep equality on PHP object instances.
-     * 
+     *
      * It loops through all properties and deep properties of provided
-     * object and check if they are equals 
-     * 
+     * object and check if they are equals
+     *
      * @param mixed $a
      * @param mixed $b
      */
@@ -188,11 +187,6 @@ class Equals
 
     /**
      * Compute deep equality of 2 PHP arrays/dictionaries.
-     * 
-     * @param array $a 
-     * @param array $b 
-     * 
-     * @return bool 
      */
     public static function arrayDeepEqual(array $a, array $b): bool
     {

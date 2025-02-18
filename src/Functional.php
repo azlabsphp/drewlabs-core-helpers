@@ -14,16 +14,14 @@ declare(strict_types=1);
 namespace Drewlabs\Core\Helpers;
 
 use Closure;
+use Drewlabs\Caching\Contracts\BufferedCacheInterface;
 use Drewlabs\Caching\Contracts\CacheInterface;
+use Drewlabs\Caching\Contracts\ProvidesPredicate;
 use Drewlabs\Caching\LRUCache;
 use Drewlabs\Caching\Tokens;
-use Drewlabs\Caching\Contracts\BufferedCacheInterface;
-use Drewlabs\Caching\Contracts\ProvidesPredicate;
-
 
 class Functional
 {
-
     /**
      * Function composition function that apply transformations to the source input in the top -> down
      * level that the functions appear.
@@ -160,7 +158,7 @@ class Functional
     /**
      * Function memoization memoization implementation in PHP Language for fast call
      * of long running pure functions or methods.
-     * 
+     *
      * It uses an internal LRU Caching system for algorithm optimization.
      *
      * ```php
@@ -188,8 +186,7 @@ class Functional
      */
     public static function memoize($function, $options = null)
     {
-        $memoize = new class()
-        {
+        $memoize = new class() {
             /**
              * @var BufferedCacheInterface&ProvidesPredicate
              */
@@ -203,12 +200,14 @@ class Functional
             public function setPredicate($equality)
             {
                 $this->cache->setPredicate($equality);
+
                 return $this;
             }
 
             public function setCacheSize(int $size)
             {
                 $this->cache->setCapacity($size);
+
                 return $this;
             }
 
@@ -217,6 +216,7 @@ class Functional
                 if ($cache) {
                     $this->cache = $cache;
                 }
+
                 return $this;
             }
 
@@ -239,6 +239,7 @@ class Functional
                 if (null !== $function) {
                     $this->callback = $function;
                 }
+
                 return $this->callback;
             }
 
@@ -250,10 +251,11 @@ class Functional
                 // Therefore we keep the recent callee arguments at the top of
                 // the list so that the searching algorithm will perform better
                 // Use deep equality comparison by default
-                /**
+                /*
                  * @var BufferedCacheInterface $cache
                  */
                 $this->cache = new LRUCache([Equals::class, 'shallow']);
+
                 return $this;
             }
 
@@ -264,6 +266,7 @@ class Functional
                 if (Tokens::__MEMOIZED__NOT_FOUND__ === ($value = $this->cache->get($args))) {
                     $this->cache->set($args, $value = ($this->callback)(...$args));
                 }
+
                 // Returns the computed value on function's call
                 return $value;
             }

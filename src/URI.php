@@ -109,7 +109,7 @@ class URI
         $url = \is_string($url) ? $url : (string) $url;
         $params = static::params($url);
 
-        return Str::hequals(($params['signature'] ?? ''), static::sign($url, $key_resolver, $absolute));
+        return Str::hequals($params['signature'] ?? '', static::sign($url, $key_resolver, $absolute));
     }
 
     /**
@@ -126,7 +126,7 @@ class URI
             return false;
         }
 
-        return ImmutableDateTime::now()->getTimestamp() > (int) ($query_params['expires']);
+        return ImmutableDateTime::now()->getTimestamp() > (int) $query_params['expires'];
     }
 
     /**

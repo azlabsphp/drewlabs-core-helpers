@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Drewlabs\Core\Helpers;
 
 /**
- * @deprecated Use decimal instead
- * 
- * Class provides a string representation of a floating point value.
+ * @deprecated use decimal instead
+ *
+ * Class provides a string representation of a floating point value
  */
 final class FloatValue extends Decimal
 {
