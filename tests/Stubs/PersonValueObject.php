@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers\Tests\Stubs;
 
+#[\AllowDynamicProperties]
 final class PersonValueObject
 {
     public function __construct($attributes = [])

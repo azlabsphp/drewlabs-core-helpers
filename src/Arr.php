@@ -104,7 +104,7 @@ class Arr
         $high = $end ?? \count($items) - 1;
 
         while ($low <= $high) {
-            $mid = floor(($low + $high) / 2);
+            $mid = (int)floor(($low + $high) / 2);
             $item = \is_object($items[$mid]) ? $items[$mid]->{$by} : $items[$mid][$by];
             if ($item === $search) {
                 return $mid;

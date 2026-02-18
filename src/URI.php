@@ -126,7 +126,7 @@ class URI
             return false;
         }
 
-        return ImmutableDateTime::now()->getTimestamp() > (int) $query_params['expires'];
+        return DateTime::now()->getTimestamp() > (int) $query_params['expires'];
     }
 
     /**

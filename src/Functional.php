@@ -296,4 +296,60 @@ class Functional
 
         return $memoize;
     }
+
+
+    /**
+     * creates a a function which takes no argument or least arguments
+     * which invoke `$fn` with the composed list of arguments.
+     * 
+     * @param Closure $fn 
+     * @param mixed ...$args 
+     * @return Closure(): mixed 
+     */
+    public static function thunk(\Closure $fn, ...$args)
+    {
+        return function (...$params) use ($fn, $args) {
+            return $fn(...$args, ...$params);
+        };
+    }
+
+
+    /**
+     * return the result of `$callback` if `$value` evaluates to true
+     * 
+     * The function return the return value of the `$callback` if `$value` is truthy,
+     * else it returns void.
+     * 
+     * @param mixed $value 
+     * @param Closure $callback 
+     * @return mixed|null 
+     */
+    public function when($value, \Closure $callback)
+    {
+        if (boolval($value) === true) {
+            return $callback($value);
+        }
+    }
+
+    /**
+     * return the result of `$callback` if `$value` function returns a truthy value.
+     * 
+     * **Note** If `$args` variadic argument is provided, `$callback` function is called with
+     *          those as argument.
+     * 
+     * The function return the return value of the `$callback` if `$value` return value is truthy,
+     * else it returns void.
+     * 
+     * @param Closure():bool $value 
+     * @param Closure $callback 
+     * @param mixed ...$args 
+     * 
+     * @return mixed|null 
+     */
+    public static function whenFunc(\Closure $value, \Closure $callback, ...$args)
+    {
+        if (boolval($value()) === true) {
+            return $callback(...$args);
+        }
+    }
 }

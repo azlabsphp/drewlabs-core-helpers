@@ -396,17 +396,14 @@ class Reflector
             throw new \InvalidArgumentException('Reflector::getPropertyValue requires a parameter of type array or object');
         }
         $value = $default;
-        // Breaking property accessibility of the OOP concept to avoid
-        // unexpected private or protected properties errors
         $reflector = new \ReflectionObject($object);
         if ($reflector->hasProperty($key)) {
             $property = $reflector->getProperty($key);
-            // Get the accessibility value of the property
-            if (!$property->isPublic()) {
+            if ((PHP_VERSION_ID < 80100) && !$property->isPublic()) {
                 $property->setAccessible(true);
             }
             $value = $property->getValue($object);
-            if (!$property->isPublic()) {
+            if ((PHP_VERSION_ID < 80100) && !$property->isPublic()) {
                 $property->setAccessible(false);
             }
         } else {
@@ -446,15 +443,12 @@ class Reflector
         $clone = self::clone($object);
         $reflector = new \ReflectionObject($clone);
         if ($reflector->hasProperty($key)) {
-            // Breaking property accessibility of the OOP concept to avoid
-            // unexpected private or protected properties errors [Cannot access private property]
             $property = $reflector->getProperty($key);
-            // Get the accessibility value of the property
-            if (!$property->isPublic()) {
+            if ((PHP_VERSION_ID < 80100) && !$property->isPublic()) {
                 $property->setAccessible(true);
             }
             $property->setValue($clone, $value);
-            if (!$property->isPublic()) {
+            if ((PHP_VERSION_ID < 80100) && !$property->isPublic()) {
                 $property->setAccessible(false);
             }
         } else {
