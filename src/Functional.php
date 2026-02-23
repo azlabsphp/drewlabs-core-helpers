@@ -321,10 +321,11 @@ class Functional
      * else it returns void.
      * 
      * @param mixed $value 
-     * @param Closure $callback 
-     * @return mixed|null 
+     * @param Closure $callback
+     * 
+     * @return mixed|null
      */
-    public function when($value, \Closure $callback)
+    public static function when($value, \Closure $callback)
     {
         if (boolval($value) === true) {
             return $callback($value);
