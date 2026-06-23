@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
-use Iterator;
-use Traversable;
-
 final class Iter
 {
     /**
@@ -190,12 +187,15 @@ final class Iter
     public static function collapse($value)
     {
         $results = [];
-        foreach ($value as $value) {
-            if (\is_object($value) && method_exists($value, 'all')) {
-                $value = $value->all();
-            } elseif (!\is_array($value)) {
+        foreach ($value as $v) {
+            if (\is_object($v) && method_exists($v, 'all')) {
+                $v = $v->all();
+            }
+            
+            if (!\is_array($v)) {
                 continue;
             }
+            
             $results[] = $value;
         }
 

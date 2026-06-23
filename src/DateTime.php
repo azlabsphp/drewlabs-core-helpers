@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
-use DateTimeInterface;
-
 final class DateTime
 {
     /** @var int */
@@ -72,7 +70,7 @@ final class DateTime
     /**
      * Returns the current date-time based on user provided timezone.
      *
-     * @param \DateTimeZone|string timezone
+     * @param \DateTimeZone|string $tz
      *
      * @return \DateTimeInterface
      */

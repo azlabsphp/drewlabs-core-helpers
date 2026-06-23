@@ -174,8 +174,10 @@ class FunctionalTest extends TestCase
         $class = new class() extends \stdClass {
             private $totalCalls = 0;
 
+            /** @var mixed */
             private $calledWith;
 
+            /** @param mixed $param */
             public function __invoke($param)
             {
                 ++$this->totalCalls;
@@ -188,6 +190,7 @@ class FunctionalTest extends TestCase
                 return 0 !== $this->totalCalls;
             }
 
+            /** @param mixed $value */
             public function toBeCalledWith($value)
             {
                 return $this->calledWith === $value;
@@ -202,13 +205,16 @@ class FunctionalTest extends TestCase
     public function test_Tap_With_Not_String_Callable()
     {
         $class = new class() extends \stdClass {
+            /** @var mixed */
             private $calledWith;
 
+            /** @param mixed $param */
             public function __invoke($param)
             {
                 $this->calledWith = $param;
             }
 
+            /** @param mixed $value */
             public function toBeCalledWith($value)
             {
                 return $this->calledWith === $value;
@@ -235,10 +241,12 @@ class FunctionalTest extends TestCase
     public function test_memoize_function()
     {
         $closure = new class() {
+            /** @var mixed */
             private $params;
 
             private $count = 0;
 
+            /** @param mixed ...$args */
             public function __invoke(...$args)
             {
                 ++$this->count;
@@ -256,6 +264,7 @@ class FunctionalTest extends TestCase
                 return $this->count === $times;
             }
 
+            /** @param mixed ...$args */
             public function calledWith(...$args)
             {
                 return $this->params === $args;

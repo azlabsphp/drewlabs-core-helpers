@@ -69,9 +69,7 @@ class LRUCache implements BufferedCacheInterface, ProvidesPredicate
 
     public function get($key)
     {
-        /**
-         * @var CachedItemInterface $current
-         */
+        /** @var CachedItemInterface|null $current */
         $current = null;
         $index = -1;
 

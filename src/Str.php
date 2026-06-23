@@ -251,7 +251,7 @@ class Str
      */
     public static function md5()
     {
-        return md5(uniqid().microtime());
+        return md5(uniqid() . microtime());
     }
 
     /**
@@ -381,7 +381,7 @@ class Str
         // Foreach values in the data attributes
         foreach ($data as $key => $value) {
             // code...
-            $patterns[] = '/(\{){2}[ ]?\$'.$key.'[ ]?(\}){2}/i';
+            $patterns[] = '/(\{){2}[ ]?\$' . $key . '[ ]?(\}){2}/i';
             $replacements[] = $value;
         }
 
@@ -391,6 +391,8 @@ class Str
     /**
      * Convert an enpty striing into PHP Nullable type.
      *
+     * @param mixed $value
+     * 
      * @return string|null
      */
     public static function valueOrNull($value)
@@ -477,7 +479,7 @@ class Str
                     self::lower(
                         preg_replace(
                             '/([A-Z])([a-z\d])/',
-                            $delimiter.'$0',
+                            $delimiter . '$0',
                             preg_replace("/[$delimiter]/", $delimiter_escape_char, $haystack)
                         )
                     ),
@@ -499,7 +501,7 @@ class Str
         // Convert all capital letters to $delimiter + lowercaseLetter
         $haystack = preg_replace([' ', $delimiter], '', lcfirst($haystack));
 
-        return mb_strtolower(preg_replace('/([A-Z])([a-z\d])/', $delimiter.'\\0', $haystack));
+        return mb_strtolower(preg_replace('/([A-Z])([a-z\d])/', $delimiter . '\\0', $haystack));
     }
 
     /**
@@ -535,11 +537,11 @@ class Str
                 $k2 = \ord(mb_substr($k, 1, 1));
                 $ord = $k2 * 256 + $k1;
                 if ($ord > 255) {
-                    $result .= '\uc1\u'.$ord.'*';
+                    $result .= '\uc1\u' . $ord . '*';
                 } elseif ($ord > 32768) {
-                    $result .= '\uc1\u'.($ord - 65535).'*';
+                    $result .= '\uc1\u' . ($ord - 65535) . '*';
                 } else {
-                    $result .= "\\'".dechex($ord);
+                    $result .= "\\'" . dechex($ord);
                 }
             } else {
                 $result .= $char;
@@ -560,6 +562,8 @@ class Str
     {
         $code = \ord(mb_substr($haystack, $offset, 1));
         if ($code >= 128) {
+            $bytesnumber = 1;
+            
             if ($code < 224) {
                 $bytesnumber = 2;
             } elseif ($code < 240) {
@@ -567,6 +571,7 @@ class Str
             } elseif ($code < 248) {
                 $bytesnumber = 4;
             }
+
             $codetemp = $code - 192 - ($bytesnumber > 2 ? 32 : 0) - ($bytesnumber > 3 ? 16 : 0);
             for ($i = 2; $i <= $bytesnumber; ++$i) {
                 ++$offset;
@@ -671,7 +676,7 @@ class Str
         $is_array = \is_array($value);
         $is_string = static::isStr($value);
         if (!($is_object || $is_string || $is_array)) {
-            throw new \InvalidArgumentException('Expected string, array or object types, got '.(null !== $value && \is_object($value) ? $value::class : \gettype($value)));
+            throw new \InvalidArgumentException('Expected string, array or object types, got ' . (null !== $value && \is_object($value) ? $value::class : \gettype($value)));
         }
         if ($is_string) {
             return $value;

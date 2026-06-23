@@ -64,16 +64,7 @@ class URITest extends TestCase
         };
         $timestamp = (new \DateTimeImmutable())->add(new \DateInterval('P1D'))->getTimestamp();
         $url = "http://localhost:8888/api/user-account-verify-weburl?expires=$timestamp&account_id=AD2D7EE9-EEFF-4A43-8BC6-29BD62E5C250&token=n3fQKj1Wlslq.yDbYOmZLS54WGaouAPH2.XJCxmWapk3XbGRc0lF3HyLnEgrbYTgb8dwWDUaeSfIU7082MQZlJ.XHTr8437RdOniSh.l88eA04ZZLH85O.XkFsysUnmhYcpqBMosX3.Yf5OKZhlZNt1S..KakUs.TUb9GXfpWOk";
-        $psr17Factory = (new \Nyholm\Psr7\Factory\Psr17Factory())->createServerRequest(
-            'GET',
-            URI::withSignature($url, $keyResolver),
-        );
-        $this->assertFalse(
-            URI::expires(
-                $psr17Factory->getUri(),
-                $keyResolver,
-            ),
-            'Expect signed url signature to be valid'
-        );
+        $psr17Factory = (new \Nyholm\Psr7\Factory\Psr17Factory())->createServerRequest('GET', URI::withSignature($url, $keyResolver));
+        $this->assertFalse(URI::expires($psr17Factory->getUri()), 'Expect signed url signature to be valid');
     }
 }

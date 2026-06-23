@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
+use BadMethodCallException;
 use Closure;
 use Drewlabs\Caching\Contracts\BufferedCacheInterface;
 use Drewlabs\Caching\Contracts\CacheInterface;
@@ -180,6 +181,7 @@ class Functional
      *  $memo();
      *```
      *
+     * @param mixed $function
      * @param int|callable|\Closure $options
      *
      * @return #Class#1cda036d
@@ -197,6 +199,7 @@ class Functional
              */
             private $callback;
 
+            /** @param mixed $equality  */
             public function setPredicate($equality)
             {
                 $this->cache->setPredicate($equality);
@@ -227,6 +230,7 @@ class Functional
                 }
             }
 
+            /** @param mixed ...$args  */
             public function remove(...$args)
             {
                 if ($this->cache) {
@@ -259,6 +263,7 @@ class Functional
                 return $this;
             }
 
+            /** @param mixed ...$args  */
             #[\ReturnTypeWillChange]
             public function __invoke(...$args)
             {
@@ -271,6 +276,14 @@ class Functional
                 return $value;
             }
 
+            /**
+             * redirect calls to the class callback property
+             * 
+             * @param mixed $name 
+             * @param mixed $arguments 
+             * @return mixed 
+             * @throws BadMethodCallException 
+             */
             public function __call($name, $arguments)
             {
                 if (\is_object($this->callback)) {

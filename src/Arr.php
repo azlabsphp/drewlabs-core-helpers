@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
-use Closure;
-use Traversable;
 
 class Arr
 {
@@ -59,10 +57,10 @@ class Arr
         $num_compare = static function ($a, $b) use ($desc) {
             return $desc ? ($a - $b >= 0 ? 1 : -1) : ($a - $b >= 0 ? -1 : 1);
         };
-        $compare = static function ($a, $b) use ($order, $by, $desc, &$str_compare, &$num_compare) {
+        $compare = static function ($a, $b) use ($by, $desc, &$str_compare, &$num_compare) {
             // Check first if is standard type in order to avoid error
             if (\is_string($a) || \is_string($b)) {
-                return $str_compare($a, $b, $order);
+                return $str_compare($a, $b);
             }
             if (is_numeric($a) || is_numeric($b)) {
                 return $num_compare($a, $b);
@@ -93,10 +91,13 @@ class Arr
 
     /**
      * Find index of an array element.
-     *
-     * @param string $by
-     *
-     * @return int|null
+     * 
+     * @param array $items 
+     * @param mixed $by 
+     * @param mixed $search 
+     * @param mixed $start 
+     * @param mixed $end 
+     * @return int 
      */
     public static function findIndexBy(array $items, $by, $search, $start = null, $end = null): int
     {
@@ -691,7 +692,7 @@ class Arr
     }
 
     /**
-     * Undocumented function.
+     * returns unique values from the list of values
      *
      * @param array $haystack
      * @param bool  $strict
@@ -703,10 +704,9 @@ class Arr
         $callback = self::valueRetriever($key);
         $exists = [];
         $out = [];
-        foreach ($haystack as $key => $value) {
-            // code...
+        foreach ($haystack as $k => $value) {
             if (!\in_array($id = $callback($value), $exists, $strict)) {
-                $out[$key] = $value;
+                $out[$k] = $value;
             }
             $exists[] = $id;
         }
@@ -1058,7 +1058,7 @@ class Arr
      */
     public static function groupBy(array $values, $key)
     {
-        $key = (!\is_string($key) && \is_callable($key)) ? $key : static function ($value) use ($key) {
+        $key = (!\is_string($key) && \is_callable($key)) ? $key : static function ($value, ...$args) use ($key) {
             if (\is_array($value)) {
                 return $value[$key] ?? null;
             }
@@ -1069,8 +1069,8 @@ class Arr
             return $value;
         };
         $results = [];
-        foreach ($values as $key => $value) {
-            $groupKeys = $key($value, $key);
+        foreach ($values as $k => $value) {
+            $groupKeys = $key($value, $k);
 
             if (!\is_array($groupKeys)) {
                 $groupKeys = [$groupKeys];

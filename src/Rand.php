@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Drewlabs\Core\Helpers;
 
+use TypeError;
+
 class Rand
 {
     /**
@@ -277,29 +279,31 @@ class Rand
         return (int) $val;
     }
 
+    /**
+     * returns integer value for provided number
+     * 
+     * @param mixed $number 
+     * @param bool $fail_open 
+     * @return int|float 
+     * @throws TypeError 
+     */
     private static function intval($number, $fail_open = false)
     {
         if (\is_int($number) || \is_float($number)) {
             $number += 0;
         } elseif (is_numeric($number)) {
-            /* @psalm-suppress InvalidOperand */
-            $number += 0;
+            $number = floatval($number) + 0;
         }
+
         /** @var int|float $number */
-        if (
-            \is_float($number)
-            && $number > ~\PHP_INT_MAX
-            && $number < \PHP_INT_MAX
-        ) {
+        if ( \is_float($number) && $number > ~\PHP_INT_MAX  && $number < \PHP_INT_MAX ) {
             $number = (int) $number;
         }
 
         if (\is_int($number)) {
             return (int) $number;
         } elseif (!$fail_open) {
-            throw new \TypeError(
-                'Expected an integer.'
-            );
+            throw new \TypeError( 'Expected an integer.' );
         }
 
         return $number;

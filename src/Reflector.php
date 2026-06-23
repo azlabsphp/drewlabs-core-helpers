@@ -73,7 +73,7 @@ class Reflector
      *
      * @param mixed $source
      *
-     * @return ReflectionAttribute[]
+     * @return \ReflectionAttribute[]
      */
     public static function getAttributes($source)
     {
@@ -137,7 +137,7 @@ class Reflector
      *
      * @throws \BadMethodCallException
      *
-     * @return ReflectionAttribute|null
+     * @return \ReflectionAttribute|null
      */
     public static function getAttribute($type, string $name)
     {
@@ -286,6 +286,8 @@ class Reflector
      *
      * @throws \ReflectionException
      *
+     * @template T
+     * 
      * @return object|T
      */
     public static function newInstance(string $blueprint, ...$args)
@@ -303,7 +305,7 @@ class Reflector
      * @param object|array $object
      * @param mixed        $default
      *
-     * @return void
+     * @return mixed
      */
     public static function getPropertyValue($object, string $key, $default = null)
     {

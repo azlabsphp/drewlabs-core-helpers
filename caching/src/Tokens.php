@@ -15,8 +15,6 @@ namespace Drewlabs\Caching;
 
 class Tokens
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     public const __MEMOIZED__NOT_FOUND__ = '__NOT_FOUND__';
 }
