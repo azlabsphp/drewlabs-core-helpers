@@ -549,7 +549,7 @@ class Arr
             }
         }
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of'.\Traversable::class.', '.\JsonSerializable::class);
+            throw new \InvalidArgumentException('Parameters must of of type array, an \stdClass, an object that define all(), toArray(), toJson() which return arrays, or are instance of' . \Traversable::class . ', ' . \JsonSerializable::class);
         }
 
         return $preserve_keys ? $value : array_values($value);
@@ -1100,6 +1100,28 @@ class Arr
     public static function recursivekrsort(array $value)
     {
         return static::_recursiveksort_($value, 'krsort');
+    }
+
+    /**
+     * Collapse an array of arrays into a single array.
+     * 
+     * @param array $value
+     * 
+     * @return array 
+     */
+    public static function collapse(array $value)
+    {
+        $result = [];
+
+        foreach ($value as $v) {
+            if (is_array($v)) {
+                array_push($result, ...collapse($v));
+                continue;
+            }
+            array_push($result, $v);
+        }
+
+        return $result;
     }
 
     /**

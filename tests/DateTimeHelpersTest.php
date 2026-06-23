@@ -59,10 +59,10 @@ class DateTimeHelpersTest extends TestCase
 
     public function testAddMinutesFunction()
     {
-        $date = DateTime::nowTz();
+        $date = DateTime::create('2026-06-23 18:55:00');
         $minutes = (int) $date->format('i');
         $next = DateTime::addMinutes($date, 5);
-        $this->assertSame((int) $next->format('i'), $minutes + 5 > 60 ? ($minutes + 5) % 60 : $minutes + 5, 'Expect the returned number of minutes to be equals to the initial date number of minutes + 5');
+        $this->assertSame((int) $next->format('i'), $minutes + 5 >= 60 ? ($minutes + 5) % 60 : $minutes + 5, 'Expect the returned number of minutes to be equals to the initial date number of minutes + 5');
     }
 
     public function testDateTimeMaxFunction()

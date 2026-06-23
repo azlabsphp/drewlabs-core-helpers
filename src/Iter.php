@@ -178,6 +178,8 @@ final class Iter
     }
 
     /**
+     * @deprecated
+     * 
      * Collapse an array of arrays into a single array.
      *
      * @param array|\Traversable $value
@@ -186,20 +188,17 @@ final class Iter
      */
     public static function collapse($value)
     {
-        $results = [];
+        $result = [];
+
         foreach ($value as $v) {
-            if (\is_object($v) && method_exists($v, 'all')) {
-                $v = $v->all();
+            if (is_array($value)) {
+                $result += static::collapse($v);
             }
             
-            if (!\is_array($v)) {
-                continue;
-            }
-            
-            $results[] = $value;
+            array_push($result, $v);
         }
 
-        return array_merge([], ...$results);
+        return $result;
     }
 
     /**

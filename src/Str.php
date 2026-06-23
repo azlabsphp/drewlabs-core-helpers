@@ -683,18 +683,10 @@ class Str
         }
 
         if ($is_object && method_exists($value, 'toArray')) {
-            /**
-             * @var array
-             */
             $arr = $value->toArray();
         } elseif ($is_object && !method_exists($value, 'toArray')) {
             $arr = get_object_vars($value);
         } else {
-            // Here we assume $value is an array as it does not under
-            // previous conditions
-            /**
-             * @var array
-             */
             $arr = array_merge($value);
         }
 
