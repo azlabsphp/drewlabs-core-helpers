@@ -1115,7 +1115,7 @@ class Arr
 
         foreach ($value as $v) {
             if (is_array($v)) {
-                array_push($result, ...collapse($v));
+                array_push($result, ...static::collapse($v));
                 continue;
             }
             array_push($result, $v);
