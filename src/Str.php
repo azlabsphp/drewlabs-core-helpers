@@ -563,7 +563,7 @@ class Str
         $code = \ord(mb_substr($haystack, $offset, 1));
         if ($code >= 128) {
             $bytesnumber = 1;
-            
+
             if ($code < 224) {
                 $bytesnumber = 2;
             } elseif ($code < 240) {
@@ -691,5 +691,18 @@ class Str
         }
 
         return json_encode(Arr::recursiveksort($arr));
+    }
+
+    /**
+     * takes a date string as input and return a formatted output of the provided date string if it's a valid data or the input value if not valid date.
+     * 
+     * @param string $date 
+     * @param string $format
+     * 
+     * @return string 
+     */
+    public static function toDateFormat(string $date, string $format = 'Y-m-d H:i:s')
+    {
+        return false !== ($result = @strtotime($date)) ? (new \DateTimeImmutable)->setTimestamp($result)->format($format) :  $date;
     }
 }
