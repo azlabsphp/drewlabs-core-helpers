@@ -416,7 +416,7 @@ class Arr
             return false;
         }
 
-        return array_keys($value) !== range(0, \count($value) - 1);
+        return count(array_filter(array_keys($value), 'is_string')) > 0;;
     }
 
     /**
